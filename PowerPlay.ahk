@@ -8,38 +8,9 @@ SetRegView 64
 CoordMode, Mouse, Screen
 
 /*
-	WIP feature list:
-	
-	Keybinder:
-	Bind any feature of the program through a device driver-ish gui to any key including:
-	screenshots (with uploading to imgur)
-	clipboard manipulation
-	multimedia controls
-	mouse functions
-	launching programs/files/websites
-	launching windows applications
-	send any text or any key combination
-	
-	"Game Options": 
-	allow custom rules to be applied when a game is active, such as:
-	change vibrancy
-	block alt-tab (use alt+shift+tab instead)
-	block windows key
-	
-	imgur uploader:
-	upload images/gifs/files to imgur and get an url back with an inbuilt command
-	also has a gui to quickly find previously uploaded pictures and fetch links quickly
-	
-	
 	todo:
 	console
-	rate limiting for imgur api (which will be impossible)
-	disable message events for prettifiers when window is closed
-	
-	later:
-	steam login thingy for me and frends
-	figure out more things to add to the nuggetgui to make it more expansive (get inspiration from other software)
-	
+	rate limiting for imgur api (which will be impossible)	
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI

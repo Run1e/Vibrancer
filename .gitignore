@@ -3,6 +3,7 @@ backup/*
 data/*
 images/*
 logs/*
+compiled/*
 lib/client_id.ahk
 menus/Steam logins.json
 SteamLogin.ahk

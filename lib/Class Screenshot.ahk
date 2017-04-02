@@ -20,13 +20,12 @@
 		this.ImgurImageFolder := this.ImageFolder "\imgur"
 		this.DeletedImageFolder := this.ImageFolder "\deleted"
 		this.LocalImageFolder := this.ImageFolder "\local"
-		this.ThumbnailImageFolder := this.ImageFolder "\thumbnails"
 		this.Busy := false
 		this.UploadCount := 0
 		this.DeleteCount := 0
 		this.FailedCount := 0
 		
-		for Index, Folder in [this.ImageFolder, this.DeletedImageFolder, this.LocalImageFolder, this.ImgurImageFolder, this.ThumbnailImageFolder]
+		for Index, Folder in [this.ImageFolder, this.DeletedImageFolder, this.LocalImageFolder, this.ImgurImageFolder]
 			if !FileExist(Folder)
 				FileCreateDir % Folder
 		
@@ -440,14 +439,14 @@
 	}
 	
 	Handshake(PluginClass) {
-		
-		if IsObject(this.Plugin)
-			Start := true
+		static Shaked
 		
 		this.Plugin := PluginClass
 		
-		if Start
+		if Shaked
 			this.StartQueue()
+			
+		Shaked := true
 		
 		return
 	}
