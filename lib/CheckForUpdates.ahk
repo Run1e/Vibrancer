@@ -29,7 +29,8 @@
 	
 	; get the version number
 	temp := StrSplit(StrSplit(inner, "`n")[1], " ")
-	VersionString := SubStr(temp[temp.MaxIndex() - 2], 2)
+	VersionString := temp[temp.MaxIndex() - 2]
+	trim(versionstring, " ")
 	NewVersion := StrSplit(VersionString, ".")
 	
 	for Index, Ver in AppVersion {
