@@ -150,7 +150,7 @@
 	}
 	
 	LaunchUploader() {
-		Run % A_WorkingDir "\Uploader." (A_IsCompiled?"exe":"ahk"),, UseErrorLevel
+		Run % A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk"),, UseErrorLevel
 		if (ErrorLevel = "ERROR")
 			Error("Failed to run Uploader Helper", A_ThisFunc, "Uploader." (A_IsCompiled?"exe":"ahk") " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
 		sleep 250 ; should be enough, maybe get a less hacky solution
