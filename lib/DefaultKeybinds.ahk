@@ -6,5 +6,6 @@
 			, "+^2": 		Actions.List["Imgur"][1]
 			, "+^3": 		Actions.List["Imgur"][2]
 			, "+^4": 		Actions.List["Imgur"][3]
+			, "+^5":		Actions.List["Built-in"][5]
 			, "!C": 		Actions.List["Built-in"][4]}
 }
