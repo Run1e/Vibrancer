@@ -1,0 +1,9 @@
+*.exe
+backup/*
+data/*
+images/*
+logs/*
+lib/client_id.ahk
+menus/Steam logins.json
+SteamLogin.ahk
+NVIDIA Classic.ahk

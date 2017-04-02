@@ -1,0 +1,38 @@
+{
+	"1": {
+		"Desc": "Data",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\data"
+		]
+	},
+	"2": {
+		"Desc": "Images",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\images"
+		]
+	},
+	"3": {
+		"Desc": "Logs",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\logs"
+		]
+	},
+	"4": {
+		"Desc": "Menus",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\menus"
+		]
+	},
+	"5": {
+		"Desc": "Reload",
+		"Func": "Reload"
+	},
+	"6": {
+		"Desc": "ListVars",
+		"Func": "ListVars"
+	}
+}
