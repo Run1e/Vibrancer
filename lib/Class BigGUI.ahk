@@ -457,6 +457,8 @@
 	; bug, when overwriting, it doesn't default the focus to the window
 	BindCallback(Bind := "", Key := "") {
 		
+		Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
+		
 		if !IsObject(Bind)
 			return this.Enable()
 		
@@ -485,6 +487,7 @@
 		
 		this.Enable()
 		this.Activate()
+		
 		
 		return
 	}

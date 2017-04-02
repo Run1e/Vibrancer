@@ -130,6 +130,34 @@
 		this.Enable()
 	}
 	
+	DeletePress() {
+		ControlGetFocus, ctrl, % this.ahkid
+		
+		if (ctrl != "msctls_hotkey321")
+			return
+		
+		if GetKeyState("CTRL", "P")
+			Key .= "^"
+		if GetKeyState("SHIFT", "P")
+			Key .= "+"
+		if GetKeyState("ALT", "P")
+			Key .= "!"
+		
+		Key .= "Del"
+		
+		Binder.SetText("msctls_hotkey321", Key)
+		
+	}
+	
+	/*
+		if InStr(Hotkey, "^")
+			ret := "CTRL + ", i++
+		if InStr(Hotkey, "+")
+			ret .= "SHIFT + ", i++
+		if InStr(Hotkey, "!")
+			ret .= "ALT + ", i++
+	*/
+	
 	Close(Bind := "", Key := "") {
 		DllCall("AnimateWindow", "UInt", this.hwnd, "Int", 60, "UInt", "0x90000")
 		WinActivate("ahk_id" this.Owner)
@@ -203,8 +231,11 @@ CreateNugget(Callback, ShowHotkey := true, Owner := "") {
 	
 	FrameShadow(Binder.hwnd)
 	
+	Hotkey.Bind("*Delete", Binder.DeletePress.Bind(Binder), Binder.hwnd)
+	
 	if (OwnerPos := WinGetPos("ahk_id" Owner))
 		Binder.Show("x" OwnerPos.X + OwnerPos.W/2 - 182/2 " y" OwnerPos.Y + OwnerPos.H/2 - 218/2 + 15 " w" WIDTH " h" HEIGHT)
 	else
 		Binder.Show()
+	
 }

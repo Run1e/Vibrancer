@@ -39,7 +39,6 @@ Plugin := new Plugin
 Screenshot := new Screenshot
 Settings := JSONFile("Settings", DefaultSettings())
 
-; create TrayTip() and use SetTimer, func, -4000 instead
 if NvAPI.InitFail { ; NvAPI initialization failed, no nvidia card is installed
 	if !Settings.NvAPI_InitFail {
 		Error("NvAPI init failed, NvAPI features disabled.", A_ThisFunc, NvAPI.InitFail = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!")
