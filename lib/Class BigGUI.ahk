@@ -631,7 +631,7 @@
 		Hotkey.Disable("Delete")
 		Hotkey.Disable("^z")
 		this.DropFilesToggle(false)
-		this.SetTitle(AppName " v" AppVersion)
+		this.SetTitle(AppName " v" MajorVersion "." MinorVersion)
 		
 		if (tab = 1) {
 			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
@@ -647,7 +647,7 @@
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
 			this.Control("SysListView323")
-			this.SetTitle(AppName " v" AppVersion " (Keybinds are disabled while window is open)")
+			this.SetTitle(AppName " v" MajorVersion "." MinorVersion " (Keybinds are disabled while window is open)")
 			this.ImgurAnimate(false)
 		}
 	}

@@ -1,5 +1,5 @@
 ﻿DefaultKeybinds(){
-	return 	{ "^Del": 	Actions.List["Multimedia"][1]
+	return 	{ "^Delete": 	Actions.List["Multimedia"][1]
 			, "^PgDn": 	Actions.List["Multimedia"][2]
 			, "^End": 	Actions.List["Multimedia"][3]
 			, "+^1":		Actions.List["Built-in"][2]
@@ -7,4 +7,4 @@
 			, "+^3": 		Actions.List["Imgur"][2]
 			, "+^4": 		Actions.List["Imgur"][3]
 			, "!C": 		Actions.List["Built-in"][4]}
-	}
+}

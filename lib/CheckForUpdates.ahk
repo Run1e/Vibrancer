@@ -29,14 +29,22 @@
 	
 	; get the version number
 	temp := StrSplit(StrSplit(inner, "`n")[1], " ")
-	NewVersion := SubStr(temp[temp.MaxIndex() - 2], 2)
+	VersionString := SubStr(temp[temp.MaxIndex() - 2], 2)
+	NewVersion := StrSplit(VersionString, ".")
 	
-	if (NewVersion > AppVersion) {
-		Msg := "Do you want to visit the download page?`n`nYour version: " AppVersion "`nLatest version: " NewVersion
+	for Index, Ver in AppVersion {
+		if (Ver < NewVersion[Index])
+			NewUpdate := true
+		else if (Var > NewVersion[Index]) ; we're ahead of the update, break
+			return
+	}
+	
+	if (NewUpdate) {
+		Msg := "Do you want to visit the download page?`n`nYour version: v" AppVersion.1 "." AppVersion.2 "." AppVersion.3 "`nLatest version: v" VersionString
 		
 		MsgBox, 68, %AppName% - New update avaliable!, % Msg
 		ifMsgBox yes
-		run % URL . "/tag/v" NewVersion
+		run % URL . "/tag/v" VersionString
 	}
 	
 	return
