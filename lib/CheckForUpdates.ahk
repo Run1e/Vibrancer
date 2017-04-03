@@ -48,7 +48,7 @@
 		
 		MsgBox, 68, %AppName% - New update avaliable!, % Msg
 		ifMsgBox yes
-		run % URL . "/tag/v" VersionString
+		run % URL . "/tag/" VersionString
 	} else
 		TrayTip(AppName " " VersionString(), "No update found.")
 	
