@@ -15,7 +15,6 @@ If you want to try the code, you'll need to create a function called client_id w
 	client_id() {
 		return "client_id_here"
 	}
-And also remove the include to client_id.ahk
 
 # Thanks to:
 
