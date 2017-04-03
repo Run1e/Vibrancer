@@ -41,13 +41,13 @@
 	}
 	
 	if (NewUpdate) {
-		Msg := "Do you want to visit the download page?`n`nYour version: v" AppVersion.1 "." AppVersion.2 "." AppVersion.3 "`nLatest version: v" VersionString
+		Msg := "Do you want to visit the download page?`n`nYour version: " VersionString() "`nLatest version: v" VersionString
 		
 		MsgBox, 68, %AppName% - New update avaliable!, % Msg
 		ifMsgBox yes
 		run % URL . "/tag/v" VersionString
 	} else
-		TrayTip(AppName " v" AppVersion.1 "." AppVersion.2 "." AppVersion.3, "No update found.")
+		TrayTip(AppName " " VersionString(), "No update found.")
 	
 	return
 }

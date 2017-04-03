@@ -5,6 +5,6 @@ images/*
 logs/*
 compiled/*
 lib/client_id.ahk
-menus/Steam logins.json
+menus/*
 SteamLogin.ahk
 NVIDIA Classic.ahk

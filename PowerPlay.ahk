@@ -69,6 +69,9 @@ JSONSave("Images", Images)
 DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
 
+; install icons
+IconInstall()
+
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
 
@@ -82,8 +85,8 @@ for Key, Bind in Keybinds
 ; init menu from json file
 CreateTrayMenu()
 
-if FileExist("icon.ico")
-	Menu, Tray, Icon, icon.ico
+if FileExist("icons\powerplay.ico")
+	Menu, Tray, Icon, icons\powerplay.ico
 
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
@@ -143,3 +146,5 @@ return
 #Include lib\Gdip_All.ahk
 #Include lib\LV_EX.ahk
 #Include lib\ObjRegisterActive.ahk
+#Include lib\IconInstall.ahk
+#Include lib\GetActionsList.ahk

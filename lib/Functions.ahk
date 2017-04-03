@@ -4,6 +4,10 @@ CtlColorBtns() {
 	return DllCall("gdi32.dll\CreateSolidBrush", "uint", 0xFFFFFF, "uptr")
 }
 
+VersionString() {
+	return "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
+}
+
 Run(file) {
 	if FileExist(file)
 		SplitPath, file,, dir

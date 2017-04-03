@@ -488,7 +488,6 @@
 		this.Enable()
 		this.Activate()
 		
-		
 		return
 	}
 	
@@ -535,16 +534,6 @@
 	UpdateBindList(FocusKey:= "") {
 		Critical 500
 		
-		static icon_func := { "Screenshot":140
-						, "Open":15}
-		
-		static icon_instr := {"Launch website: ":13
-						, "Launch: ":24
-						, "Play/Pause":178
-						, "Previous Song":178
-						, "Next Song":178}
-		
-		
 		this.SetDefault()
 		this.Options("ListView", this.BindListViewHWND)
 		
@@ -552,19 +541,26 @@
 		
 		this.Control("-Redraw", this.BindListViewHWND)
 		
-		ImageList := IL_Create(10, 2, false)
-		;LV_SetImageList(ImageList)
+		/*
+			ImageList := IL_Create(10, 2, false)
+			LV_SetImageList(ImageList)
+		*/
 		
 		LV_Delete()
 		
 		for Key, Bind in Keybinds {
 			
-			if icon_func[Bind.Func]
-				Icon := IL_Add(ImageList, "shell32.dll", icon_func[Bind.Func])
-			else if (InStr(Bind.Desc, icon_instr[Bind.Desc]) = 1)
-				Icon := IL_Add(ImageList, "shell32.dll", icon_instr[Bind.Desc])
+			/*
+				if FileExist("icons\octicons\" Bind.Icon ".ico")
+					Icon := IL_Add(ImageList, "icons\octicons\" Bind.Icon ".ico")
+				else {
+					if !DashIcon
+						DashIcon := IL_Add(ImageList, "icons\octicons\dash.ico")
+					Icon := DashIcon
+				}
+			*/
 			
-			Pos := LV_Add("Icon" . Icon, HotkeyToString(Key), Keybinds[Key].Desc, Key)
+			Pos := LV_Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
 			
 			if (Key = FocusKey)
 				Settings.GuiState.BindListPos := Pos
@@ -631,7 +627,7 @@
 		Hotkey.Disable("Delete")
 		Hotkey.Disable("^z")
 		this.DropFilesToggle(false)
-		this.SetTitle(AppName " v" AppVersion.1 "." AppVersion.2 "." AppVersion.3)
+		this.SetTitle(AppName " " VersionString())
 		
 		if (tab = 1) {
 			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
@@ -647,7 +643,7 @@
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
 			this.Control("SysListView323")
-			this.SetTitle(AppName " v" AppVersion.1 "." AppVersion.2 "." AppVersion.3 " (Keybinds are disabled while window is open)")
+			this.SetTitle(AppName " " VersionString() " (Keybinds are disabled while window is open)")
 			this.ImgurAnimate(false)
 		}
 	}
@@ -675,12 +671,7 @@
 			this.SetTab(Settings.GuiState.ActiveTab)
 		
 		if !IsShown {
-			if FileExist("icon.ico") && !A_IsCompiled {
-				hIcon := DllCall( "LoadImage", UInt,0, Str, A_WorkingDir "\icon.ico", UInt,1, UInt,0, UInt,0, UInt,0x10 )
-				SendMessage, 0x80, 0, hIcon ,, % this.ahkid  ; One affects Title bar and
-				SendMessage, 0x80, 1, hIcon ,, % this.ahkid  ; the other the ALT+TAB menu
-			}
-			
+			this.SetIcon("icons\powerplay.ico")
 			IsShown := true
 		}
 	}
@@ -710,7 +701,7 @@
 	}
 	
 	ImageButtonApply(hwnd) {
-		static RoundPx := 3
+		static RoundPx := 0
 		static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
 						, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
 						, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click

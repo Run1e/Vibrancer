@@ -100,6 +100,8 @@ Settings() {
 	SetGUI.Options("-MinimizeBox")
 	SetGUI.Show()
 	
+	SetGUI.SetIcon(Icon("gear"))
+	
 }
 
 /*

@@ -27,47 +27,60 @@ CreateTrayMenu() {
 	Tray.Add()
 	Tray.SetDefault("Open")
 	
+	; add icons for hardcoded items
+	Tray.Icon("Open", Icon("device-desktop"))
+	Tray.Icon("Settings", Icon("gear"))
+	
 	; add menumap info for hardcoded items
 	Menu.Map.Tray.Open := {Func:"Open"}
 	Menu.Map.Tray.Settings := {Func:"Settings"}
 	Menu.Map.Tray.Exit := {Func:"Exit"}
 	
-	for Index, MenuName in TrayMenu {
-		
-		; load the json
-		try
-			MenuObj := JSON.Load(FileRead("menus\" MenuName ".json"))
-		catch e {
-			ErrorEx((e, e.extra := "Failed loading JSON in menus\" MenuName ".json"), true)
-			continue
-		}
-		
-		if MenuObj.1.HasKey("Desc") { ; it's a list
+	for Index, TrayObj in TrayMenu {
+	
+		if TrayObj.HasKey("File") { ; points to another file, it's a submenu
+			
+			; load the json
+			try
+				SubMenuObj := JSON.Load(FileRead("menus\" TrayObj.File ".json"))
+			catch e {
+				ErrorEx((e, e.extra := "Failed loading JSON in menus\" TrayObj.File ".json"), true)
+				continue ; cancel this submenu
+			}
 			
 			; create a temp menu to create the submenu in
-			TempMenu := new Menu(MenuName)
+			TempMenu := new Menu(TrayObj.Desc)
 			
 			; add the menu name to the static Menus array so we know we need to clear it before refreshing the menus
-			Menus.Insert(MenuName)
+			Menus.Insert(TrayObj.Desc)
 			
 			; populate the submenu
-			for Index, MenuItem in MenuObj {
+			for Index, MenuItem in SubMenuObj {
 				TempMenu.Add(MenuItem.Desc)
-				Menu.Map[MenuName, MenuItem.Desc] := MenuItem
+				TempMenu.Icon(MenuItem.Desc, Icon(MenuItem.Icon))
+				Menu.Map[TrayObj.Desc, MenuItem.Desc] := MenuItem
 			}
 			
 			; add the submenu to the tray menu
 			Tray.Add(TempMenu)
+			Tray.Icon(TrayObj.Desc, Icon(TrayObj.Icon))
 			TempMenu := ""
 			
-		} else if MenuObj.HasKey("Desc") { ; it's a single menu item
-			Tray.Add(MenuObj.Desc)
-			Menu.Map["Tray", MenuObj.Desc] := MenuObj
+		} else { ; it's a single menu item
+			Tray.Add(TrayObj.Desc)
+			Tray.Icon(TrayObj.Desc, Icon(TrayObj.Icon))
+			Menu.Map["Tray", TrayObj.Desc] := TrayObj
 		}
 	}
 	
 	if Index
 		Tray.Add()
 	Tray.Add("Exit")
-	
+	Tray.Icon("Exit", Icon("x"))
+}
+
+Icon(name) {
+	if (name = "powerplay")
+		return "icons\powerplay.ico"
+	return "icons\octicons\" name ".ico"
 }

@@ -31,13 +31,19 @@
 				return this.Menu.RemoveAt(Index)
 	}
 	
+	Icon(Item, Icon) {
+		if !FileExist(Icon)
+			return false
+		Menu % this.Name, Icon, % Item , % Icon
+		return ErrorLevel
+	}
+	
 	Color(Color) {
 		Menu % this.Name, Color, % Color
 	}
 	
 	Destroy() {
 		this.DeleteAll()
-		this := ""
 	}
 	
 	Clear() {
