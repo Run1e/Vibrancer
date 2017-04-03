@@ -131,7 +131,7 @@ return
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk
 
-#Include lib\client_id.ahk
+#Include *i lib\client_id.ahk
 
 ; thanks fams
 #Include lib\Class CtlColors.ahk

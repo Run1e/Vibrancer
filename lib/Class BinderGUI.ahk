@@ -147,6 +147,9 @@
 		
 		Binder.SetText("msctls_hotkey321", Key)
 		
+		; check if in use
+		this.HotkeyChange()
+		
 	}
 	
 	/*

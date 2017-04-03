@@ -1,4 +1,10 @@
-﻿Run(file) {
+﻿; removes grey border around buttons
+CtlColorBtns() {
+	static init := OnMessage(0x0135, "CtlColorBtns")
+	return DllCall("gdi32.dll\CreateSolidBrush", "uint", 0xFFFFFF, "uptr")
+}
+
+Run(file) {
 	if FileExist(file)
 		SplitPath, file,, dir
 	try

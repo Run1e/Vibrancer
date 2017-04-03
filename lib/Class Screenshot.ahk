@@ -25,6 +25,9 @@
 		this.DeleteCount := 0
 		this.FailedCount := 0
 		
+		if !StrLen(this.api_access)
+			TrayTip("No client_id", "")
+		
 		for Index, Folder in [this.ImageFolder, this.DeletedImageFolder, this.LocalImageFolder, this.ImgurImageFolder]
 			if !FileExist(Folder)
 				FileCreateDir % Folder
@@ -127,6 +130,8 @@
 	Upload(File) {
 		if !FileExist(File)
 			return Error("File specified for upload doesn't exist", A_ThisFunc, "File: " File, true)
+		if !StrLen(this.api_access)
+			return Error("No client_id", A_ThisFunc, "File: " file), TrayTip("Error", "Can't upload, no client_id specified.")
 		this.AddQueue({Event:"Upload", File:File})
 		if !this.RunQueue
 			this.StartQueue()
@@ -136,6 +141,8 @@
 		Image := Images[Index]
 		if !IsObject(Image)
 			return Error("Failed to find image in Images", A_ThisFunc, "Index: " Index)
+		if !StrLen(this.api_access)
+			return Error("No client_id", A_ThisFunc, "Index: " Index), TrayTip("Error", "Can't delete, no client_id specified.")
 		this.AddQueue({Event:"Delete", DeleteHash:Image.deletehash, Index:Index})
 		if !this.RunQueue
 			this.StartQueue()
