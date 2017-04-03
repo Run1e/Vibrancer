@@ -34,10 +34,13 @@
 	NewVersion := StrSplit(VersionString, ".")
 	
 	for Index, Ver in AppVersion {
-		if (Ver < NewVersion[Index])
+		if (Ver < NewVersion[Index]) {
 			NewUpdate := true
-		else if (Var > NewVersion[Index]) ; we're ahead of the update, break
-			return
+			break
+		} else if (Ver > NewVersion[Index]) {
+			NewUpdate := false
+			break
+		}
 	}
 	
 	if (NewUpdate) {

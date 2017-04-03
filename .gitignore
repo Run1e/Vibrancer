@@ -2,9 +2,9 @@
 backup/*
 data/*
 images/*
+menus/*
 logs/*
 compiled/*
 lib/client_id.ahk
-menus/*
 SteamLogin.ahk
 NVIDIA Classic.ahk
