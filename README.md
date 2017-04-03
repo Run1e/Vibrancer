@@ -6,7 +6,7 @@ A Windows application which allows you to:
 - Delete and manage uploaded images
 - Easily create powerful keybinds such as multimedia controls
 
-<img src="https://cloud.githubusercontent.com/assets/5571284/24335157/4c76bf46-1278-11e7-9833-19710ba22a5c.png"></img> <img src="https://cloud.githubusercontent.com/assets/5571284/24335158/4c938c02-1278-11e7-9e35-5e22c066a39b.png"></img> <img src="https://cloud.githubusercontent.com/assets/5571284/24335159/4ca5b29c-1278-11e7-857d-93aad70e9e5c.png"></img> <img src="https://cloud.githubusercontent.com/assets/5571284/24335235/b284ef3c-1279-11e7-8f99-d2ee8fa08f2a.png"></img> 
+<img src="https://cloud.githubusercontent.com/assets/5571284/24335157/4c76bf46-1278-11e7-9833-19710ba22a5c.png"></img> <img src="https://cloud.githubusercontent.com/assets/5571284/24335158/4c938c02-1278-11e7-9e35-5e22c066a39b.png"></img> <img src="https://cloud.githubusercontent.com/assets/5571284/24335159/4ca5b29c-1278-11e7-857d-93aad70e9e5c.png"></img>
 
 Currently WIP, installer will be avaliable at "launch".
 
