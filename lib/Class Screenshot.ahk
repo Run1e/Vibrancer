@@ -10,7 +10,7 @@
 	__New() {
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp"
 		this.CLSID := "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}"
-		this.api_access := IsFunc("client_id")?client_id():""
+		this.api_access := IsFunc("client_id")?Func("client_id").Call():""
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp" 
 		this.Queue := []
 		this.QueueErrors := []
@@ -24,9 +24,6 @@
 		this.UploadCount := 0
 		this.DeleteCount := 0
 		this.FailedCount := 0
-		
-		if !StrLen(this.api_access)
-			TrayTip("No client_id", "")
 		
 		for Index, Folder in [this.ImageFolder, this.DeletedImageFolder, this.LocalImageFolder, this.ImgurImageFolder]
 			if !FileExist(Folder)
@@ -131,7 +128,7 @@
 		if !FileExist(File)
 			return Error("File specified for upload doesn't exist", A_ThisFunc, "File: " File, true)
 		if !StrLen(this.api_access)
-			return Error("No client_id", A_ThisFunc, "File: " file), TrayTip("Error", "Can't upload, no client_id specified.")
+			return this.NoClientID()
 		this.AddQueue({Event:"Upload", File:File})
 		if !this.RunQueue
 			this.StartQueue()
@@ -142,10 +139,15 @@
 		if !IsObject(Image)
 			return Error("Failed to find image in Images", A_ThisFunc, "Index: " Index)
 		if !StrLen(this.api_access)
-			return Error("No client_id", A_ThisFunc, "Index: " Index), TrayTip("Error", "Can't delete, no client_id specified.")
+			return this.NoClientID()
 		this.AddQueue({Event:"Delete", DeleteHash:Image.deletehash, Index:Index})
 		if !this.RunQueue
 			this.StartQueue()
+	}
+	
+	NoClientID() {
+		TrayTip("Error", "Can't upload, no client_id specified.")
+		Error("No client_id", A_ThisFunc, "File: " file)
 	}
 	
 	HeaderInfo(header) { ; save headers to this.LastHeaders
@@ -452,7 +454,7 @@
 		
 		if Shaked
 			this.StartQueue()
-			
+		
 		Shaked := true
 		
 		return
