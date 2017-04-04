@@ -10,7 +10,7 @@
 	__New() {
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp"
 		this.CLSID := "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}"
-		this.api_access := client_id()
+		this.api_access := IsFunc("client_id")?client_id():""
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp" 
 		this.Queue := []
 		this.QueueErrors := []
