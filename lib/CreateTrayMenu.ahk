@@ -78,9 +78,3 @@ CreateTrayMenu() {
 	Tray.Add("Exit")
 	Tray.Icon("Exit", Icon("x"))
 }
-
-Icon(name) {
-	if (name = "powerplay")
-		return "icons\powerplay.ico"
-	return "icons\octicons\" name ".ico"
-}

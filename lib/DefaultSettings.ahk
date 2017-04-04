@@ -1,5 +1,5 @@
 ﻿DefaultSettings() {
-	return 	{ Beep: false
+	return 	{ StartUp: true
 			, Font: "Segoe UI Light"
 			, Color: {Selection: "44C6F6", Tab: "FE9A2E", Dark: "353535"} ; FE9A2E
 			, GuiState: {ActiveTab: 1, GameListPos: 1, BindListPos: 1}

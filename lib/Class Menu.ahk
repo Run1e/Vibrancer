@@ -32,6 +32,8 @@
 	}
 	
 	Icon(Item, Icon) {
+		if !StrLen(Item)
+			return false
 		if !FileExist(Icon)
 			return false
 		Menu % this.Name, Icon, % Item , % Icon

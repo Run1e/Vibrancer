@@ -1,6 +1,5 @@
 ﻿; free octicons from github, can be used when adding a menu item via a plugin
 IconInstall() {
-	
 	if !FileExist("icons") 
 		FileCreateDir icons
 	
@@ -17,5 +16,10 @@ IconInstall() {
 	FileInstall, D:\Documents\Scripts\octicons\device-desktop.ico, icons\octicons\device-desktop.ico
 	FileInstall, D:\Documents\Scripts\octicons\plus.ico, icons\octicons\plus.ico
 	FileInstall, D:\Documents\Scripts\octicons\dash.ico, icons\octicons\dash.ico
-	
+}
+
+Icon(name := "") {
+	if (name = "icon")
+		return "icons\powerplay.ico"
+	return "icons\octicons\" name ".ico"
 }

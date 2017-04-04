@@ -137,4 +137,4 @@ m(x*){
 	MsgBox,0,, % text
 }
 
-#Include lib\HTTPRequest.ahk
+#Include lib\third-party\HTTPRequest.ahk

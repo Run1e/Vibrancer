@@ -634,11 +634,14 @@
 			Hotkey.Bind("^z", this.RegretProg.Bind(this), this.hwnd)
 			this.Control("Focus", "SysListView321")
 			this.ImgurAnimate(false)
+			this.SelectScreen(Settings.VibrancyScreen + 1)
 		} else if (tab = 2) {
+			Hotkey.Bind("Delete", this.ImgurDelete.Bind(this), this.hwnd)
 			this.DropFilesToggle(true)
 			this.ImgurAnimate(true) ; animate gifs
 			this.Options("ListView", this.ImgurListViewHWND)
 			LV_Modify(1, "Vis") ; show first item
+			LV_Modify(0, "-Select") ; show first item
 		} else if (tab = 3) {
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
@@ -671,7 +674,7 @@
 			this.SetTab(Settings.GuiState.ActiveTab)
 		
 		if !IsShown {
-			this.SetIcon("icons\powerplay.ico")
+			this.SetIcon(Icon("icon"))
 			IsShown := true
 		}
 	}

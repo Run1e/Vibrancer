@@ -41,9 +41,6 @@ ApplyRules(Info) {
 	
 	if Info.BlockAltTab
 		Hotkey.Bind("!Tab", "returnlabel")
-	
-	if (Settings.Beep && ((Info.Vibrancy > 0) || Info.BlockWinKey || Info.BlockAltTab))
-		soundbeep
 }
 
 DisableRules() {

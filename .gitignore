@@ -6,5 +6,6 @@ menus/*
 logs/*
 compiled/*
 lib/client_id.ahk
+icon.png
 SteamLogin.ahk
 NVIDIA Classic.ahk

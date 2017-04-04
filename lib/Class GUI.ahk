@@ -66,7 +66,9 @@
 	}
 	
 	SetTitle(NewTitle) {
-		WinSetTitle, % this.ahkid,, % NewTitle
+		;WinSetTitle, % this.ahkid,, % NewTitle
+		this.Show(this.IsVisible?"":"Hide", NewTitle)
+		;tooltip % errorlevel
 	}
 	
 	ControlGet(Command, Value := "", Control := "") {

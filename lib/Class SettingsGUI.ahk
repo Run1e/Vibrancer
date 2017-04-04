@@ -3,7 +3,7 @@
 	; save settings and close
 	Save() {
 		
-		Beep := this.ControlGet("Checked",, "Button5")
+		StartUp := this.ControlGet("Checked",, "Button5")
 		VibrancyDefault := this.GetText("Edit1")
 		CloseOnCopy := this.ControlGet("Checked",, "Button7")
 		CloseOnOpen := this.ControlGet("Checked",, "Button8")
@@ -22,7 +22,7 @@
 			Tooltip
 		}
 		
-		Settings.Beep := Beep
+		Settings.StartUp := StartUp
 		Settings.VibrancyDefault := VibrancyDefault
 		DisableRules() ; set new vibrancy
 		
@@ -31,6 +31,7 @@
 		Settings.Imgur.UseGifv := UseGifv
 		
 		JSONSave("Settings", Settings)
+		ApplySettings()
 		this.Close()
 	}
 	
@@ -43,7 +44,6 @@
 	; close gui
 	Close() {
 		this.Destroy()
-		
 		
 		SetGUI := "" ; remove global ref
 		
@@ -69,47 +69,36 @@ Settings() {
 	
 	SetGUI.Font("s10", Settings.Font)
 	SetGUI.Color("FFFFFF")
+	SetGui.Margin(6, 10)
 	
 	; groupboxes
-	SetGUI.Add("Groupbox", "xm h140 w180", AppName)
+	SetGUI.Add("Groupbox", "xm y2 h142 w180", AppName)
 	SetGUI.Add("Groupbox", "xm y+6 h134 w180", "Imgur")
 	
 	; bottom buttons
 	SetGUI.Add("Button",, "Check for updates", Func("CheckForUpdates"))
-	SetGUI.Add("Button", "x143 yp w50", "Save", SetGUI.Save.Bind(SetGUI))
+	SetGUI.Add("Button", "x137 yp w50", "Save", SetGUI.Save.Bind(SetGUI))
 	
 	; power play controls
-	SetGUI.Add("Checkbox", "xm+12 y34 Checked" Settings.Beep, "Beep!")
+	SetGUI.Add("Checkbox", "xm+12 y26 w150 Checked" Settings.StartUp, "Launch on Startup")
 	SetGUI.Add("Text",, "Desktop Vibrancy: ")
-	SetGUI.Add("Edit", "x130 yp-2 w49 Number -Wrap Limit")
+	SetGUI.Add("Edit", "x125 yp-2 w49 Number -Wrap Limit")
 	SetGUI.Add("UpDown", "Range0-100", Settings.VibrancyDefault)
-	SetGUI.Add("Button", "xm+12 yp+30 w156", "Set Pastebin API Key", SetGUI.InputPastebinKey.Bind(SetGUI))
+	SetGUI.Add("Button", "xm+12 yp+34 w156", "Set Pastebin API Key", SetGUI.InputPastebinKey.Bind(SetGUI))
 	SetGUI.Font("s8")
-	SetGUI.Add("Link",, "<a href=""https://pastebin.com/api"">Get your Developer API Key here</a>")
+	SetGUI.Add("Link", "yp+36", "<a href=""https://pastebin.com/api"">Get your Developer API Key here</a>")
 	SetGUI.Font("s10")
 	
+	SetGui.Margin(6, 8)
 	; imgur controls
-	SetGUI.Add("Checkbox", "xm+12 y180 Checked" Settings.Imgur.CloseOnCopy, "Close on copy")
+	SetGUI.Add("Checkbox", "xm+12 y176 Checked" Settings.Imgur.CloseOnCopy, "Close on copy")
 	SetGUI.Add("Checkbox", "Checked" Settings.Imgur.CloseOnOpen, "Close on open")
 	SetGUI.Add("Checkbox", "Checked" Settings.Imgur.UseGifv, "Link to .gifv")
 	SetGUI.Add("Text",, "Image list limit: ")
-	SetGUI.Add("Edit", "x114 yp-2 w33 Number -Wrap Limit", Settings.Imgur.ListViewMax)
-	
-	; imgur section
+	SetGUI.Add("Edit", "x110 yp-2 w33 Number -Wrap Limit", Settings.Imgur.ListViewMax)
 	
 	SetGUI.Options("-MinimizeBox")
 	SetGUI.Show()
 	
 	SetGUI.SetIcon(Icon("gear"))
-	
 }
-
-/*
-	{ Beep: false
-	, Font: "Segoe UI Light"
-	, Color: {Selection: "44C6F6", Tab: "FE9A2E", Dark: "353535"} ; FE9A2E
-	, GuiState: {ActiveTab: 1, GameListPos: 1, BindListPos: 1}
-	, Imgur: {CloseOnOpen: true, CloseOnCopy: true, ListViewMax:100, UseGifv:true}
-	, VibrancyScreen: SysGet("MonitorPrimary") - 1 ; proper arrays apparently start at 0. who would've known.
-	, VibrancyDefault: 50}
-*/

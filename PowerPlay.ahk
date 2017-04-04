@@ -85,15 +85,29 @@ for Key, Bind in Keybinds
 ; init menu from json file
 CreateTrayMenu()
 
-if FileExist("icons\powerplay.ico")
-	Menu, Tray, Icon, icons\powerplay.ico
+; apply/reenforce settings that do something external
+ApplySettings()
+
+if FileExist(Icon("icon"))
+	Menu, Tray, Icon, % Icon("icon")
 
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
 
-if Settings.Beep
-	SoundBeep
 return
+
+/*
+	OnClipboardChange:
+	if !(A_ComputerName = "DESKTOP-AAVK743")
+		return
+	Tooltip % clipboard
+	SetTimer, OnClipboardChangeHide, -1000
+	return
+	
+	OnClipboardChangeHide:
+	tooltip
+	return
+*/
 
 Exit:
 CtlColors.Free() ; free ctlcolors thing
@@ -133,18 +147,19 @@ return
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk
+#Include lib\IconInstall.ahk
+#Include lib\GetActionsList.ahk
+#Include lib\ApplySettings.ahk
 
 #Include *i lib\client_id.ahk
 
 ; thanks fams
-#Include lib\Class CtlColors.ahk
-#Include lib\Class ImageButton.ahk
-#Include lib\Class JSON.ahk
-#Include lib\Class LV_Colors.ahk
-#Include lib\Class NvAPI.ahk
-#Include lib\FrameShadow.ahk
-#Include lib\Gdip_All.ahk
-#Include lib\LV_EX.ahk
-#Include lib\ObjRegisterActive.ahk
-#Include lib\IconInstall.ahk
-#Include lib\GetActionsList.ahk
+#Include lib\third-party\Class CtlColors.ahk
+#Include lib\third-party\Class ImageButton.ahk
+#Include lib\third-party\Class JSON.ahk
+#Include lib\third-party\Class LV_Colors.ahk
+#Include lib\third-party\Class NvAPI.ahk
+#Include lib\third-party\FrameShadow.ahk
+#Include lib\third-party\Gdip_All.ahk
+#Include lib\third-party\LV_EX.ahk
+#Include lib\third-party\ObjRegisterActive.ahk
