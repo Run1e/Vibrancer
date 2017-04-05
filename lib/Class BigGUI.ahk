@@ -341,6 +341,7 @@
 		for Index, HWND in this.MonitorHWND
 			CtlColors.Change(HWND, ((Screen = Index) ? Settings.Color.Tab : "FFFFFF"), ((Screen = Index) ? "FFFFFF" : "000000"))
 		Settings.VibrancyScreen := Screen-1
+		DisableRules()
 	}
 	
 	GamesWinBlock() {

@@ -12,18 +12,21 @@
 		this.CLSID := "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}"
 		this.api_access := IsFunc("client_id")?Func("client_id").Call():""
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp" 
+		this.ImageQuality := 100 ; in %
+		
 		this.Queue := []
 		this.QueueErrors := []
 		this.RunQueue := false
-		this.ImageQuality := 90 ; in %
+		this.Busy := false
+		
+		this.UploadCount := 0
+		this.DeleteCount := 0
+		this.FailedCount := 0
+		
 		this.ImageFolder := A_WorkingDir "\images"
 		this.ImgurImageFolder := this.ImageFolder "\imgur"
 		this.DeletedImageFolder := this.ImageFolder "\deleted"
 		this.LocalImageFolder := this.ImageFolder "\local"
-		this.Busy := false
-		this.UploadCount := 0
-		this.DeleteCount := 0
-		this.FailedCount := 0
 		
 		for Index, Folder in [this.ImageFolder, this.DeletedImageFolder, this.LocalImageFolder, this.ImgurImageFolder]
 			if !FileExist(Folder)
@@ -146,7 +149,7 @@
 	}
 	
 	NoClientID() {
-		TrayTip("Error", "Can't upload, no client_id specified.")
+		TrayTip("Error", "Can't upload, no client_id specified.`n`nRead the GitHub README for instructions!")
 		Error("No client_id", A_ThisFunc, "File: " file)
 	}
 	

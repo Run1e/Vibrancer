@@ -34,12 +34,6 @@
 		Gui % this.hwnd ":Show", % Options, % Title
 	}
 	
-	ShowHide(Options := "", Title := "") {
-		this.IsVisible := false
-		hwnd := this.hwnd
-		Gui, %hwnd%:Show, Hide %Options%, % Title
-	}
-	
 	Hide(Options := "") {
 		this.IsVisible := false
 		Gui % this.hwnd ":Hide", % Options
@@ -178,7 +172,7 @@ GuiSize:
 GuiClose:
 GuiEscape:
 GuiDropFiles:
-for a, b in Gui.Parameters[SubStr(A_ThisLabel, 4)], Params := []
-	Params.Insert(%b%)
+for Index, ParamName in Gui.Parameters[SubStr(A_ThisLabel, 4)], Params := []
+	Params.Insert(%ParamName%)
 Gui.Instances[A_Gui][SubStr(A_ThisLabel, 4)](Params*)
 return
