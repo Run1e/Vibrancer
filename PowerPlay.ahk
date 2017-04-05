@@ -18,7 +18,7 @@ global NvAPI, Settings, Keybinds, AppName, AppVersion, Big, Binder, GameRules, V
 OnExit, Exit
 
 AppName := "Power Play"
-AppVersion := [0, 9, 1]
+AppVersion := [0, 9, 2]
 
 SetWorkingDir % A_ScriptDir
 if !FileExist(A_WorkingDir "\data") {
