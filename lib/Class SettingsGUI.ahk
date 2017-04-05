@@ -10,10 +10,8 @@
 		UseGifv := this.ControlGet("Checked",, "Button9")
 		ListViewMax := this.GetText("Edit2")
 		
-		if (ListViewMax < 10) {
-			TrayTip("Invalid parameter", "Please select a value higher than 10 as Image list limit.")
-			return
-		}
+		if (ListViewMax < 10)
+			return TrayTip("Invalid parameter", "Please select a value higher than 10 as Image list limit.")
 		
 		if (ListViewMax != Settings.Imgur.ListViewMax) {
 			Settings.Imgur.ListViewMax := ListViewMax

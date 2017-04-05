@@ -8,10 +8,8 @@
 		EditText := this.GetText("Edit1")
 		Rebind := this.GuiControlGet(, Binder.BindHotkeyHWND)
 		
-		if !StrLen(Key) && this.ShowHotkey {
-			TrayTip, % AppName, Please input a Hotkey.
-			return
-		}
+		if !StrLen(Key) && this.ShowHotkey
+			return TrayTip("Please input a Hotkey.")
 		
 		; create nugget
 		if (this.Assignment ~= this.DDLAssignments) { ; assignment used a dll control, get the data from it
@@ -47,7 +45,7 @@
 		
 		if !IsObject(Bind) || !StrLen(Bind.Desc) { ; throw an error if we don't have a bind object
 			Error("Unable to create Bind nugget", A_ThisFunc, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText "`nRebind: " Rebind)
-			TrayTip, Error, Unable to create create nugget.`nAn error log has been saved.
+			TrayTip("Unable to create create nugget.`nAn error log has been saved.")
 			this.Close()
 		} else
 			this.Close(Bind, Key)

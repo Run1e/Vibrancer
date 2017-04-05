@@ -16,7 +16,11 @@
 		if (pBitmap < 1) ; failed at creating bitmap from file
 			return false
 		
-		return this.AddBitmap(pBitmap)
+		Icon := this.AddBitmap(pBitmap)
+		
+		Gdip_DisposeImage(pBitmap)
+		
+		return Icon
 	}
 	
 	AddBitmap(pBitmap) {

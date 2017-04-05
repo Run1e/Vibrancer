@@ -13,12 +13,13 @@ CoordMode, Mouse, Screen
 	rate limiting for imgur api (which will be impossible)	
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI
+global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI
 
 OnExit, Exit
 
 AppName := "Power Play"
 AppVersion := [0, 9, 2]
+AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 SetWorkingDir % A_ScriptDir
 if !FileExist(A_WorkingDir "\data") {

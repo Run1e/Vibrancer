@@ -87,7 +87,7 @@
 	CaptureWindow() {
 		WinGetPos, x, y, w, h, A
 		if ErrorLevel {
-			TrayTip, Error Occured, Failed getting active window position.
+			TrayTip("Failed getting active window position.")
 			return Error("Failed to get WinPos", A_ThisFunc, "ErrorLevel set by WinGetPos: " ErrorLevel)
 		}
 		Screenshot.Capture(x, y, w, h)
@@ -149,7 +149,7 @@
 	}
 	
 	NoClientID() {
-		TrayTip("Error", "Can't upload, no client_id specified.`n`nRead the GitHub README for instructions!")
+		TrayTip("Can't upload, no client_id specified.`n`nRead the GitHub README for instructions!")
 		Error("No client_id", A_ThisFunc, "File: " file)
 	}
 	
@@ -165,7 +165,7 @@
 		Run % A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk"),, UseErrorLevel
 		if (ErrorLevel = "ERROR")
 			Error("Failed to run Uploader Helper", A_ThisFunc, "Uploader." (A_IsCompiled?"exe":"ahk") " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
-		sleep 250 ; should be enough, maybe get a less hacky solution
+		sleep 500 ; should be enough, maybe get a less hacky solution
 	}
 	
 	CheckAlive() {
@@ -203,7 +203,12 @@
 	
 	StopQueue() { ; stops queue at next StepQueue
 		this.RunQueue := false
+		
 		Big.SetText(Big.StartStopButtonHWND, "Start")
+		
+		Fin := (this.Queue.MaxIndex() > 0)
+		this.AllowPause(Fin)
+		this.AllowClear(Fin)
 	}
 	
 	ClearQueue() {
@@ -220,14 +225,9 @@
 		if Advance
 			this.Queue.Pop()
 		
-		if !this.RunQueue {
-			if this.Queue.MaxIndex() {
-				this.SetStatus("Paused..")
-				this.AllowPause(true)
-				this.AllowClear(true)
-			}
-			return
-		} else
+		if !this.RunQueue ; user paused
+			return this.StopQueue(), this.SetStatus("Paused..")
+		else
 			this.AllowClear(false)
 		
 		Pop := this.Queue[this.Queue.MaxIndex()]
@@ -252,15 +252,12 @@
 	
 	; create and show the user the result of the queue
 	FinishQueue() {
-		this.RunQueue := false
-		this.SetStatus("Queue finished!")
-		this.AllowPause(false)
-		this.AllowClear(false)
 		
-		if (!this.UploadCount && !this.DeleteCount && this.FailedCount) {
+		; craft queue message
+		if (!this.UploadCount && !this.DeleteCount && this.FailedCount) { ; everything failed :(
 			Title := "Queue items failed"
 			Msg := "Failed items: " this.FailedCount
-			this.FailedCount := 0
+			AllFail := true
 		}
 		else if (this.UploadCount && !this.DeleteCount) { ; only uploads
 			
@@ -270,15 +267,13 @@
 				Msg := "Link copied to clipboard."
 				
 				; check for hotkey pointing to Action.RunClipboard()
-				; and show it in the traytip in that case
+				; and show it in the traytip in that case to remind user that they have that hotkey
 				if !Big.IsVisible {
 					for Key, Bind in Keybinds {
 						if (Bind.Func = "RunClipboard") {
 							Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
 							break
-						}
-					}
-				}
+				}}} ; I've never done this before. How exiting.
 				
 			} else
 				Msg := "Open the Imgur tab to see images."
@@ -293,14 +288,18 @@
 			Msg := this.UploadCount " image" (this.UploadCount>1?"s":"") " uploaded.`n" this.DeleteCount  " image" (this.DeleteCount>1?"s":"") " deleted."
 		}
 		
-		if (this.FailedCount)
+		if this.FailedCount && !AllFail
 			Msg .= "`n`nFailed items: " this.FailedCount
 		
-		TrayTip, % Title, % Msg
+		; show msg
+		TrayTip(Title, Msg)
 		
+		; reset info
 		this.QueueErrors := []
 		this.UploadCount:=this.DeleteCount:=this.FailedCount:=0
+		
 		this.StopQueue()
+		this.SetStatus("Queue finished!")
 	}
 	
 	; text representation of what's going on (which is shown in the main gui)
@@ -374,12 +373,12 @@
 		
 		this.Busy := false
 		
-		if (res.status = 200) {
+		if (res.status = 200) { ; successful deletion
 			
 			Image := Images.Delete(Index)
 			JSONSave("Images", Images)
 			
-			FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension, 1
+			FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension
 			
 			Big.LV_Colors_OnMessage(false)
 			Big.ImgurListRemove(Index)
@@ -410,7 +409,7 @@
 		status := res.status
 		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
 		
-		Error("Imgur threw an error: " this.ImgurErrors[status], A_ThisFunc, "File: " file "`n`n" pa(res))
+		Error("Imgur threw an error: " this.ImgurErrors[status], A_ThisFunc, "File: " file "`n`nRes:`n" pa(res) "`n`nHeaders:`n" pa(this.LastHeaders))
 		
 		if (status = "400") {
 			
@@ -429,15 +428,14 @@
 			
 		} else if (status = 429) { ; rate limit reached or ip temporarily blocked
 			
-			this.QueueErrors.Push("Imgur: " error)
+			; this.QueueErrors.Push("Imgur: " error)
 			
-			if (this.LastHeaders["X-RateLimit-UserRemaining"] = 0) { ; user has spent all credits
-				TrayTip, Imgur error!, % "You've uploaded too much.`nImgur will allow more uploads in " Round(this.Timeout / 60) " minutes."
-			} else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) { ; client_id credits is empty, we need a new one
-				TrayTip, Imgur error!, % "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening."
-			} else { ; last error is IP spam prevention
-				TrayTip, Imgur is panicking!, % "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.Timeout / 60) " minutes."
-			}
+			if (this.LastHeaders["X-RateLimit-UserRemaining"] = 0) ; user has spent all credits
+				TrayTip("Imgur error!", "You've uploaded too much.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
+			else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) ; client_id credits is empty, we need a new one
+				TrayTip("Imgur error!", "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening.")
+			else ; last error is IP spam prevention
+				TrayTip("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
 			
 			this.StopQueue()
 			this.SetStatus("Imgur error..")

@@ -214,7 +214,7 @@
 		
 		Size := ArraySize(Selected)
 		
-		TrayTip, % "Link" (Size>1?"s":"") " copied!", % (Size>1?Size " links were copied to your clipboard":clipboard)
+		TrayTip("Link" (Size>1?"s":"") " copied!", (Size>1?Size " links were copied to your clipboard":clipboard))
 		
 		if Settings.Imgur.CloseOnCopy && StrLen(links)
 			this.Close()
@@ -628,7 +628,7 @@
 		Hotkey.Disable("Delete")
 		Hotkey.Disable("^z")
 		this.DropFilesToggle(false)
-		this.SetTitle(AppName " " VersionString())
+		this.SetTitle(AppName " " AppVersionString)
 		
 		if (tab = 1) {
 			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
@@ -647,7 +647,7 @@
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
 			this.Control("SysListView323")
-			this.SetTitle(AppName " " VersionString() " (Keybinds are disabled while window is open)")
+			this.SetTitle(AppName " " AppVersionString " (Keybinds are disabled while window is open)")
 			this.ImgurAnimate(false)
 		}
 	}

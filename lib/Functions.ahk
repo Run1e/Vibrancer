@@ -4,10 +4,6 @@ CtlColorBtns() {
 	return DllCall("gdi32.dll\CreateSolidBrush", "uint", 0xFFFFFF, "uptr")
 }
 
-VersionString() {
-	return "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
-}
-
 Run(file) {
 	if FileExist(file)
 		SplitPath, file,, dir
@@ -18,8 +14,11 @@ Run(file) {
 	return true
 }
 
-TrayTip(Title, Msg) {
-	TrayTip, % Title, % Msg
+TrayTip(Title, Msg := "") {
+	if !StrLen(Msg)
+		TrayTip, % AppName " " AppVersionString, % Title
+	else
+		TrayTip, % Title, % Msg
 }
 
 pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
@@ -111,7 +110,7 @@ RegRead(root, sub, value) {
 	return output
 }
 
-POST(URL, POST := "", TIMEOUT_SECONDS := 5, PROXY := "") {
+POST(URL, POST := "", TIMEOUT_SECONDS := 5, PROXY := "", GET := false) {
 	static HTTP := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	
 	; check for internet connection
@@ -119,7 +118,7 @@ POST(URL, POST := "", TIMEOUT_SECONDS := 5, PROXY := "") {
 		return false
 	
 	; open the URL and set header
-	HTTP.Open("POST", URL, true)
+	HTTP.Open(GET?"GET":"POST", URL, true)
 	HTTP.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
 	
 	; set proxy if specified or the internet explorer settings have it set

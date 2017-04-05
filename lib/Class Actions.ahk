@@ -25,10 +25,8 @@
 	
 	; if running the clipboard fails (ie, not a file/link), it googles it
 	RunClipboard() {
-		if !StrLen(clipboard) {
-			TrayTip, Oops!, Clipboard is empty!
-			return
-		}
+		if !StrLen(clipboard)
+			return TrayTip("Clipboard is empty!")
 		
 		if !Run(clipboard) ; running the clipboard failed, just google the contents
 			run % "https://www.google.com/#q=" UriEncode(clipboard)

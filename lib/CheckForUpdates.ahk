@@ -1,38 +1,17 @@
 ﻿CheckForUpdates() {
-	URL := "https://github.com/Run1e/PowerPlay/releases"
+	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases/latest"
 	
-	; get innertext of class release-mate
-	wb := ComObjCreate("InternetExplorer.Application")
-	wb.Visible := false
-	wb.Navigate(URL)
+	; get github api info on the powerplay repo
+	GitRaw := POST(URL,,,, true) ; returns false on failure
 	
-	; wait for it to start loading
-	Loop
-		Sleep 50
-	Until (wb.busy)
+	if !GitRaw
+		return TrayTip("Failed fetching update info")
 	
-	; wait for it to end loading
-	Loop
-		Sleep 50
-	Until (!wb.busy && (wb.Document.ReadyState = "Complete"))
+	; load into obj
+	GitJSON := JSON.Load(GitRaw)
 	
-	try
-		inner := wb.Document.getElementsByClassName("release-meta")[0].innerText
-	catch e {
-		TrayTip("Error!", "Failed fetching version number.")
-		wb.Quit()
-		wb := ""
-		return
-	}
-	wb.Quit()
-	wb := ""
-	
-	; get the version number
-	temp := StrSplit(StrSplit(inner, "`n")[1], " ")
-	VersionString := temp[temp.MaxIndex() - 2]
-	trim(versionstring, " ")
-	NewVersion := StrSplit(VersionString, ".")
-	
+	; check whether new update is out
+	NewVersion := StrSplit(GitJSON.tag_name, ".")
 	for Index, Ver in AppVersion {
 		if (Ver < NewVersion[Index]) {
 			NewUpdate := true
@@ -43,14 +22,13 @@
 		}
 	}
 	
-	if (NewUpdate) {
-		Msg := "Do you want to visit the download page?`n`nYour version: " VersionString() "`nLatest version: v" VersionString
-		
-		MsgBox, 68, %AppName% - New update avaliable!, % Msg
+	; keep it simple fam. for now at least
+	if NewUpdate {
+		MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to visit the download page?"
 		ifMsgBox yes
-		run % URL . "/tag/" VersionString
+			Run(GitJSON.html_url)
 	} else
-		TrayTip(AppName " " VersionString(), "No update found.")
+		TrayTip("No update found.")
 	
 	return
 }

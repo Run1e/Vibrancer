@@ -1,14 +1,11 @@
 ﻿PastebinUpload() {
 	static EndPoint := "https://pastebin.com/api/api_post.php"
 	
-	if !StrLen(clipboard) {
-		TrayTip, Clipboard empty!, Your clipboard does not contain any text.
-		return
-	} 
-	else if !StrLen(Settings.PastebinKey) {
-		TrayTip, No Pastebin key!, Please enter your Pastebin API key in the settings.
-		return
-	}
+	if !StrLen(clipboard)
+		return TrayTip("Your clipboard does not contain any text.")
+	
+	if !StrLen(Settings.PastebinKey)
+		return TrayTip("No Pastebin key!", "Please enter your Pastebin API key in the settings.")
 	
 	POST := {api_dev_key:Settings.PastebinKey, api_option:"paste", api_paste_code:clipboard}
 	
@@ -33,5 +30,5 @@
 	} else
 		Title := "Paste failed!", Msg := (Response?"Error: " Response:"Request timed out.")
 	
-	TrayTip, % Title, % Msg
+	TrayTip(Title, Msg)
 }
