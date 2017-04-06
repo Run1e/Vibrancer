@@ -13,11 +13,12 @@
 	DropFiles(FileList, FileCount, ControlHWND, GuiX, GuiY) {
 		for Index, File in StrSplit(FileList, "`n") {
 			SplitPath, File,,, ext
-			if (ext ~= Screenshot.AllowedExt)
-				Screenshot.Upload(File)
+			if (ext ~= Uploader.AllowedExt)
+				Uploader.Upload(File)
 			else 
-				Screenshot.QueueErrors.Push(ext " files are not allowed on imgur!")
-		}
+				Uploader.QueueErrors.Push(ext " files are not allowed on imgur!")
+		} if !Uploader.RunQueue
+			Uploader.StartQueue()
 	}
 	
 	ImgurGetSelected() {
@@ -96,12 +97,12 @@
 		Image := Images[Index]
 		
 		if (Image.extension = "gif") {
-			IconList := this.ImgurImageList.AddGif(Screenshot.ImgurImageFolder "\" Image.id "." image.extension)
+			IconList := this.ImgurImageList.AddGif(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
 			this.AnimatedImages[Index] := IconList
 			this.AnimatedPositions[Index] := 1
 			IconNumber := IconList.1
 		} else
-			IconNumber := this.ImgurImageList.AddImage(Screenshot.ImgurImageFolder "\" Image.id "." image.extension)
+			IconNumber := this.ImgurImageList.AddImage(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
 		
 		if IconNumber {
 			if Insert
@@ -179,12 +180,12 @@
 	ImgurDelete() {
 		Selected := this.ImgurGetSelected()
 		
-		MsgBox, 308, Image deletion, % Selected.MaxIndex() " image" (Selected.MaxIndex()>1?"s":"") " selected.`nProceed with deletion?"
+		MsgBox, 52, Image deletion, % Selected.MaxIndex() " image" (Selected.MaxIndex()>1?"s":"") " selected.`nProceed with deletion?"
 		ifMsgBox no
 		return
 		
 		for Index, ImageIndex in Selected
-			Screenshot.Delete(ImageIndex)
+			Uploader.Delete(ImageIndex)
 	}
 	
 	ImgurOpenLinks() {
@@ -221,19 +222,19 @@
 	}
 	
 	StartStopQueue() {
-		if Screenshot.RunQueue
-			Screenshot.StopQueue()
-		else if !Screenshot.Busy
-			Screenshot.StartQueue()
+		if Uploader.RunQueue
+			Uploader.StopQueue()
+		else if !Uploader.Busy
+			Uploader.StartQueue()
 	}
 	
 	ClearQueue() {
-		if Screenshot.Busy ; uploader is working, don't do anything
+		if Uploader.Busy ; uploader is working, don't do anything
 			return
 		
 		this.SetText(this.StartStopButtonHWND, "Stop")
 		this.QueueControl(false)
-		Screenshot.ClearQueue()
+		Uploader.ClearQueue()
 	}
 	
 	ClearQueueControl(Toggle) {
@@ -341,7 +342,6 @@
 		for Index, HWND in this.MonitorHWND
 			CtlColors.Change(HWND, ((Screen = Index) ? Settings.Color.Tab : "FFFFFF"), ((Screen = Index) ? "FFFFFF" : "000000"))
 		Settings.VibrancyScreen := Screen-1
-		DisableRules()
 	}
 	
 	GamesWinBlock() {
@@ -628,26 +628,24 @@
 		Hotkey.Disable("Delete")
 		Hotkey.Disable("^z")
 		this.DropFilesToggle(false)
-		this.SetTitle(AppName " " AppVersionString)
 		
 		if (tab = 1) {
 			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretProg.Bind(this), this.hwnd)
 			this.Control("Focus", "SysListView321")
-			this.ImgurAnimate(false)
 			this.SelectScreen(Settings.VibrancyScreen + 1)
+			this.ImgurAnimate(false)
 		} else if (tab = 2) {
 			Hotkey.Bind("Delete", this.ImgurDelete.Bind(this), this.hwnd)
 			this.DropFilesToggle(true)
-			this.ImgurAnimate(true) ; animate gifs
 			this.Options("ListView", this.ImgurListViewHWND)
 			LV_Modify(1, "Vis") ; show first item
 			LV_Modify(0, "-Select") ; show first item
+			this.ImgurAnimate(true) ; animate gifs
 		} else if (tab = 3) {
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
 			this.Control("SysListView323")
-			this.SetTitle(AppName " " AppVersionString " (Keybinds are disabled while window is open)")
 			this.ImgurAnimate(false)
 		}
 	}
@@ -661,9 +659,6 @@
 		if SetGUI.IsVisible
 			return
 		
-		for Key in Keybinds ; disable all hotkeys
-			Hotkey.Disable(Key)
-		
 		this.LV_Colors_OnMessage(true)
 		
 		if tab
@@ -675,6 +670,7 @@
 			this.SetTab(Settings.GuiState.ActiveTab)
 		
 		if !IsShown {
+			this.SetTitle(AppName " " AppVersionString)
 			this.SetIcon(Icon("icon"))
 			IsShown := true
 		}
@@ -700,8 +696,7 @@
 		
 		this.LV_Colors_OnMessage(false)
 		
-		for Key, Bind in Keybinds ; rebind hotkeys
-			Hotkey.Bind(Key, Actions[Bind.Func].Bind(Actions, Bind.Param*))
+		Keybinds(true)
 	}
 	
 	ImageButtonApply(hwnd) {

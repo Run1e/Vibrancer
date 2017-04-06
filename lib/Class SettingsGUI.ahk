@@ -47,16 +47,11 @@
 		
 		if this.OpenMainOnClose
 			Big.Open()
-		
-		for Key in Keybinds
-			Hotkey.Enable(Key)
+
 	}
 }
 
 Settings() {
-	
-	for Key in Keybinds
-		Hotkey.Disable(Key)
 	
 	SetGUI := new SettingsGUI("Settings")
 	

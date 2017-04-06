@@ -6,11 +6,33 @@
 #NoTrayIcon
 SetRegView 64
 CoordMode, Mouse, Screen
+SetTitleMatchMode 2
 
 /*
 	todo:
 	console
 	rate limiting for imgur api (which will be impossible)	
+*/
+
+/*
+	[size=150][/size]
+	[list]
+	[/list]
+	
+	[size=150][url=https://github.com/Run1e/PowerPlay/releases]Download[/url][/size]
+	[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
+	[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
+*/
+
+/*
+	To update:
+	1. Exit PowerPlay
+	2. Overwrite the old executables (PowerPlay, PowerPlayUploader) with the new downloaded ones
+	3. Launch PowerPlay.exe again
+*/
+
+/*
+- Fixed a bug where keybinds were accidentally enabled
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI
@@ -37,7 +59,7 @@ if !FileExist(A_WorkingDir "\menus")
 pToken := Gdip_Startup()
 
 Plugin := new Plugin
-Screenshot := new Screenshot
+Uploader := new Uploader
 Settings := JSONFile("Settings", DefaultSettings())
 
 if NvAPI.InitFail { ; NvAPI initialization failed, no nvidia card is installed
@@ -80,8 +102,7 @@ VERT_SCROLL := SysGet(2)
 CreateBigGUI()
 
 ; bind hotkeys
-for Key, Bind in Keybinds
-	Hotkey.Bind(Key, Actions[Bind.Func].Bind(Actions, Bind.Param*))
+Keybinds(true)
 
 ; init menu from json file
 CreateTrayMenu()
@@ -97,22 +118,9 @@ Menu, Tray, Icon ; show trayicon
 
 return
 
-/*
-	OnClipboardChange:
-	if !(A_ComputerName = "DESKTOP-AAVK743")
-		return
-	Tooltip % clipboard
-	SetTimer, OnClipboardChangeHide, -1000
-	return
-	
-	OnClipboardChangeHide:
-	tooltip
-	return
-*/
-
 Exit:
 CtlColors.Free() ; free ctlcolors thing
-Screenshot.Free() ; revoke object and close upload helper
+Uploader.Free() ; revoke object and close upload helper
 Gdip_Shutdown(pToken) ; shut down gdip
 ; revoke COM objects
 ObjRegisterActive(Plugin, "")
@@ -128,6 +136,7 @@ return
 #Include lib\Class Actions.ahk
 #Include lib\Class BigGUI.ahk
 #Include lib\Class BinderGUI.ahk
+#Include lib\Class Capture.ahk
 #Include lib\Class ConsoleGUI.ahk
 #Include lib\Class CustomImageList.ahk
 #Include lib\Class FileSelectGUI.ahk
@@ -136,7 +145,7 @@ return
 #Include lib\Class Menu.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class SettingsGUI.ahk
-#Include lib\Class Screenshot.ahk
+#Include lib\Class Uploader.ahk
 #Include lib\CreateTrayMenu.ahk
 #Include lib\DefaultKeybinds.ahk
 #Include lib\DefaultSettings.ahk
@@ -144,6 +153,7 @@ return
 #Include lib\Error.ahk
 #Include lib\Functions.ahk
 #Include lib\JSONfunctions.ahk
+#Include lib\Keybinds.ahk
 #Include lib\MenuHandler.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
@@ -153,6 +163,7 @@ return
 #Include lib\ApplySettings.ahk
 
 #Include *i lib\client_id.ahk
+#Include *i Custom.ahk
 
 ; thanks fams
 #Include lib\third-party\Class CtlColors.ahk
@@ -164,3 +175,4 @@ return
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
+#Include lib\third-party\Class _CHotkeyControl.ahk

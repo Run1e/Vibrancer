@@ -12,8 +12,6 @@ CreateTrayMenu() {
 	Menu.Map := []
 	Menu.Map.Tray := {}
 	
-	; remove previous items if we've just refreshing
-	
 	; clear all menus
 	for Index, MenuInstanceName in Menus
 		Menu.Instances[MenuInstanceName].Clear()

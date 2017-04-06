@@ -166,6 +166,8 @@
 		this.Destroy()
 		
 		this.Callback.Call(Bind, Key)
+		
+		Keybinds(true)
 	}
 	
 	Escape() {
@@ -174,6 +176,8 @@
 }
 
 CreateNugget(Callback, ShowHotkey := true, Owner := "") {
+	
+	Keybinds(false)
 	
 	; list of assignments
 	AssignmentList := [	  "Multimedia"

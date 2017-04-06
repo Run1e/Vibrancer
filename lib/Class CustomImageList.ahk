@@ -58,7 +58,7 @@
 				IconList.Push(this.AddBitmap(pBitmap))
 				DelayAdd := 0
 			}
-		} 
+		}
 		
 		Gdip_DisposeImage(pBitmap)
 		Object.Delete("dimensionIDs")

@@ -48,14 +48,15 @@ m(x*){
 	MsgBox,0, % AppName, % text
 }
 
+ArraySize(arr) {
+	return NumGet(&arr, 4*A_PtrSize)
+}
+
 SysGet(sub, param3 := "") {
 	SysGet, out, % sub, % param3
 	return out
 }
 
-ArraySize(arr) {
-	return NumGet(&arr, 4*A_PtrSize)
-}
 
 ObjFullyClone(obj) {
 	nobj := obj.Clone()

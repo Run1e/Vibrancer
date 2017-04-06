@@ -44,7 +44,9 @@ ApplyRules(Info) {
 }
 
 DisableRules() {
-	NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, Settings.VibrancyScreen)
+	SysGet, MonitorCount, MonitorCount
+	Loop % MonitorCount
+		NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index-1)
 	Hotkey.Disable("LWin")
 	Hotkey.Disable("!Tab")
 }

@@ -16,11 +16,11 @@
 	
 	Screenshot(Size) {
 		if (Size = "Area")
-			Screenshot.CaptureRect()
+			Capture.Rect()
 		else if (Size = "Window")
-			Screenshot.CaptureWindow()
+			Capture.Window()
 		else if (Size = "Full")
-			Screenshot.CaptureScreen()
+			Capture.Screen()
 	}
 	
 	; if running the clipboard fails (ie, not a file/link), it googles it

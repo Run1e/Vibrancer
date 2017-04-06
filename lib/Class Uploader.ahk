@@ -1,18 +1,18 @@
-﻿Class Screenshot {
+﻿Class Uploader {
 	
-	static ImgurErrors := 	{ 400: "Invalid parameters specified"
+	__New() {
+		
+		this.ImgurErrors := { 400: "Invalid parameters specified"
 						, 401: "User authentication required to perform action"
 						, 403: "Forbidden request"
 						, 404: "Non-existent resource"
 						, 429: "Rate limit reached"
 						, 500: "Internal error"}
-	
-	__New() {
+		
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp"
 		this.CLSID := "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}"
 		this.api_access := IsFunc("client_id")?Func("client_id").Call():""
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp" 
-		this.ImageQuality := 100 ; in %
 		
 		this.Queue := []
 		this.QueueErrors := []
@@ -21,7 +21,6 @@
 		
 		this.UploadCount := 0
 		this.DeleteCount := 0
-		this.FailedCount := 0
 		
 		this.ImageFolder := A_WorkingDir "\images"
 		this.ImgurImageFolder := this.ImageFolder "\imgur"
@@ -35,97 +34,9 @@
 		; setup com object
 		ObjRegisterActive(this, this.CLSID)
 		
-		this.LaunchUploader()
+		; launch the uploader
+		this.LaunchWorker()
 	}
-	
-	; gdip solution later maybe?
-	CaptureRect() {
-		static abort
-		color=999999
-		r:=2
-		w:=120
-		Gui 55: -Caption +AlwaysOnTop +Border +LastFound hwndmousehover -E0x20
-		Gui 55: Show
-		WinSet, Region,0-0 w%w% h%w% R300-300, % "ahk_id" mousehover
-		WinSet, Transparent, 5, ahk_id %mousehover%
-		Loop 4 {
-			num:=50+A_Index
-			Gui %num%: Color, % color
-			Gui %num%: -Caption +ToolWindow +AlwaysOnTop
-		} Cursor("IDC_CROSS")
-		while (!GetKeyState("LButton", "P")) {
-			MouseGetPos, xn, yn
-			Gui 55: Show, % "NA X" xn - w/2 " Y" yn - w/2 " W" w " H" w
-			if GetKeyState("Escape", "P") {
-				abort:=true
-				goto abort
-			} sleep 16
-		} MouseGetPos, x, y
-		while (GetKeyState("LButton", "P")) {
-			MouseGetPos, xn, yn
-			Gui 51: Show, % "NA X" (xn < x ? xn : x) " Y" y " W" abs(xn-x) + r " H" r ; CD
-			Gui 52: Show, % "NA X" (xn < x ? xn : x) " Y" yn " W" abs(xn-x) + r " H" r ; AB
-			Gui 53: Show, % "NA X" x " Y" (yn < y ? yn : y) " W" r " H" abs(yn-y) ; AD
-			Gui 54: Show, % "NA X" xn " Y" (yn < y ? yn : y) " W" r " H" abs(yn-y) ; BC
-			Gui 55: Show, % "NA X" xn - w/2 " Y" yn - w/2
-			if GetKeyState("Escape", "P") {
-				abort:=true
-				goto abort
-			} sleep 16
-		}
-		abort:
-		Loop 5 {
-			num:=50+A_Index
-			Gui %num%: Destroy
-		} Cursor()
-		if !abort
-			Screenshot.Capture(x < xn ? x : xn, y < yn ? y : yn, abs(xn-x), abs(yn-y))
-		abort:=false
-		return
-	}
-	
-	CaptureWindow() {
-		WinGetPos, x, y, w, h, A
-		if ErrorLevel {
-			TrayTip("Failed getting active window position.")
-			return Error("Failed to get WinPos", A_ThisFunc, "ErrorLevel set by WinGetPos: " ErrorLevel)
-		}
-		Screenshot.Capture(x, y, w, h)
-	}
-	
-	CaptureScreen() {
-		Screenshot.Capture(0, 0, A_ScreenWidth, A_ScreenHeight)
-	}
-	
-	Capture(x, y, w, h) {
-		if !StrLen(x) || !StrLen(y) || !StrLen(w) || !StrLen(h)
-			return Error("Invalid parameters passed", A_ThisFunc, x ", " y ", " w ", " h, true)
-		
-		Name := A_Now A_MSec
-		File := this.LocalImageFolder "\" Name ".png" ; save to local image folder
-		
-		pBitmap := Gdip_BitmapFromScreen(x "|" y "|" w "|" h)
-		
-		Gdip_Success := Gdip_SaveBitmapToFile(pBitmap, File, this.ImageQuality)
-		if (Gdip_Success < 0) {
-			Error := {  -1:"Extension supplied is not a supported file format"
-					, -2:"Could not get a list of encoders on system"
-					, -3:"Could not find matching encoder for specified file format"
-					, -4:"Could not get WideChar name of output file"
-					, -5:"Could not save file to disk"}[Gdip_Success]
-			return Error(Error, A_ThisFunc ": Gdip_SaveBitmapToFile", "File: " File "`nImageQuality: " this.ImageQuality, true)
-		}
-		
-		Gdip_DisposeImage(pBitmap)
-		this.Upload(File)
-		return Name
-	}
-	
-	
-	
-	/*
-		*** PLUGIN METHODS BELOW ***
-	*/
 	
 	Upload(File) {
 		if !FileExist(File)
@@ -161,22 +72,6 @@
 		} this.LastHeaders := hdr
 	}
 	
-	LaunchUploader() {
-		Run % A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk"),, UseErrorLevel
-		if (ErrorLevel = "ERROR")
-			Error("Failed to run Uploader Helper", A_ThisFunc, "Uploader." (A_IsCompiled?"exe":"ahk") " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
-		sleep 500 ; should be enough, maybe get a less hacky solution
-	}
-	
-	CheckAlive() {
-		try
-			this.Plugin.ArbitraryMethodNameToLureOutAnError()
-		catch e {
-			this.LaunchUploader()
-			return false
-		} return true
-	}
-	
 	UploadUpdate(Percentage) {
 		if (Percentage > 99)
 			Msg := "Waiting.."
@@ -196,6 +91,8 @@
 	}
 	
 	StartQueue() {
+		if this.RunQueue
+			return
 		this.RunQueue := true
 		Big.SetText(Big.StartStopButtonHWND, "Pause")
 		this.StepQueue()
@@ -245,61 +142,9 @@
 		this.SetStatus(Pop.Event="Delete"?"Deleting..":"Starting..")
 		
 		if (Pop.Event = "Upload")
-			this.Plugin.Upload(Pop.File)
+			this.Worker.Upload(Pop.File)
 		else if (Pop.Event = "Delete")
-			this.Plugin.Delete(Pop.Index, Pop.DeleteHash)
-	}
-	
-	; create and show the user the result of the queue
-	FinishQueue() {
-		
-		; craft queue message
-		if (!this.UploadCount && !this.DeleteCount && this.FailedCount) { ; everything failed :(
-			Title := "Queue items failed"
-			Msg := "Failed items: " this.FailedCount
-			AllFail := true
-		}
-		else if (this.UploadCount && !this.DeleteCount) { ; only uploads
-			
-			Title := (this.UploadCount>1?this.UploadCount " i":"I")"mage" (this.UploadCount>1?"s":"") " uploaded!"
-			if (this.UploadCount=1) {
-				
-				Msg := "Link copied to clipboard."
-				
-				; check for hotkey pointing to Action.RunClipboard()
-				; and show it in the traytip in that case to remind user that they have that hotkey
-				if !Big.IsVisible {
-					for Key, Bind in Keybinds {
-						if (Bind.Func = "RunClipboard") {
-							Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
-							break
-				}}} ; I've never done this before. How exiting.
-				
-			} else
-				Msg := "Open the Imgur tab to see images."
-			
-		}
-		else if (this.DeleteCount && !this.UploadCount) { ; only deletions
-			Title := (this.DeleteCount>1?this.DeleteCount " i":"I") "mage" (this.DeleteCount>1?"s":"") " deleted!"
-			Msg := "Image" (this.DeleteCount>1?"s":"") " have been deleted from imgur."
-		}
-		else { ; both
-			Title := "Queue report:"
-			Msg := this.UploadCount " image" (this.UploadCount>1?"s":"") " uploaded.`n" this.DeleteCount  " image" (this.DeleteCount>1?"s":"") " deleted."
-		}
-		
-		if this.FailedCount && !AllFail
-			Msg .= "`n`nFailed items: " this.FailedCount
-		
-		; show msg
-		TrayTip(Title, Msg)
-		
-		; reset info
-		this.QueueErrors := []
-		this.UploadCount:=this.DeleteCount:=this.FailedCount:=0
-		
-		this.StopQueue()
-		this.SetStatus("Queue finished!")
+			this.Worker.Delete(Pop.Index, Pop.DeleteHash)
 	}
 	
 	; text representation of what's going on (which is shown in the main gui)
@@ -358,12 +203,11 @@
 	}
 	
 	UploadFailure(file, res) {
-		this.FailedCount++
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
 		} else { ; uploader threw the error
 			Error("Uploader threw an error when uploading", A_ThisFunc, "File: " file "`n`n" res)
-			this.QueueErrors.Push("Uploader error: " res)
+			this.QueueErrors.Push(res)
 			this.StepQueue(true)
 		} return
 	}
@@ -394,12 +238,11 @@
 	}
 	
 	DeleteFailure(Index, res) {
-		this.FailedCount++
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
 		} else {
 			Error("Program threw an error when deleting", A_ThisFunc, "Image: " pa(Images[Index]) "`n`n" res)
-			this.QueueErrors.Push("Delete error: " res)
+			this.QueueErrors.Push(res)
 			this.StepQueue(true)
 		}
 	}
@@ -417,13 +260,13 @@
 				res.status := 429
 				this.ImgurError(res)
 			} else {
-				this.QueueErrors.Push("Imgur: " error)
+				this.QueueErrors.Push(error)
 				this.StepQueue(true) ; skip and continue
 			}
 			
 		} else if (status ~= "401|403|404") {
 			
-			this.QueueErrors.Push("Imgur: " error)
+			this.QueueErrors.Push(error)
 			this.StepQueue(true) ; skip and continue
 			
 		} else if (status = 429) { ; rate limit reached or ip temporarily blocked
@@ -438,27 +281,102 @@
 				TrayTip("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
 			
 			this.StopQueue()
-			this.SetStatus("Imgur error..")
+			this.SetStatus("Imgur timeout/limit")
 			
 		} else if (status = 500) { ; imgur internal error
 			
-			this.QueueErrors.Push("Imgur: " error)
+			this.QueueErrors.Push(error)
 			this.StepQueue(true) ; skip, continue
 			
 		}
 	}
 	
-	Handshake(PluginClass) {
+	; clean up and craft a message for the user
+	FinishQueue() {
+		
+		; craft queue message
+		if (!this.UploadCount && !this.DeleteCount && this.QueueErrors.MaxIndex()) { ; everything failed :(
+			
+			for Index, Error in this.QueueErrors
+				Errors .= Error "`n"
+			
+			if (this.QueueErrors.MaxIndex() < 4) {
+				Title := "Queue error" . (this.QueueErrors.MaxIndex()>1?"s":"") . ":"
+				Msg := Errors
+			} else { ; many errors
+				MsgBox, 64, List of failed queue items:, % Errors
+				Shown := true
+			}
+			
+			AllFail := true
+			
+		}
+		else if (this.UploadCount && !this.DeleteCount) { ; only uploads
+			
+			Title := (this.UploadCount>1?this.UploadCount " i":"I")"mage" (this.UploadCount>1?"s":"") " uploaded!"
+			if (this.UploadCount=1) {
+				
+				Msg := "Link copied to clipboard."
+				
+				; check for hotkey pointing to Action.RunClipboard()
+				; and show it in the traytip in that case to remind user that they have that hotkey
+				if !Big.IsVisible {
+					for Key, Bind in Keybinds {
+						if (Bind.Func = "RunClipboard") {
+							Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
+							break
+				}}} ; I've never done this before. How exiting.
+				
+			} else
+				Msg := "Open the Imgur tab to see images."
+			
+		}
+		else if (this.DeleteCount && !this.UploadCount) { ; only deletions
+			Title := (this.DeleteCount>1?this.DeleteCount " i":"I") "mage" (this.DeleteCount>1?"s":"") " deleted!"
+			Msg := "Image" (this.DeleteCount>1?"s":"") " have been deleted from imgur."
+		}
+		else { ; both
+			Title := "Queue report:"
+			Msg := this.UploadCount " image" (this.UploadCount>1?"s":"") " uploaded.`n" this.DeleteCount  " image" (this.DeleteCount>1?"s":"") " deleted."
+		}
+		
+		if this.QueueErrors.MaxIndex() && !AllFail
+			Msg .= "`n`nQueue errors: " this.QueueErrors.MaxIndex()
+		
+		if !Shown
+			TrayTip(Title, Msg)
+		
+		; reset info
+		this.QueueErrors := []
+		this.UploadCount:=this.DeleteCount:=0
+		
+		this.StopQueue()
+		this.SetStatus("Queue finished!")
+	}
+	
+	Handshake(UploaderObj) {
 		static Shaked
-		
-		this.Plugin := PluginClass
-		
+		this.Worker := UploaderObj
 		if Shaked
 			this.StartQueue()
-		
 		Shaked := true
-		
 		return
+	}
+	
+	LaunchWorker() {
+		Run % A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk"),, UseErrorLevel
+		if (ErrorLevel = "ERROR")
+			Error("Failed to run Uploader Helper", A_ThisFunc, "Uploader." (A_IsCompiled?"exe":"ahk") " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
+		sleep 500 ; should be enough, maybe get a less hacky solution
+	}
+	
+	CheckAlive() {
+		try
+			this.Worker.ArbitraryMethodNameToLureOutAnError()
+		catch e {
+			this.LaunchWorker()
+			return false
+		} return true
 	}
 	
 	RuntimeError(Msg) {
@@ -467,7 +385,7 @@
 	}
 	
 	Free() {
-		this.Plugin.Exit() ; close upload helper
+		this.Worker.Exit() ; close upload helper
 		sleep 50
 		DllCall("oleaut32\RevokeActiveObject", "uint", this.cookie, "ptr", 0) ; revoke plugin object
 	}
