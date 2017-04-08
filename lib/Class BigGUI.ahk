@@ -656,7 +656,7 @@
 		if this.IsVisible
 			return WinActivate(this.ahkid)
 		
-		if SetGUI.IsVisible
+		if SetGUI.IsVisible || Capture.Capturing
 			return
 		
 		this.LV_Colors_OnMessage(true)

@@ -53,6 +53,9 @@
 
 Settings() {
 	
+	if Capture.Capturing
+		return
+		
 	SetGUI := new SettingsGUI("Settings")
 	
 	if WinExist(Big.ahkid) {

@@ -12,6 +12,7 @@
 			static WH_MOUSE_LL := 14
 			
 			Keybinds(false)
+			Capture.Capturing := true
 			
 			this.CD := 33 ; circle diameter
 			this.CircleLuma := 1
@@ -77,6 +78,7 @@
 			
 			Cursor() ; reset cursor
 			Keybinds(true)
+			Capture.Capturing := false
 			
 			; capture
 			if this.Dragging && !Abort {
@@ -108,6 +110,13 @@
 	
 	Class ScreenClass {
 		Start() {
+			static Size := 1.8
+				, Width := A_ScreenWidth / Size
+				, Height := A_ScreenHeight / Size
+				, Margin := 10
+				, Outline := 2
+				, Separator := 10
+			
 			SysGet, MonitorCount, MonitorCount
 			
 			if (MonitorCount = 1)
@@ -115,17 +124,14 @@
 			
 			Keybinds(false)
 			
+			Capture.Capturing := true
+			
 			Hotkey.Bind("Escape", this.Close.Bind(this))
 			
 			this.Vis := new GUI
 			this.Vis.Parent := this
 			this.Vis.Options("-Caption +ToolWindow +AlwaysOnTop +Border +E0x80000")
 			
-			Size := 1.8
-			Width := A_ScreenWidth / Size
-			Height := A_ScreenHeight / Size
-			Margin := 10
-			Outline := 2
 			
 			this.Vis.Show("x0 y0 w" A_ScreenWidth " h" A_ScreenHeight)
 			
@@ -139,7 +145,7 @@
 			
 			Bitmaps := []
 			
-			for MonitorID, Mon in MonitorSetup(Width-Margin*2, Height-Margin*2, 10) {
+			for MonitorID, Mon in MonitorSetup(Width-Margin*2, Height-Margin*2, Separator) {
 				
 				pBitmap := Gdip_BitmapFromScreen(MonitorID)
 				
@@ -178,6 +184,7 @@
 			this.Vis.Destroy()
 			this.Vis := ""
 			Keybinds(true)
+			Capture.Capturing := false
 		}
 		
 		CaptureMonitor(MonitorID, Close := false) {
