@@ -509,6 +509,10 @@
 		LV_Modify((LV_GetCount()<Pos?LV_GetCount():Pos), "Focus Select Vis") ; select closest new row
 		
 		this.BindListViewSize()
+		
+		; disable the hotkey if it isn't a gui hotkey
+		if (RealKey != "Delete") && (RealKey != "^z")
+			Hotkey.Disable(RealKey)
 	}
 	
 	RegretBind() {
@@ -529,6 +533,9 @@
 		}
 		
 		this.BindListViewSize()
+		
+		if (Info.Key != "Delete") && (Info.Key != "^z")
+		Hotkey.Bind(Info.Key, Actions[Info.Bind.Func].Bind(Actions, Info.Bind.Param*))
 	}
 	
 	UpdateBindList(FocusKey:= "") {
