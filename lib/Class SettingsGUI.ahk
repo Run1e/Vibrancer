@@ -47,19 +47,15 @@
 		
 		if this.OpenMainOnClose
 			Big.Open()
-
 	}
 }
 
 Settings() {
 	
-	if Capture.Capturing
-		return
-		
 	SetGUI := new SettingsGUI("Settings")
 	
-	if WinExist(Big.ahkid) {
-		Big.Hide()
+	if Big.IsVisible {
+		Big.Close()
 		SetGUI.OpenMainOnClose := true
 	}
 	

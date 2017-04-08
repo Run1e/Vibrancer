@@ -12,7 +12,6 @@
 			static WH_MOUSE_LL := 14
 			
 			Keybinds(false)
-			Capture.Capturing := true
 			
 			this.CD := 33 ; circle diameter
 			this.CircleLuma := 1
@@ -34,7 +33,7 @@
 			
 			Cursor("IDC_CROSS")
 			
-			this.MouseHook := DllCall("SetWindowsHookEx", "int", WH_MOUSE_LL, "uint", RegisterCallback("MouseProc"), "uint", DllCall("GetModuleHandle", "Uint", 0), "uint", 0)
+			this.MouseHook := DllCall("SetWindowsHookEx", "int", WH_MOUSE_LL, "uint", RegisterCallback("MouseProc"), "uint", 0, "uint", 0)
 		}
 		
 		OnMouseMove(x, y) {
@@ -57,12 +56,12 @@
 							, abs(this.sy-y) + (ny>this.sy?-1:1))
 				
 			} else if this.Dragging
-				this.Finish()
+				this.Close(true)
 			else ; not started dragging
 				this.Vis.Pos(x - this.CD/2, y - this.CD/2, this.CD, this.CD)
 		}
 		
-		Finish(Abort := false) {
+		Close(Upload := false) {
 			
 			if this.Finishing
 				return
@@ -77,11 +76,11 @@
 			this.Vis := ""
 			
 			Cursor() ; reset cursor
+			
 			Keybinds(true)
-			Capture.Capturing := false
 			
 			; capture
-			if this.Dragging && !Abort {
+			if this.Dragging && Upload {
 				MouseGetPos, x, y
 				func := Capture.Capture.Bind(Capture, (this.sx<x?this.sx:x), (this.sy<y?this.sy:y), abs(this.sx-x), abs(this.sy-y))
 				SetTimer, %func%, -1 ; start upload init in a new thread, this one freaks out if we don't.
@@ -91,7 +90,7 @@
 		; listen for escape key press
 		Class RectGUI extends GUI {
 			Escape() {
-				this.Parent.Finish(true)
+				this.Parent.Close()
 			}
 		}
 	}
@@ -115,6 +114,7 @@
 				, Height := A_ScreenHeight / Size
 				, Margin := 10
 				, Outline := 2
+				, OutlineColor := 0x85AAAAAA
 				, Separator := 10
 			
 			SysGet, MonitorCount, MonitorCount
@@ -124,14 +124,13 @@
 			
 			Keybinds(false)
 			
-			Capture.Capturing := true
+			this.Capturing := true
 			
 			Hotkey.Bind("Escape", this.Close.Bind(this))
 			
 			this.Vis := new GUI
 			this.Vis.Parent := this
 			this.Vis.Options("-Caption +ToolWindow +AlwaysOnTop +Border +E0x80000")
-			
 			
 			this.Vis.Show("x0 y0 w" A_ScreenWidth " h" A_ScreenHeight)
 			
@@ -141,7 +140,7 @@
 			G := Gdip_GraphicsFromHDC(hdc)
 			Gdip_SetInterpolationMode(G, 7)
 			
-			pPen := Gdip_CreatePen(0xFFFFFFFF, Outline) ; outline pen
+			pPen := Gdip_CreatePen(OutlineColor, Outline) ; outline pen
 			
 			Bitmaps := []
 			
@@ -154,16 +153,16 @@
 				
 				Gdip_DrawRectangle(G, pPen, Margin + Mon.x, Margin + Mon.y, Mon.w, Mon.h)
 				
-				Gdip_DrawImage(G, pBitmap, Margin + Mon.x + Outline, Margin + Mon.y + Outline, Mon.w - Outline*2, Mon.h - Outline*2, 0, 0, bWidth, bHeight)
+				Gdip_DrawImage(G, pBitmap, Margin + Mon.x + Outline - 1, Margin + Mon.y + Outline - 1, Mon.w - Outline*2 + 1, Mon.h - Outline*2 + 1, 0, 0, bWidth, bHeight)
 				
 				Bitmaps.Push(pBitmap)
 				
 				HWND := this.Vis.Add("Text"
-					, "x" Margin + Mon.x
-					. " y" Margin + Mon.y
-					. " w" Mon.w
-					. " h" Mon.h
-					. " +Border 0x200 Center", MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
+								, "x" Margin + Mon.x
+								. " y" Margin + Mon.y
+								. " w" Mon.w
+								. " h" Mon.h
+								. " +Border 0x200 Center", MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
 			}
 			
 			UpdateLayeredWindow(this.Vis.hwnd, hdc, A_ScreenWidth / 2 - Width / 2, A_ScreenHeight / 2 - Height / 2, Width, Height)
@@ -183,8 +182,8 @@
 		Close() {
 			this.Vis.Destroy()
 			this.Vis := ""
+			this.Capturing := false
 			Keybinds(true)
-			Capture.Capturing := false
 		}
 		
 		CaptureMonitor(MonitorID, Close := false) {
@@ -193,12 +192,10 @@
 			
 			SysGet, Monitor, Monitor, % MonitorID
 			
-			x := MonitorLeft
-			y := MonitorTop
-			w := MonitorRight - MonitorLeft
-			h := MonitorBottom - MonitorTop
-			
-			Capture.Capture(x, y, w, h)
+			Capture.Capture( MonitorLeft
+						, MonitorTop
+						, MonitorRight - MonitorLeft
+						, MonitorBottom - MonitorTop)
 		}
 	}
 	

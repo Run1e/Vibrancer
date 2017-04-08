@@ -262,7 +262,6 @@
 		
 		FileSelectFile, Game, 3, % A_ProgramFiles, Select an .exe file, *.exe
 		
-		
 		if ErrorLevel
 			return this.Enable()
 		
@@ -458,8 +457,6 @@
 	; bug, when overwriting, it doesn't default the focus to the window
 	BindCallback(Bind := "", Key := "") {
 		
-		Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
-		
 		if !IsObject(Bind)
 			return this.Enable()
 		
@@ -488,6 +485,8 @@
 		
 		this.Enable()
 		this.Activate()
+		
+		Keybinds(true)
 		
 		return
 	}
@@ -625,28 +624,36 @@
 		this.ActiveTab := tab
 		this.Control("Choose", "SysTabControl321", tab)
 		
-		Hotkey.Disable("Delete")
-		Hotkey.Disable("^z")
-		this.DropFilesToggle(false)
+		this.SetTabHotkeys(tab)
 		
 		if (tab = 1) {
-			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
-			Hotkey.Bind("^z", this.RegretProg.Bind(this), this.hwnd)
 			this.Control("Focus", "SysListView321")
 			this.SelectScreen(Settings.VibrancyScreen + 1)
 			this.ImgurAnimate(false)
+			this.DropFilesToggle(false)
 		} else if (tab = 2) {
-			Hotkey.Bind("Delete", this.ImgurDelete.Bind(this), this.hwnd)
-			this.DropFilesToggle(true)
 			this.Options("ListView", this.ImgurListViewHWND)
 			LV_Modify(1, "Vis") ; show first item
 			LV_Modify(0, "-Select") ; show first item
 			this.ImgurAnimate(true) ; animate gifs
+			this.DropFilesToggle(true)
+		} else if (tab = 3) {
+			this.Control("Focus", "SysListView323")
+			this.ImgurAnimate(false)
+			this.DropFilesToggle(false)
+		}
+	}
+	
+	SetTabHotkeys(tab) {
+		if (tab = 1) {
+			Hotkey.Bind("Delete", this.DeleteProg.Bind(this), this.hwnd)
+			Hotkey.Bind("^z", this.RegretProg.Bind(this), this.hwnd)
+		} else if (tab = 2) {
+			Hotkey.Bind("Delete", this.ImgurDelete.Bind(this), this.hwnd)
+			Hotkey.Disable("^z")
 		} else if (tab = 3) {
 			Hotkey.Bind("Delete", this.DeleteBind.Bind(this), this.hwnd)
 			Hotkey.Bind("^z", this.RegretBind.Bind(this), this.hwnd)
-			this.Control("SysListView323")
-			this.ImgurAnimate(false)
 		}
 	}
 	
@@ -656,7 +663,7 @@
 		if this.IsVisible
 			return WinActivate(this.ahkid)
 		
-		if SetGUI.IsVisible || Capture.Capturing
+		if SetGUI.IsVisible
 			return
 		
 		this.LV_Colors_OnMessage(true)
