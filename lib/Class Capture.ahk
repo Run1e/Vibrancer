@@ -2,63 +2,197 @@
 	static Upload := true
 	static ImageQuality := 100 ; in %
 	
-		; gdip solution later maybe?
+	
 	Rect() {
-		static abort
-		color=999999
-		r:=2
-		w:=120
-		Gui 55: -Caption +AlwaysOnTop +Border +LastFound hwndmousehover -E0x20
-		Gui 55: Show
-		WinSet, Region,0-0 w%w% h%w% R300-300, % "ahk_id" mousehover
-		WinSet, Transparent, 5, ahk_id %mousehover%
-		Loop 4 {
-			num:=50+A_Index
-			Gui %num%: Color, % color
-			Gui %num%: -Caption +ToolWindow +AlwaysOnTop
-		} Cursor("IDC_CROSS")
-		while (!GetKeyState("LButton", "P")) {
-			MouseGetPos, xn, yn
-			Gui 55: Show, % "NA X" xn - w/2 " Y" yn - w/2 " W" w " H" w
-			if GetKeyState("Escape", "P") {
-				abort:=true
-				goto abort
-			} sleep 16
-		} MouseGetPos, x, y
-		while (GetKeyState("LButton", "P")) {
-			MouseGetPos, xn, yn
-			Gui 51: Show, % "NA X" (xn < x ? xn : x) " Y" y " W" abs(xn-x) + r " H" r ; CD
-			Gui 52: Show, % "NA X" (xn < x ? xn : x) " Y" yn " W" abs(xn-x) + r " H" r ; AB
-			Gui 53: Show, % "NA X" x " Y" (yn < y ? yn : y) " W" r " H" abs(yn-y) ; AD
-			Gui 54: Show, % "NA X" xn " Y" (yn < y ? yn : y) " W" r " H" abs(yn-y) ; BC
-			Gui 55: Show, % "NA X" xn - w/2 " Y" yn - w/2
-			if GetKeyState("Escape", "P") {
-				abort:=true
-				goto abort
-			} sleep 16
+		this.RectClass.Start()
+	}
+	
+	Class RectClass {
+		Start() {
+			static WH_MOUSE_LL := 14
+			
+			Keybinds(false)
+			
+			this.CD := 33 ; circle diameter
+			this.CircleLuma := 1
+			this.RectLuma := 25
+			
+			this.Finishing := false
+			this.Dragging := false
+			
+			; create the circle gui
+			this.Vis := new this.RectGUI
+			this.Vis.Parent := this
+			
+			this.Vis.Options("-E0x20 +AlwaysOnTop -Caption +Border +ToolWindow")
+			this.Vis.WinSet("Region", "w" this.CD " h" this.CD " 0-0 R" this.CD "-" this.CD)
+			this.Vis.WinSet("Transparent", this.CircleLuma)
+			
+			MouseGetPos, x, y
+			this.Vis.Show("x" x - this.CD/2 " y" y - this.CD/2 " w" this.CD " h" this.CD)
+			
+			Cursor("IDC_CROSS")
+			
+			this.MouseHook := DllCall("SetWindowsHookEx", "int", WH_MOUSE_LL, "uint", RegisterCallback("MouseProc"), "uint", DllCall("GetModuleHandle", "Uint", 0), "uint", 0)
 		}
-		abort:
-		Loop 5 {
-			num:=50+A_Index
-			Gui %num%: Destroy
-		} Cursor()
-		if !abort
-			Capture.Capture(x < xn ? x : xn, y < yn ? y : yn, abs(xn-x), abs(yn-y))
-		abort:=false
-		return
+		
+		OnMouseMove(x, y) {
+			if GetKeyState("LButton", "P") { ; draggin
+				
+				; set initial vars
+				if !this.Dragging {
+					this.Dragging := true
+					this.sx:=x
+					this.sy:=y
+					this.Vis.Pos(0, 0, 0, 0) ; "hide" for a sec
+					this.Vis.WinSet("Transparent", this.RectLuma)
+					this.Vis.WinSet("Region", "") ; make rect again
+				}
+				
+				; move rect
+				this.Vis.Pos(	  nx := (this.sx<x?this.sx:x)
+							, ny := (this.sy<y?this.sy:y)
+							, abs(this.sx-x) + (nx>this.sx?-1:1)
+							, abs(this.sy-y) + (ny>this.sy?-1:1))
+				
+			} else if this.Dragging
+				this.Finish()
+			else ; not started dragging
+				this.Vis.Pos(x - this.CD/2, y - this.CD/2, this.CD, this.CD)
+		}
+		
+		Finish(Abort := false) {
+			
+			if this.Finishing
+				return
+			
+			this.Finishing := true
+			
+			; unhook mouse hook
+			DllCall("UnhookWindowsHookEx", "Uint", this.MouseHook)
+			
+			; destroy window
+			this.Vis.Destroy()
+			this.Vis := ""
+			
+			Cursor() ; reset cursor
+			Keybinds(true)
+			
+			; capture
+			if this.Dragging && !Abort {
+				MouseGetPos, x, y
+				func := Capture.Capture.Bind(Capture, (this.sx<x?this.sx:x), (this.sy<y?this.sy:y), abs(this.sx-x), abs(this.sy-y))
+				SetTimer, %func%, -1 ; start upload init in a new thread, this one freaks out if we don't.
+			}
+		}
+		
+		; listen for escape key press
+		Class RectGUI extends GUI {
+			Escape() {
+				this.Parent.Finish(true)
+			}
+		}
 	}
 	
 	Window() {
-		WinGetPos, x, y, w, h, A
-		if ErrorLevel {
+		Pos := WinGetPos("A")
+		if !Pos {
 			TrayTip("Failed getting active window position.")
 			return Error("Failed to get WinPos", A_ThisFunc, "ErrorLevel set by WinGetPos: " ErrorLevel)
-		}
-		Capture.Capture(x, y, w, h)
+		} this.Capture(Pos.x, Pos.y, Pos.w, Pos.h)
 	}
 	
 	Screen() {
-		Capture.Capture(0, 0, A_ScreenWidth, A_ScreenHeight)
+		this.ScreenClass.Start()
+	}
+	
+	Class ScreenClass {
+		Start() {
+			SysGet, MonitorCount, MonitorCount
+			
+			if (MonitorCount = 1)
+				return this.CaptureMonitor(1)
+			
+			Keybinds(false)
+			
+			Hotkey.Bind("Escape", this.Close.Bind(this))
+			
+			this.Vis := new GUI
+			this.Vis.Parent := this
+			this.Vis.Options("-Caption +ToolWindow +AlwaysOnTop +Border +E0x80000")
+			
+			Size := 1.8
+			Width := A_ScreenWidth / Size
+			Height := A_ScreenHeight / Size
+			Margin := 10
+			Outline := 2
+			
+			this.Vis.Show("x0 y0 w" A_ScreenWidth " h" A_ScreenHeight)
+			
+			hbm := CreateDIBSection(Width, Height)
+			hdc := CreateCompatibleDC()
+			obm := SelectObject(hdc, hbm)
+			G := Gdip_GraphicsFromHDC(hdc)
+			Gdip_SetInterpolationMode(G, 7)
+			
+			pPen := Gdip_CreatePen(0xFFFFFFFF, Outline) ; outline pen
+			
+			Bitmaps := []
+			
+			for MonitorID, Mon in MonitorSetup(Width-Margin*2, Height-Margin*2, 10) {
+				
+				pBitmap := Gdip_BitmapFromScreen(MonitorID)
+				
+				bWidth := Gdip_GetImageWidth(pBitmap)
+				bHeight := Gdip_GetImageHeight(pBitmap)
+				
+				Gdip_DrawRectangle(G, pPen, Margin + Mon.x, Margin + Mon.y, Mon.w, Mon.h)
+				
+				Gdip_DrawImage(G, pBitmap, Margin + Mon.x + Outline, Margin + Mon.y + Outline, Mon.w - Outline*2, Mon.h - Outline*2, 0, 0, bWidth, bHeight)
+				
+				Bitmaps.Push(pBitmap)
+				
+				HWND := this.Vis.Add("Text"
+					, "x" Margin + Mon.x
+					. " y" Margin + Mon.y
+					. " w" Mon.w
+					. " h" Mon.h
+					. " +Border 0x200 Center", MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
+			}
+			
+			UpdateLayeredWindow(this.Vis.hwnd, hdc, A_ScreenWidth / 2 - Width / 2, A_ScreenHeight / 2 - Height / 2, Width, Height)
+			
+			Gdip_DeletePen(pPen)
+			SelectObject(hdc, obm)
+			DeleteObject(hbm)
+			DeleteDC(hdc)
+			Gdip_DeleteGraphics(G)
+			
+			for Index, Bitmap in Bitmaps
+				Gdip_DisposeImage(Bitmap)
+			
+			Bitmaps := []
+		}
+		
+		Close() {
+			this.Vis.Destroy()
+			this.Vis := ""
+			Keybinds(true)
+		}
+		
+		CaptureMonitor(MonitorID, Close := false) {
+			if Close
+				this.Close()
+			
+			SysGet, Monitor, Monitor, % MonitorID
+			
+			x := MonitorLeft
+			y := MonitorTop
+			w := MonitorRight - MonitorLeft
+			h := MonitorBottom - MonitorTop
+			
+			Capture.Capture(x, y, w, h)
+		}
 	}
 	
 	Capture(x, y, w, h) {
@@ -66,24 +200,37 @@
 			return Error("Invalid parameters passed", A_ThisFunc, x ", " y ", " w ", " h, true)
 		
 		Name := A_Now A_MSec
-		File := this.LocalImageFolder "\" Name ".png" ; save to local image folder
+		File := Uploader.LocalImageFolder "\" Name ".png" ; save to local image folder
 		
 		pBitmap := Gdip_BitmapFromScreen(x "|" y "|" w "|" h)
 		
-		Gdip_Success := Gdip_SaveBitmapToFile(pBitmap, File, this.ImageQuality)
+		Gdip_Success := Gdip_SaveBitmapToFile(pBitmap, File, Uploader.ImageQuality)
 		if (Gdip_Success < 0) {
 			Error := {  -1:"Extension supplied is not a supported file format"
 					, -2:"Could not get a list of encoders on system"
 					, -3:"Could not find matching encoder for specified file format"
 					, -4:"Could not get WideChar name of output file"
 					, -5:"Could not save file to disk"}[Gdip_Success]
-			return Error(Error, A_ThisFunc ": Gdip_SaveBitmapToFile", "File: " File "`nImageQuality: " this.ImageQuality, true)
+			return Error(Error, A_ThisFunc ": Gdip_SaveBitmapToFile", "File: " File "`nImageQuality: " Uploader.ImageQuality, true)
 		}
 		
 		Gdip_DisposeImage(pBitmap)
 		
-		Uploader.Upload(File)
+		if !FileExist(File)
+			return Error("Failed creating file for upload.", A_ThisFunc, "Name: " name)
+		
+		if this.Upload
+			Uploader.Upload(File)
 		
 		return Name
 	}
+}
+
+MouseProc(nCode, wParam, lParam) {
+	Critical
+	
+	if (wParam = 0x200) ; WM_MOUSEMOVE
+		Capture.RectClass.OnMouseMove(NumGet(lParam+0,0,"int"), NumGet(lParam+4,0,"int"))
+	
+	return DllCall("CallNextHookEx", "uint", Capture.RectClass.MouseHook, "int", nCode, "uint", wParam, "uint", lParam)
 }

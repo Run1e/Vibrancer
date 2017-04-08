@@ -6,7 +6,8 @@ IconInstall() {
 	if !FileExist("icons\octicons")
 		FileCreateDir icons\octicons
 	
-	FileInstall, icons\powerplay.ico, icons\powerplay.ico
+	if (FileSHA1("icons\powerplay.ico") != "5817ED69EE42E3B12A629B6820F9D419C269A9FA")
+		FileInstall, icons\powerplay.ico, icons\powerplay.ico
 	
 	FileInstall, D:\Documents\Scripts\octicons\arrow-up.ico, icons\octicons\arrow-up.ico
 	FileInstall, D:\Documents\Scripts\octicons\gear.ico, icons\octicons\gear.ico

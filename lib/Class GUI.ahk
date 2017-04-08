@@ -76,7 +76,8 @@
 	}
 	
 	Pos(x := "", y := "", w := "", h := "", NoActivate := true) {
-		WinMove, % this.ahk_id,, % x, % y, % w, % h
+		Gui % this.hwnd ":Show", % (StrLen(x)?"x" x:"") (StrLen(y)?" y" y:"") (StrLen(w)?" w" w:"") (StrLen(h)?" h" h:"")
+		;WinMove, % this.ahk_id,, % x, % y, % w, % h
 	}
 	
 	SetIcon(Icon) {
@@ -121,6 +122,10 @@
 	
 	DropFilesToggle(Toggle) {
 		this.Options((Toggle ? "+" : "-") . "E0x10")
+	}
+	
+	WinSet(Command, Param) {
+		WinSet, % Command, % Param, % this.ahkid
 	}
 	
 	/*

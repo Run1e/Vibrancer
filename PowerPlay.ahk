@@ -4,6 +4,7 @@
 #NoEnv
 #Persistent
 #NoTrayIcon
+DetectHiddenWindows On
 SetRegView 64
 CoordMode, Mouse, Screen
 SetTitleMatchMode 2
@@ -40,7 +41,7 @@ global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Bi
 OnExit, Exit
 
 AppName := "Power Play"
-AppVersion := [0, 9, 2]
+AppVersion := [0, 9, 3]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 SetWorkingDir % A_ScriptDir
@@ -176,3 +177,4 @@ return
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\Class _CHotkeyControl.ahk
+#Include lib\third-party\FileSHA1.ahk
