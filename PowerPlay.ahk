@@ -189,5 +189,4 @@ return
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
-;#Include lib\third-party\Class _CHotkeyControl.ahk
 #Include lib\third-party\FileSHA1.ahk
