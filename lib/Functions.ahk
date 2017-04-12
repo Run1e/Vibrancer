@@ -34,18 +34,18 @@ pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
 	} return
 }
 
+m(x*) {
+	for a, b in x
+		text .= (IsObject(b)?pa(b):b) "`n"
+	MsgBox, 0, % AppName, % text
+}
+
 pas(array, seperator:=", ", depth=5, indentLevel:="") {
 	return StrReplace(pa(array, depth, indentLevel), "`n", seperator)
 }
 
-pap(array) {
-	m(pa(array))
-}
-
-m(x*){
-	for a,b in x
-		text.=b "`n"
-	MsgBox,0, % AppName, % text
+as(arr) {
+	return ArraySize(arr)
 }
 
 ArraySize(arr) {
@@ -75,25 +75,17 @@ WinActivate(win) {
 	WinActivate % win
 }
 
-HotkeyToString(hotkey, caps := true) {
+HotkeyToString(Hotkey) {
 	i:=0
 	if InStr(Hotkey, "^")
-		ret := "CTRL + ", i++
+		ret := "Ctrl + ", i++
 	if InStr(Hotkey, "+")
-		ret .= "SHIFT + ", i++
+		ret .= "Shift + ", i++
 	if InStr(Hotkey, "!")
-		ret .= "ALT + ", i++
-	add := SubStr(Hotkey, i+1)
-	if caps
-		StringUpper, add, add
-	return ret . add
-}
-
-StringToHotkey(string) {
-	mod := {SHIFT:"+",CTRL:"^", ALT:"!"}
-	for a, b in mod
-		string := StrReplace(string, a, b)
-	return StrReplace(string, " + ", "")
+		ret .= "Alt + ", i++
+	ret .= SubStr(Hotkey, i+1)
+	StringUpper, ret, ret
+	return ret
 }
 
 StringReplace(hay, needle, repl) {
@@ -109,58 +101,6 @@ Random(min, max) {
 RegRead(root, sub, value) {
 	RegRead, output, % root, % sub, % value
 	return output
-}
-
-POST(URL, POST := "", TIMEOUT_SECONDS := 5, PROXY := "", GET := false) {
-	static HTTP := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-	
-	; check for internet connection
-	if !DllCall("Wininet.dll\InternetGetConnectedState", "Str", 0x40,"Int",0)
-		return false
-	
-	; open the URL and set header
-	HTTP.Open(GET?"GET":"POST", URL, true)
-	HTTP.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-	
-	; set proxy if specified or the internet explorer settings have it set
-	RegRead ProxyEnable, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyEnable
-	if PROXY
-		HTTP.SetProxy(2, PROXY)
-	else if ProxyEnable {
-		RegRead ProxyServer, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Internet Settings, ProxyServer
-		HTTP.SetProxy(2, ProxyServer)
-	}
-	
-	; make the POST string if it's specified as an object
-	if IsObject(POST)
-		for Key, Value in POST
-			POST .= (A_Index > 1 ? "&" : "") Key "=" UriEncode(Value)
-	
-	; send
-	HTTP.Send(POST)
-	
-	try {
-		if HTTP.WaitForResponse(TIMEOUT_SECONDS)
-			return HTTP.ResponseText
-	} catch e
-		return false
-	return false
-}
-
-UriEncode(Uri) { ; thanks to GeekDude for providing this function!
-	VarSetCapacity(Var, StrPut(Uri, "UTF-8"), 0)
-	StrPut(Uri, &Var, "UTF-8")
-	f := A_FormatInteger
-	SetFormat, IntegerFast, H
-	while Code := NumGet(Var, A_Index - 1, "UChar")
-		if (Code >= 0x30 && Code <= 0x39 ; 0-9
-			|| Code >= 0x41 && Code <= 0x5A ; A-Z
-			|| Code >= 0x61 && Code <= 0x7A) ; a-z
-			Res .= Chr(Code)
-	else
-		Res .= "%" . SubStr(Code + 0x100, -1)
-	SetFormat, IntegerFast, %f%
-	return, Res
 }
 
 ; https://autohotkey.com/boards/viewtopic.php?t=9093

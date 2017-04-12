@@ -27,7 +27,7 @@ MonitorSetup(MaxWidth, MaxHeight, Separator := 2) {
 	; figure out which screens have to be offset to make the separators
 	for a, s in mon {
 		for z, x in mon {
-			if (s.left = x.right) { ; shared vertical side, offset y
+			if (s.left = x.right) { ; shared vertical side, offset x
 				adds_x[a] := (adds_x[z]?adds_x[z]:0) + Separator
 				add_x += Separator
 			} if (s.top = x.bot) { ; shared horizontal side, offset y

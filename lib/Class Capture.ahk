@@ -8,14 +8,15 @@
 	}
 	
 	Class RectClass {
+		
+		static CD := 60
+			, CircleLuma := 10
+			, RectLuma := 32
+		
 		Start() {
 			static WH_MOUSE_LL := 14
 			
 			Keybinds(false)
-			
-			this.CD := 33 ; circle diameter
-			this.CircleLuma := 1
-			this.RectLuma := 25
 			
 			this.Finishing := false
 			this.Dragging := false
@@ -24,6 +25,7 @@
 			this.Vis := new this.RectGUI
 			this.Vis.Parent := this
 			
+			this.Vis.Color(727272)
 			this.Vis.Options("-E0x20 +AlwaysOnTop -Caption +Border +ToolWindow")
 			this.Vis.WinSet("Region", "w" this.CD " h" this.CD " 0-0 R" this.CD "-" this.CD)
 			this.Vis.WinSet("Transparent", this.CircleLuma)
@@ -33,7 +35,22 @@
 			
 			Cursor("IDC_CROSS")
 			
-			this.MouseHook := DllCall("SetWindowsHookEx", "int", WH_MOUSE_LL, "uint", RegisterCallback("MouseProc"), "uint", 0, "uint", 0)
+			this.MouseHook := DllCall("SetWindowsHookEx"
+								, "int", WH_MOUSE_LL
+								, "uint", RegisterCallback(this.MouseProc, "F",, &this)  ; put a pointer to 'this' in A_EventInfo
+								, "uint", 0
+								, "uint", 0)
+		}
+		
+		MouseProc(wParam, lParam) {
+			Critical
+			
+			this := Object(A_EventInfo) ; get this
+			
+			if (wParam = 0x200) ; 0x200 = WM_MOUSEMOVE
+				this.OnMouseMove(NumGet(lParam+0,0,"int"), NumGet(lParam+4,0,"int"))
+			
+			return DllCall("CallNextHookEx", "uint", this.MouseHook, "int", 0, "uint", wParam, "uint", lParam)
 		}
 		
 		OnMouseMove(x, y) {
@@ -44,7 +61,7 @@
 					this.Dragging := true
 					this.sx:=x
 					this.sy:=y
-					this.Vis.Pos(0, 0, 0, 0) ; "hide" for a sec
+					this.Vis.Pos(0, 0, 0, 0) ; "hide" for a sec while changing stuff
 					this.Vis.WinSet("Transparent", this.RectLuma)
 					this.Vis.WinSet("Region", "") ; make rect again
 				}
@@ -108,14 +125,15 @@
 	}
 	
 	Class ScreenClass {
+		
+		static Width := A_ScreenWidth / 1.8
+			, Height := A_ScreenHeight / 1.8
+			, Margin := 10
+			, Outline := 2
+			, OutlineColor := 0xFFFFFFFF ; white with no transparency
+			, Separator := 10
+		
 		Start() {
-			static Size := 1.8
-				, Width := A_ScreenWidth / Size
-				, Height := A_ScreenHeight / Size
-				, Margin := 10
-				, Outline := 2
-				, OutlineColor := 0x85AAAAAA
-				, Separator := 10
 			
 			SysGet, MonitorCount, MonitorCount
 			
@@ -134,38 +152,49 @@
 			
 			this.Vis.Show("x0 y0 w" A_ScreenWidth " h" A_ScreenHeight)
 			
-			hbm := CreateDIBSection(Width, Height)
+			hbm := CreateDIBSection(this.Width, this.Height)
 			hdc := CreateCompatibleDC()
 			obm := SelectObject(hdc, hbm)
 			G := Gdip_GraphicsFromHDC(hdc)
 			Gdip_SetInterpolationMode(G, 7)
 			
-			pPen := Gdip_CreatePen(OutlineColor, Outline) ; outline pen
+			pPen := Gdip_CreatePen(this.OutlineColor, this.Outline) ; outline pen
 			
 			Bitmaps := []
 			
-			for MonitorID, Mon in MonitorSetup(Width-Margin*2, Height-Margin*2, Separator) {
+			for MonitorID, Mon in MonitorSetup(this.Width-this.Margin*2, this.Height-this.Margin*2, this.Separator) {
 				
 				pBitmap := Gdip_BitmapFromScreen(MonitorID)
 				
 				bWidth := Gdip_GetImageWidth(pBitmap)
 				bHeight := Gdip_GetImageHeight(pBitmap)
 				
-				Gdip_DrawRectangle(G, pPen, Margin + Mon.x, Margin + Mon.y, Mon.w, Mon.h)
+				Gdip_DrawRectangle(G, pPen
+								, this.Margin + Mon.x
+								, this.Margin + Mon.y
+								, Mon.w, Mon.h)
 				
-				Gdip_DrawImage(G, pBitmap, Margin + Mon.x + Outline - 1, Margin + Mon.y + Outline - 1, Mon.w - Outline*2 + 1, Mon.h - Outline*2 + 1, 0, 0, bWidth, bHeight)
+				Gdip_DrawImage(G, pBitmap
+							, this.Margin + Mon.x + this.Outline - 1
+							, this.Margin + Mon.y + this.Outline - 1
+							, Mon.w - this.Outline*2 + 1
+							, Mon.h - this.Outline*2 + 1
+							, 0, 0, bWidth, bHeight)
 				
 				Bitmaps.Push(pBitmap)
 				
 				HWND := this.Vis.Add("Text"
-								, "x" Margin + Mon.x
-								. " y" Margin + Mon.y
+								, "x" this.Margin + Mon.x
+								. " y" this.Margin + Mon.y
 								. " w" Mon.w
 								. " h" Mon.h
 								. " +Border 0x200 Center", MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
 			}
 			
-			UpdateLayeredWindow(this.Vis.hwnd, hdc, A_ScreenWidth / 2 - Width / 2, A_ScreenHeight / 2 - Height / 2, Width, Height)
+			UpdateLayeredWindow(this.Vis.hwnd, hdc
+							, A_ScreenWidth / 2 - this.Width / 2
+							, A_ScreenHeight / 2 - this.Height / 2
+							, this.Width, this.Height)
 			
 			Gdip_DeletePen(pPen)
 			SelectObject(hdc, obm)
@@ -228,13 +257,4 @@
 		
 		return Name
 	}
-}
-
-MouseProc(nCode, wParam, lParam) {
-	Critical
-	
-	if (wParam = 0x200) ; WM_MOUSEMOVE
-		Capture.RectClass.OnMouseMove(NumGet(lParam+0,0,"int"), NumGet(lParam+4,0,"int"))
-	
-	return DllCall("CallNextHookEx", "uint", Capture.RectClass.MouseHook, "int", nCode, "uint", wParam, "uint", lParam)
 }

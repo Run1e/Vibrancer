@@ -10,10 +10,13 @@
 	POST := {api_dev_key:Settings.PastebinKey, api_option:"paste", api_paste_code:clipboard}
 	
 	; timeout of 6 should (emphasis on SHOULD) be enough for pretty much any paste
-	Response := POST(EndPoint, POST, 6)
+	if !HTTP.Post(EndPoint, POST)
+		return TrayTip("Failed uploading paste")
+	
+	Response := POST.ResponseText
 	
 	if (InStr(Response, "https://pastebin.com") = 1) {
-		Title := "Clipboard pasted!"
+		Title := "Clipboard uploaded!"
 		Msg := "Link copied to clipboard."
 		
 		if !Big.IsVisible {

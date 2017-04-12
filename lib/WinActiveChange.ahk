@@ -1,8 +1,8 @@
 ﻿; https://autohotkey.com/board/topic/66726-method-to-detect-active-window-change/
 WinActiveChange(wParam, hwnd) {
-	static HSHELL_RUDEAPPACTIVATED := 32772, RulesEnabled
+	static RulesEnabled
 	
-	if (wParam != HSHELL_RUDEAPPACTIVATED) ; only listen for HSHELL_RUDEAPPACTIVATED
+	if (wParam != 32772) ; only listen for HSHELL_RUDEAPPACTIVATED
 		return
 	
 	WinGet, ProcessPath, ProcessPath, ahk_id %hwnd%
@@ -19,9 +19,13 @@ WinActiveChange(wParam, hwnd) {
 				WinGetTitle, Title, ahk_id %hwnd%
 				GameRules[Process].Title := Title
 				JSONSave("GameRules", GameRules)
-				Big.SetDefault()
-				Big.Control("ListView", Big.GameListViewHWND)
-				LV_Modify(A_Index, "Col1", Title)
+				Big.UpdateGameList()
+				
+				; I'm having inconsistensies making the 'nice way' work, so I just refresh the while stupid listview instead
+				
+				;Big.SetDefault()
+				;Big.Control("ListView", Big.GameListViewHWND)
+				;LV_Modify(A_Index, "Col1", Title)
 			}
 			
 			return

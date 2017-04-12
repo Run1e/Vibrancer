@@ -12,7 +12,6 @@
 		this.AllowedExt := "png|jpg|jpeg|gif|bmp"
 		this.CLSID := "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}"
 		this.api_access := IsFunc("client_id")?Func("client_id").Call():""
-		this.AllowedExt := "png|jpg|jpeg|gif|bmp" 
 		
 		this.Queue := []
 		this.QueueErrors := []
@@ -77,40 +76,47 @@
 			Msg := "Waiting.."
 		else
 			Msg := Percentage "%"
-		this.SetStatus(Msg)
+		this.GuiSetStatus(Msg)
 	}
 	
 	AddQueue(Pop) {
 		this.Queue.InsertAt(1, Pop)
 		
-		this.SetStatus() ; update queue counter
+		this.GuiSetStatus() ; update queue counter
 		if (this.Queue.MaxIndex() > 1)
-			this.AllowPause(true)
+			this.GuiAllowPause(true)
 		else
-			this.AllowPause(false)
+			this.GuiAllowPause(false)
 	}
 	
 	StartQueue() {
 		if this.RunQueue
 			return
 		this.RunQueue := true
-		Big.SetText(Big.StartStopButtonHWND, "Pause")
+		this.GuiSetPauseText("Pause")
+		this.GuiSetStatus("Starting..")
 		this.StepQueue()
 	}
 	
 	StopQueue() { ; stops queue at next StepQueue
+		if this.RunQueue
+			this.GuiAllowPause(false)
 		this.RunQueue := false
-		
-		Big.SetText(Big.StartStopButtonHWND, "Start")
-		
-		Fin := (this.Queue.MaxIndex() > 0)
-		this.AllowPause(Fin)
-		this.AllowClear(Fin)
+		this.GuiSetPauseText(this.Queue.MaxIndex()>1?"Pausing..":"Start")
 	}
 	
 	ClearQueue() {
 		this.Queue := []
+		this.GuiAllowPause(false)
+		this.GuiAllowClear(false)
 		this.FinishQueue()
+	}
+	
+	AllowStart(Text := "Paused..") {
+		this.GuiSetStatus(Text)
+		this.GuiSetPauseText("Start")
+		this.GuiAllowClear(true)
+		this.GuiAllowPause(true)
 	}
 	
 	StepQueue(Advance := false) {
@@ -122,10 +128,12 @@
 		if Advance
 			this.Queue.Pop()
 		
-		if !this.RunQueue ; user paused
-			return this.StopQueue(), this.SetStatus("Paused..")
-		else
-			this.AllowClear(false)
+		if !this.RunQueue {
+			return this.AllowStart()
+		} else {
+			this.GuiAllowClear(false)
+			this.GuiAllowPause(true)
+		}
 		
 		Pop := this.Queue[this.Queue.MaxIndex()]
 		
@@ -135,33 +143,16 @@
 		this.Busy := true ; indicates the Uploader is working
 		
 		if (this.Queue.MaxIndex() > 1)
-			this.AllowPause(true)
+			this.GuiAllowPause(true)
 		else
-			this.AllowPause(false)
+			this.GuiAllowPause(false)
 		
-		this.SetStatus(Pop.Event="Delete"?"Deleting..":"Starting..")
+		this.GuiSetStatus(Pop.Event="Delete"?"Deleting..":"Starting..")
 		
 		if (Pop.Event = "Upload")
 			this.Worker.Upload(Pop.File)
 		else if (Pop.Event = "Delete")
 			this.Worker.Delete(Pop.Index, Pop.DeleteHash)
-	}
-	
-	; text representation of what's going on (which is shown in the main gui)
-	SetStatus(Status := "") {
-		static CurrentStatus
-		if this.Queue.MaxIndex()
-			QueueText := "Queue: " this.Queue.MaxIndex()
-		Big.ImgurStatus((StrLen(QueueText)?QueueText " - ":"") . (StrLen(Status)?Status:CurrentStatus))
-		CurrentStatus := Status
-	}
-	
-	AllowPause(Toggle) {
-		Big.QueueControl(Toggle)
-	}
-	
-	AllowClear(Toggle) {
-		Big.ClearQueueControl(Toggle)
 	}
 	
 	UploadResponse(file, JSON_DATA) {
@@ -202,6 +193,7 @@
 		
 	}
 	
+	; upload failed
 	UploadFailure(file, res) {
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
@@ -224,9 +216,7 @@
 			
 			FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension
 			
-			Big.LV_Colors_OnMessage(false)
-			Big.ImgurListRemove(Index)
-			Big.LV_Colors_OnMessage(true)
+			this.GuiRemoveImage(Index)
 			
 			this.DeleteCount++
 			
@@ -237,6 +227,7 @@
 		
 	}
 	
+	; deletion failed
 	DeleteFailure(Index, res) {
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
@@ -247,7 +238,8 @@
 		}
 	}
 	
-	ImgurError(res) { ; takes an imgur error status and decides what to do
+	; takes an imgur error status and decides what to do
+	ImgurError(res) {
 		
 		status := res.status
 		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
@@ -271,17 +263,17 @@
 			
 		} else if (status = 429) { ; rate limit reached or ip temporarily blocked
 			
-			; this.QueueErrors.Push("Imgur: " error)
+			this.QueueErrors.Push(error)
 			
 			if (this.LastHeaders["X-RateLimit-UserRemaining"] = 0) ; user has spent all credits
 				TrayTip("Imgur error!", "You've uploaded too much.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
-			else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) ; client_id credits is empty, we need a new one
+			else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) ; client_id credits is empty, we need a new one, kinda bad tbh
 				TrayTip("Imgur error!", "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening.")
 			else ; last error is IP spam prevention
 				TrayTip("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
 			
 			this.StopQueue()
-			this.SetStatus("Imgur timeout/limit")
+			this.AllowStart("Imgur error")
 			
 		} else if (status = 500) { ; imgur internal error
 			
@@ -293,6 +285,7 @@
 	
 	; clean up and craft a message for the user
 	FinishQueue() {
+		this.GuiSetStatus("Queue finished!")
 		
 		; craft queue message
 		if (!this.UploadCount && !this.DeleteCount && this.QueueErrors.MaxIndex()) { ; everything failed :(
@@ -300,7 +293,7 @@
 			for Index, Error in this.QueueErrors
 				Errors .= Error "`n"
 			
-			if (this.QueueErrors.MaxIndex() < 4) {
+			if (this.QueueErrors.MaxIndex() < 3) {
 				Title := "Queue error" . (this.QueueErrors.MaxIndex()>1?"s":"") . ":"
 				Msg := Errors
 			} else { ; many errors
@@ -325,11 +318,10 @@
 						if (Bind.Func = "RunClipboard") {
 							Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
 							break
-				}}} ; I've never done this before. How exiting.
+				}}} ; I've never done this before. How exciting.
 				
 			} else
 				Msg := "Open the Imgur tab to see images."
-			
 		}
 		else if (this.DeleteCount && !this.UploadCount) { ; only deletions
 			Title := (this.DeleteCount>1?this.DeleteCount " i":"I") "mage" (this.DeleteCount>1?"s":"") " deleted!"
@@ -351,15 +343,14 @@
 		this.UploadCount:=this.DeleteCount:=0
 		
 		this.StopQueue()
-		this.SetStatus("Queue finished!")
 	}
 	
 	Handshake(UploaderObj) {
-		static Shaked
 		this.Worker := UploaderObj
-		if Shaked
+		if this.Queue.MaxIndex() { ; restart queue
+			this.RunQueue := false
 			this.StartQueue()
-		Shaked := true
+		}
 		return
 	}
 	
@@ -374,6 +365,7 @@
 		try
 			this.Worker.ArbitraryMethodNameToLureOutAnError()
 		catch e {
+			this.GuiSetStatus("Starting worker..")
 			this.LaunchWorker()
 			return false
 		} return true
@@ -385,8 +377,37 @@
 	}
 	
 	Free() {
-		this.Worker.Exit() ; close upload helper
+		try ; attempt to close worker
+			this.Worker.Exit()
+		catch e
+			Error("Worked already quit before main script", A_ThisFunc)
 		sleep 50
-		DllCall("oleaut32\RevokeActiveObject", "uint", this.cookie, "ptr", 0) ; revoke plugin object
+	}
+	
+	; === Gui control ===
+	
+	GuiRemoveImage(Index) {
+		Big.LV_Colors_OnMessage(false)
+		Big.ImgurListRemove(Index)
+		Big.LV_Colors_OnMessage(true)
+	}
+	
+	; text representation of what's going on (which is shown in the main gui)
+	GuiSetStatus(Status := "") {
+		static CurrentStatus
+		Big.ImgurStatus((this.Queue.MaxIndex()?"Queue: " this.Queue.MaxIndex() " - ":"") . (StrLen(Status)?Status:CurrentStatus))
+		CurrentStatus := Status
+	}
+	
+	GuiSetPauseText(Text) {
+		Big.SetText(Big.StartStopButtonHWND, Text)
+	}
+	
+	GuiAllowPause(Toggle) {
+		Big.QueueControl(Toggle)
+	}
+	
+	GuiAllowClear(Toggle) {
+		Big.ClearQueueControl(Toggle)
 	}
 }

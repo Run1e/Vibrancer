@@ -8,8 +8,16 @@
 		EditText := this.GetText("Edit1")
 		Rebind := this.GuiControlGet(, Binder.BindHotkeyHWND)
 		
-		if !StrLen(Key) && this.ShowHotkey
+		if !StrLen(Key) && this.HotkeyMode
 			return TrayTip("Please input a Hotkey.")
+		
+		if this.HotkeyMode {
+			if !this.HotkeyCheck(Key)
+				return
+		} else {
+			if !this.TextCheck(Title)
+				return
+		}
 		
 		; create nugget
 		if (this.Assignment ~= this.DDLAssignments) { ; assignment used a dll control, get the data from it
@@ -30,8 +38,11 @@
 			else if (this.Assignment = "Send Text")
 				Bind := {Desc:"Send Text: " EditText, Func:"SendRaw", Param:[EditText]}
 			else if (this.Assignment = "Launch File/Program") {
-				SplitPath, EditText, OutFileName
-				Bind := {Desc:"Launch: " OutFileName, Func:"Run", Param:[EditText]}
+				if !StrLen(this.CustomFileName)
+					SplitPath, EditText, FileName
+				else
+					FileName := this.CustomFileName
+				Bind := {Desc:"Launch " FileName, Func:"Run", Param:[EditText]}
 			}
 			
 		} else if (this.Assignment = "Rebind Key") {
@@ -39,8 +50,6 @@
 				SoundPlay, *-64
 				return
 			} Bind := {Desc:"Rebound to: " HotkeyToString(Rebind), Func:"Send", Param:[Rebind]}
-		} else if (this.Assignment = "Launch Application") {
-			; todo
 		}
 		
 		if !IsObject(Bind) || !StrLen(Bind.Desc) { ; throw an error if we don't have a bind object
@@ -119,13 +128,23 @@
 	
 	SelectFile() {
 		this.Disable()
-		this.Options("+OwnDialogs")
-		FileSelectFile, out, S, % A_ProgramFiles, Select a file:
-		if ErrorLevel
-			return this.Enable()
-		this.SetText("Edit1", out)
-		ControlSend, Edit1, {End}, % this.ahkid
+		this.Options("-AlwaysOnTop")
+		AppSelect(this.SelectFileCallback.Bind(this), this.hwnd, true)
+	}
+	
+	SelectFileCallback(Info) {
+		
+		this.Options("+AlwaysOnTop")
 		this.Enable()
+		this.Activate()
+		
+		if !IsObject(Info)
+			return
+		
+		this.CustomFileName := Info.DisplayName
+		
+		this.SetText("Edit1", Info.Run)
+		ControlSend, Edit1, {End}, % this.ahkid
 	}
 	
 	DeletePress() {
@@ -147,27 +166,34 @@
 		
 		; check if in use
 		this.HotkeyChange()
+	}
+	
+	; check for dupe hotkey
+	HotkeyCheck(Key) {
+		ret := true
+		if IsObject(Keybinds[Key]) { ; key is already bound
+			this.Options("-AlwaysOnTop")
+			this.Disable()
+			MsgBox, 52, Duplicate Hotkey, % "This key is already in use!`n`nPrevious function: " Keybinds[Key].Desc "`n`nOverwrite previous function?"
+			ifMsgBox no ; cancel
+			ret:=false
+			this.Options("+AlwaysOnTop")
+			this.Enable()
+		} return ret
+	}
+	
+	TextCheck(Text) {
 		
 	}
 	
-	/*
-		if InStr(Hotkey, "^")
-			ret := "CTRL + ", i++
-		if InStr(Hotkey, "+")
-			ret .= "SHIFT + ", i++
-		if InStr(Hotkey, "!")
-			ret .= "ALT + ", i++
-	*/
-	
-	Close(Bind := "", Key := "") {
+	Close(Bind := "", ID := "") {
+		
 		DllCall("AnimateWindow", "UInt", this.hwnd, "Int", 60, "UInt", "0x90000")
 		WinActivate("ahk_id" this.Owner)
 		
 		this.Destroy()
 		
-		this.Callback.Call(Bind, Key)
-		
-		Keybinds(true)
+		this.Callback.Call(Bind, ID)
 	}
 	
 	Escape() {
@@ -175,9 +201,7 @@
 	}
 }
 
-CreateNugget(Callback, ShowHotkey := true, Owner := "") {
-	
-	Keybinds(false)
+CreateNugget(Callback, HotkeyMode := true, Owner := "") {
 	
 	; list of assignments
 	AssignmentList := [	  "Multimedia"
@@ -199,7 +223,7 @@ CreateNugget(Callback, ShowHotkey := true, Owner := "") {
 	Binder.Font("s10", Settings.Font)
 	Binder.Margin(6, 4)
 	
-	Binder.ShowHotkey := ShowHotkey
+	Binder.HotkeyMode := HotkeyMode
 	Binder.Callback := Callback
 	Binder.Owner := Owner
 	
@@ -208,10 +232,12 @@ CreateNugget(Callback, ShowHotkey := true, Owner := "") {
 	CONTROL_HEIGHT := Binder.CONTROL_HEIGHT
 	
 	; main hotkey control
-	if ShowHotkey {
-		Binder.Add("Text", "Center x0 w" WIDTH, "Key:")
+	Binder.Add("Text", "Center x0 w" WIDTH, (HotkeyMode?"Key":"Title") ":")
+	
+	if HotkeyMode
 		Binder.MainHotkeyHWND := Binder.Add("Hotkey", "x6 yp+25 w" WIDTH-12 " Center",, Binder.HotkeyChange.Bind(Binder))
-	}
+	else
+		Binder.MainTextHWND := Binder.Add("Text", "x6 yp+25 w" WIDTH-12 " Center")
 	
 	Binder.Add("Text", "x0 w" WIDTH " Center", "Assignment:")
 	Binder.Add("DropDownList", "x6 w" WIDTH-12 " h" CONTROL_HEIGHT " Choose1 R99", AssignmentDDL, Binder.AssignmentDDL.Bind(Binder))
@@ -228,7 +254,7 @@ CreateNugget(Callback, ShowHotkey := true, Owner := "") {
 	Binder.Margin(6, 10)
 	Binder.Add("Text", "x6 yp+" 8+CONTROL_HEIGHT " w" WIDTH-12 " h1 0x08") ; separator
 	Binder.Add("Button", "x6 yp+8 h" CONTROL_HEIGHT, "Cancel", Binder.Close.Bind(Binder))
-	Binder.Add("Button", "xp" WIDTH - (ShowHotkey?95:61) " yp h" CONTROL_HEIGHT, ShowHotkey?"Add Keybind":"Create", Binder.AddButton.Bind(Binder))
+	Binder.Add("Button", "xp" WIDTH - (HotkeyMode?95:61) " yp h" CONTROL_HEIGHT, HotkeyMode?"Add Keybind":"Create", Binder.AddButton.Bind(Binder))
 	Binder.Options("+Owner" Owner " -Caption +Border +AlwaysOnTop") ; remove border and caption and make BigGUI the owner
 	
 	; set initial values

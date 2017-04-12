@@ -16,11 +16,12 @@ SetTitleMatchMode 2
 */
 
 /*
-	[size=150][/size]
+	[size=150]v0.9.3[/size]
+	
 	[list]
 	[/list]
 	
-	[size=150][url=https://github.com/Run1e/PowerPlay/releases]Download[/url][/size]
+	[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
 	[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
 	[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
 */
@@ -33,22 +34,32 @@ SetTitleMatchMode 2
 */
 
 /*
+- Adding/selecting programs is done through a list (manual selection is still possible!)
+- Changed color and transparancy of rectangle tool to work better on whiter surfaces
+- .exe files can be dropped onto the Games tab to add them
 - Fixed a bug where keybinds were accidentally enabled
+- Tweaked logic on when pause/clear is allowed in the imgur queue
+- Moved WinHttp stuff into a separate class
+- Fixed issue where queue freezed if helper had to be restarted
+- Made new icon + fixed ico sizes (thanks tidbit!)
+- Misc fixes
+Reported by noname:
+- On shutdown main script threw a COM when attempting to exit upload helper
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI
+global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog
 
 OnExit, Exit
 
 AppName := "Power Play"
-AppVersion := [0, 9, 3]
+AppVersion := [0, 9, 4]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 SetWorkingDir % A_ScriptDir
 if !FileExist(A_WorkingDir "\data") {
 	FileCreateDir % A_WorkingDir "\data"
 	if ErrorLevel { ; failed creating subfolder
-		MsgBox, 48, % AppName, Unable to create necessary subfolders.`n`nPlease run PowerPlay as administrator in or a directory where it has the rights it needs.
+		MsgBox, 48, % AppName, Unable to create necessary subfolders.`n`nPlease run PowerPlay as administrator or in a directory where it has the rights it needs (for example C:\PowerPlay\).
 		run % A_ScriptDir
 		ExitApp
 	}
@@ -61,6 +72,7 @@ pToken := Gdip_Startup()
 
 Plugin := new Plugin
 Uploader := new Uploader
+
 Settings := JSONFile("Settings", DefaultSettings())
 
 if NvAPI.InitFail { ; NvAPI initialization failed, no nvidia card is installed
@@ -102,9 +114,6 @@ VERT_SCROLL := SysGet(2)
 ; create main gui
 CreateBigGUI()
 
-; bind hotkeys
-Keybinds(true)
-
 ; init menu from json file
 CreateTrayMenu()
 
@@ -117,15 +126,17 @@ if FileExist(Icon("icon"))
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
 
+; bind hotkeys
+Keybinds(true)
 return
 
 Exit:
-CtlColors.Free() ; free ctlcolors thing
-Uploader.Free() ; revoke object and close upload helper
+CtlColors.Free() ; free ctlcolors
+Uploader.Free() ; close upload helper
 Gdip_Shutdown(pToken) ; shut down gdip
 ; revoke COM objects
 ObjRegisterActive(Plugin, "")
-ObjRegisterActive(Screenshot, "")
+ObjRegisterActive(Uploader, "")
 Big.ImgurListView.Destroy()
 ExitApp
 return ; super unnecessary return
@@ -140,9 +151,10 @@ return
 #Include lib\Class Capture.ahk
 #Include lib\Class ConsoleGUI.ahk
 #Include lib\Class CustomImageList.ahk
-#Include lib\Class FileSelectGUI.ahk
+#Include lib\Class AppSelectGUI.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
+#Include lib\Class HTTP.ahk
 #Include lib\Class Menu.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class SettingsGUI.ahk
@@ -161,6 +173,7 @@ return
 #Include lib\WinActiveChange.ahk
 #Include lib\IconInstall.ahk
 #Include lib\GetActionsList.ahk
+#Include lib\GetApplications.ahk
 #Include lib\ApplySettings.ahk
 
 #Include *i lib\client_id.ahk
@@ -176,5 +189,5 @@ return
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
-#Include lib\third-party\Class _CHotkeyControl.ahk
+;#Include lib\third-party\Class _CHotkeyControl.ahk
 #Include lib\third-party\FileSHA1.ahk

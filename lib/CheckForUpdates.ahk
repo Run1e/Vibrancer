@@ -2,16 +2,15 @@
 	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases/latest"
 	
 	; get github api info on the powerplay repo
-	GitRaw := POST(URL,,,, true) ; returns false on failure
-	
-	if !GitRaw
+	if !HTTP.Get(URL, Data)
 		return TrayTip("Failed fetching update info")
 	
 	; load into obj
-	GitJSON := JSON.Load(GitRaw)
+	GitJSON := JSON.Load(Data.ResponseText)
 	
 	; check whether new update is out
 	NewVersion := StrSplit(GitJSON.tag_name, ".")
+	
 	for Index, Ver in AppVersion {
 		if (Ver < NewVersion[Index]) {
 			NewUpdate := true
@@ -28,7 +27,7 @@
 		ifMsgBox yes
 			Run(GitJSON.html_url)
 	} else
-		TrayTip("No update found.")
+		TrayTip("You're up to date!")
 	
 	return
 }

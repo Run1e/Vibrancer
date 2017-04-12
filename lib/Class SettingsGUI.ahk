@@ -52,6 +52,9 @@
 
 Settings() {
 	
+	if IsObject(SetGUI)
+		return SetGUI.Activate()
+	
 	SetGUI := new SettingsGUI("Settings")
 	
 	if Big.IsVisible {

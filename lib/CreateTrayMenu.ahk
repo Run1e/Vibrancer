@@ -35,7 +35,6 @@ CreateTrayMenu() {
 	Menu.Map.Tray.Exit := {Func:"Exit"}
 	
 	for Index, TrayObj in TrayMenu {
-	
 		if TrayObj.HasKey("File") { ; points to another file, it's a submenu
 			
 			; load the json
@@ -71,8 +70,9 @@ CreateTrayMenu() {
 		}
 	}
 	
-	if Index
+	if ArraySize(TrayMenu)
 		Tray.Add()
+	
 	Tray.Add("Exit")
 	Tray.Icon("Exit", Icon("x"))
 }

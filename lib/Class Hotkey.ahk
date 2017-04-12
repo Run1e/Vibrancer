@@ -1,4 +1,4 @@
-﻿class Hotkey {
+﻿Class Hotkey {
 	static Keys := [] ; keep track of hotkeys
 	
 	; bind a hotkey to a function/label

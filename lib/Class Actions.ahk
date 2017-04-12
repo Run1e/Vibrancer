@@ -29,7 +29,7 @@
 			return TrayTip("Clipboard is empty!")
 		
 		if !Run(clipboard) ; running the clipboard failed, just google the contents
-			run % "https://www.google.com/#q=" UriEncode(clipboard)
+			run % "https://www.google.com/#q=" HTTP.UriEncode(clipboard)
 	}
 	
 	UploadClip() {

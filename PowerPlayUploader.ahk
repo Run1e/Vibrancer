@@ -86,13 +86,15 @@ Class Uploader {
 		return
 	}
 	
-	GetBinaryData(file) {
-		this.ADODB.Open() ; Open the Stream object to load a file into it
-		this.ADODB.LoadFromFile(file) ; Load the contents of the file into the Stream
-		Binary := this.ADODB.Read()
-		this.ADODB.Close()
-		return Binary
-	}
+	/*
+		GetBinaryData(file) {
+			this.ADODB.Open() ; Open the Stream object to load a file into it
+			this.ADODB.LoadFromFile(file) ; Load the contents of the file into the Stream
+			Binary := this.ADODB.Read()
+			this.ADODB.Close()
+			return Binary
+		}
+	*/
 	
 	/*
 		this.ImageFile := ComObjCreate("WIA.ImageFile")

@@ -11,14 +11,25 @@
 	
 	; drag/drop
 	DropFiles(FileList, FileCount, ControlHWND, GuiX, GuiY) {
-		for Index, File in StrSplit(FileList, "`n") {
-			SplitPath, File,,, ext
-			if (ext ~= Uploader.AllowedExt)
-				Uploader.Upload(File)
-			else 
-				Uploader.QueueErrors.Push(ext " files are not allowed on imgur!")
-		} if !Uploader.RunQueue
-			Uploader.StartQueue()
+		if (this.ActiveTab = 1) {
+			for Index, File in StrSplit(FileList, "`n") {
+				SplitPath, File,,, ext
+				if (ext = "exe")
+					GameRules[File] := {BlockAltTab:false, BlockWinKey:true, Vibrancy:50}, AddFile := File
+			} if StrLen(AddFile)
+				this.UpdateGameList(AddFile)
+			else
+				TrayTip("Only .exe files are allowed!")
+		} else if (this.ActiveTab = 2) {
+			for Index, File in StrSplit(FileList, "`n") {
+				SplitPath, File,,, ext
+				if (ext ~= Uploader.AllowedExt)
+					Uploader.Upload(File)
+				else 
+					Uploader.QueueErrors.Push(ext " files are not allowed on imgur!")
+			} if !Uploader.RunQueue
+				Uploader.StartQueue()
+		}
 	}
 	
 	ImgurGetSelected() {
@@ -180,6 +191,9 @@
 	ImgurDelete() {
 		Selected := this.ImgurGetSelected()
 		
+		if !Selected.MaxIndex()
+			return
+		
 		MsgBox, 52, Image deletion, % Selected.MaxIndex() " image" (Selected.MaxIndex()>1?"s":"") " selected.`nProceed with deletion?"
 		ifMsgBox no
 		return
@@ -255,39 +269,40 @@
 	
 	; probably temporary (right?????)
 	AddProg() {
-		Critical 500
-		
 		this.Disable()
-		this.Options("+OwnDialogs")
 		
-		FileSelectFile, Game, 3, % A_ProgramFiles, Select an .exe file, *.exe
+		AppSelect(this.AddProgCallback.Bind(this), this.hwnd)
+	}
+	
+	AddProgCallback(Info) {
 		
-		if ErrorLevel
-			return this.Enable()
+		this.Enable()
+		this.Activate()
 		
-		if IsObject(GameRules[Game]) {
-			MsgBox,48,Duplicate entry, This program is already in the list.
-			Settings.GuiState.GameListPos := GameRules.HasKey(Game)
-			this.GameListSelection()
-			this.Enable()
+		if !IsObject(Info)
 			return
-		}
 		
-		GameRules[Game] := {BlockAltTab:false, BlockWinKey:true, Vibrancy:50}
+		Game := {BlockAltTab:false, BlockWinKey:true, Vibrancy:50}
+		
+		if StrLen(Info.DisplayName)
+			Game.Title := Info.DisplayName
+		
+		if StrLen(Info.DisplayIcon)
+			Game.Icon := Info.DisplayIcon
+		
+		GameRules[Info.InstallLocation] := Game
 		
 		JSONSave("GameRules", GameRules)
 		
-		this.UpdateGameList(Game)
+		this.UpdateGameList(Info.InstallLocation)
 		
 		Loop % LV_GetCount() {
 			LV_GetText(LVKey, A_Index, 2)
-			if (LVKey = Game) {
-				this.GamesHistory.Insert({Event:"Addition", Key:Game, Pos:A_Index})
+			if (LVKey = Info.InstallLocation) {
+				this.GamesHistory.Insert({Event:"Addition", Key:Info.InstallLocation, Pos:A_Index})
 				break
 			}
 		}
-		
-		this.Enable()
 	}
 	
 	DeleteProg() {
@@ -409,8 +424,6 @@
 		this.GameListViewSize()
 		
 		this.Control("+Redraw", this.GameListViewHWND)
-		
-		return
 	}
 	
 	GameListViewSelection() {
@@ -427,8 +440,6 @@
 			this.SetText("Button3", GameRules[Key].BlockWinKey)
 			this.SetText("Button4", GameRules[Key].BlockAltTab)
 		}
-		
-		return
 	}
 	
 	GameListViewSize() {
@@ -451,24 +462,21 @@
 	
 	AddBind() {
 		this.Disable()
+		Keybinds(false)
 		CreateNugget(this.BindCallback.Bind(this), true, this.hwnd) ; callback, hotkeycontrol, owner
 	}
 	
 	; bug, when overwriting, it doesn't default the focus to the window
 	BindCallback(Bind := "", Key := "") {
 		
-		if !IsObject(Bind)
-			return this.Enable()
 		
-		if IsObject(Keybinds[Key]) { ; key is already bound
-			MsgBox, 52, Duplicate Hotkey, % "This key is already in use!`n`nPrevious function: " Keybinds[Key].Desc "`n`nOverwrite previous function?"
-			ifMsgBox no ; regret
-			return this.Enable()
-			else ; remove the previous key nuggeterino
-				Keybinds.Remove(Key)
+		if !IsObject(Bind) {
+			this.Enable(), Keybinds(true)
+			return
 		}
 		
 		Keybinds[Key] := Bind
+		Keybinds(true)
 		
 		this.UpdateBindList(Key)
 		
@@ -485,10 +493,6 @@
 		
 		this.Enable()
 		this.Activate()
-		
-		Keybinds(true)
-		
-		return
 	}
 	
 	DeleteBind() {
@@ -535,7 +539,7 @@
 		this.BindListViewSize()
 		
 		if (Info.Key != "Delete") && (Info.Key != "^z")
-		Hotkey.Bind(Info.Key, Actions[Info.Bind.Func].Bind(Actions, Info.Bind.Param*))
+			Hotkey.Bind(Info.Key, Actions[Info.Bind.Func].Bind(Actions, Info.Bind.Param*))
 	}
 	
 	UpdateBindList(FocusKey:= "") {
@@ -548,27 +552,10 @@
 		
 		this.Control("-Redraw", this.BindListViewHWND)
 		
-		/*
-			ImageList := IL_Create(10, 2, false)
-			LV_SetImageList(ImageList)
-		*/
-		
 		LV_Delete()
 		
 		for Key, Bind in Keybinds {
-			
-			/*
-				if FileExist("icons\octicons\" Bind.Icon ".ico")
-					Icon := IL_Add(ImageList, "icons\octicons\" Bind.Icon ".ico")
-				else {
-					if !DashIcon
-						DashIcon := IL_Add(ImageList, "icons\octicons\dash.ico")
-					Icon := DashIcon
-				}
-			*/
-			
 			Pos := LV_Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
-			
 			if (Key = FocusKey)
 				Settings.GuiState.BindListPos := Pos
 		}
@@ -579,9 +566,6 @@
 		
 		this.BindListViewSelection()
 		this.BindListViewSize()
-		
-		
-		return
 	}
 	
 	BindListViewSelection() {
@@ -625,19 +609,14 @@
 	SetTab(tab) {
 		this.SetDefault()
 		
-		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
-			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
-		
 		this.ActiveTab := tab
 		this.Control("Choose", "SysTabControl321", tab)
-		
-		this.SetTabHotkeys(tab)
 		
 		if (tab = 1) {
 			this.Control("Focus", "SysListView321")
 			this.SelectScreen(Settings.VibrancyScreen + 1)
 			this.ImgurAnimate(false)
-			this.DropFilesToggle(false)
+			this.DropFilesToggle(true)
 		} else if (tab = 2) {
 			this.Options("ListView", this.ImgurListViewHWND)
 			LV_Modify(1, "Vis") ; show first item
@@ -649,6 +628,9 @@
 			this.ImgurAnimate(false)
 			this.DropFilesToggle(false)
 		}
+		
+		this.SetTabHotkeys(tab)
+		this.SetTabColor(tab)
 	}
 	
 	SetTabHotkeys(tab) {
@@ -664,11 +646,16 @@
 		}
 	}
 	
+	SetTabColor(tab) {
+		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
+			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
+	}
+	
 	Open(tab := "") {
-		static IsShown := false ; fix ctlcolor issue :'(
+		static IsShown := false
 		
 		if this.IsVisible
-			return WinActivate(this.ahkid)
+			return this.Activate()
 		
 		if SetGUI.IsVisible
 			return
@@ -680,14 +667,14 @@
 		
 		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
 		
-		if !tab
-			this.SetTab(Settings.GuiState.ActiveTab)
-		
 		if !IsShown {
 			this.SetTitle(AppName " " AppVersionString)
+			this.SetTab(tab?tab:this.ActiveTab)
 			this.SetIcon(Icon("icon"))
 			IsShown := true
 		}
+		
+		this.SetTabColor(tab?tab:this.ActiveTab)
 	}
 	
 	Save() {
@@ -847,8 +834,6 @@ CreateBigGUI() {
 	
 	Big.UpdateImgurList()
 	
-	; ==========================================
-	
 	Big.Tab(3)
 	Big.Margin(0, 0)
 	Big.Font("s11")
@@ -866,7 +851,7 @@ CreateBigGUI() {
 	
 	Big.UpdateBindList()
 	
-	; ==========================================
+	Big.ActiveTab := Settings.GuiState.ActiveTab
 	
 	Big.LV_Colors_OnMessage(false)
 	Big.Options("-MinimizeBox")
