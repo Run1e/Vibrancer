@@ -1,4 +1,4 @@
-# <img src="http://i.imgur.com/OX90ale.png"></img> PowerPlay
+# <img src="http://i.imgur.com/OX90ale.png"></img>  Power Play
 
 A Windows application which allows you to:
 - Boost ingame vibrancy for any game/program via NVIDIA's API
