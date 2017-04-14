@@ -1,4 +1,5 @@
-# Power Play
+# <img src="http://i.imgur.com/qQvZypa.png"></img> PowerPlay
+
 A Windows application which allows you to:
 - Boost ingame vibrancy for any game/program via NVIDIA's API
 - Block alt-tab/windows key when ingame
