@@ -9,8 +9,8 @@
 	
 	Class RectClass {
 		
-		static CD := 60
-			, CircleLuma := 10
+		static CD := 160
+			, CircleLuma := 1
 			, RectLuma := 32
 		
 		Start() {
@@ -26,7 +26,7 @@
 			this.Vis.Parent := this
 			
 			this.Vis.Color(727272)
-			this.Vis.Options("-E0x20 +AlwaysOnTop -Caption +Border +ToolWindow")
+			this.Vis.Options("-E0x20 +AlwaysOnTop -Caption +Border +ToolWindow") ; border makes it update nicer for some reason
 			this.Vis.WinSet("Region", "w" this.CD " h" this.CD " 0-0 R" this.CD "-" this.CD)
 			this.Vis.WinSet("Transparent", this.CircleLuma)
 			
@@ -35,71 +35,70 @@
 			
 			Cursor("IDC_CROSS")
 			
-			this.MouseHook := DllCall("SetWindowsHookEx"
-								, "int", WH_MOUSE_LL
-								, "uint", RegisterCallback(this.MouseProc, "F",, &this)  ; put a pointer to 'this' in A_EventInfo
-								, "uint", 0
-								, "uint", 0)
+			Hotkey.Bind("LButton", this.StartDrag.Bind(this))
+			
+			this.MouseHook := new OnMouseMove(this.OnMouseMove.Bind(this))
 		}
 		
-		MouseProc(wParam, lParam) {
-			Critical
+		StartDrag() {
+			this.Dragging := true
 			
-			this := Object(A_EventInfo) ; get this
+			DllCall("ShowCursor", "int", false)
 			
-			if (wParam = 0x200) ; 0x200 = WM_MOUSEMOVE
-				this.OnMouseMove(NumGet(lParam+0,0,"int"), NumGet(lParam+4,0,"int"))
+			MouseGetPos, x, y
+			this.sx := x, this.sy := y
 			
-			return DllCall("CallNextHookEx", "uint", this.MouseHook, "int", 0, "uint", wParam, "uint", lParam)
+			this.Vis.Pos(0, 0, 0, 0) ; "hide" for a sec while changing stuff
+			this.Vis.WinSet("Region", "") ; make rect again
+			this.Vis.WinSet("Transparent", this.RectLuma)
+			
+			this.OnMouseMove(x, y)
+			
+			Hotkey.Bind("LButton Up", this.Close.Bind(this, true))
 		}
 		
 		OnMouseMove(x, y) {
-			if GetKeyState("LButton", "P") { ; draggin
-				
-				; set initial vars
-				if !this.Dragging {
-					this.Dragging := true
-					this.sx:=x
-					this.sy:=y
-					this.Vis.Pos(0, 0, 0, 0) ; "hide" for a sec while changing stuff
-					this.Vis.WinSet("Transparent", this.RectLuma)
-					this.Vis.WinSet("Region", "") ; make rect again
-				}
-				
-				; move rect
-				this.Vis.Pos(	  nx := (this.sx<x?this.sx:x)
-							, ny := (this.sy<y?this.sy:y)
-							, abs(this.sx-x) + (nx>this.sx?-1:1)
-							, abs(this.sy-y) + (ny>this.sy?-1:1))
-				
-			} else if this.Dragging
-				this.Close(true)
-			else ; not started dragging
-				this.Vis.Pos(x - this.CD/2, y - this.CD/2, this.CD, this.CD)
+			static Offset := 6
+			if this.Dragging { ; draggin
+				this.Vis.Pos(	  this.dx := (x>=this.sx?this.sx:x-Offset)
+							, this.dy := (y>=this.sy?this.sy:y-Offset)
+							, this.dw := abs(x-this.sx) + Offset
+							, this.dh := abs(y-this.sy) + Offset)
+			} else {
+				this.Vis.Pos(	  x - this.CD/2
+							, y - this.CD/2
+							, this.CD
+							, this.CD)
+			}
 		}
 		
-		Close(Upload := false) {
-			
+		Close(Upload) {
 			if this.Finishing
 				return
 			
 			this.Finishing := true
 			
 			; unhook mouse hook
-			DllCall("UnhookWindowsHookEx", "Uint", this.MouseHook)
+			this.MouseHook := ""
 			
 			; destroy window
 			this.Vis.Destroy()
 			this.Vis := ""
+			
+			DllCall("ShowCursor", "int", true)
 			
 			Cursor() ; reset cursor
 			
 			Keybinds(true)
 			
 			; capture
-			if this.Dragging && Upload {
-				MouseGetPos, x, y
-				func := Capture.Capture.Bind(Capture, (this.sx<x?this.sx:x), (this.sy<y?this.sy:y), abs(this.sx-x), abs(this.sy-y))
+			if Upload {
+				func := Capture.Capture.Bind(	  Capture
+										, this.dx
+										, this.dy
+										, this.dw
+										, this.dh)
+				
 				SetTimer, %func%, -1 ; start upload init in a new thread, this one freaks out if we don't.
 			}
 		}
@@ -107,7 +106,7 @@
 		; listen for escape key press
 		Class RectGUI extends GUI {
 			Escape() {
-				this.Parent.Close()
+				this.Parent.Close(false)
 			}
 		}
 	}

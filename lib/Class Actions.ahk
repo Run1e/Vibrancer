@@ -29,7 +29,7 @@
 			return TrayTip("Clipboard is empty!")
 		
 		if !Run(clipboard) ; running the clipboard failed, just google the contents
-			run % "https://www.google.com/#q=" HTTP.UriEncode(clipboard)
+			Run("https://www.google.com/#q=" HTTP.UriEncode(clipboard))
 	}
 	
 	UploadClip() {
@@ -50,6 +50,24 @@
 	
 	CheckForUpdates() {
 		CheckForUpdates()
+	}
+	
+	PrintHeaders() {
+		for a, b in Uploader.LastHeaders
+			if InStr(a, "X-Post-Rate-Limit")
+				temp .= a ": " b "`n"
+		if StrLen(temp)
+			TrayTip("IMGUR HEADERS", temp)
+		else
+			TrayTip("No headers stored.")
+	}
+	
+	PrintSettings() {
+		m(Settings)
+	}
+	
+	PrintKeybinds() {
+		m(Keybinds)
 	}
 	
 	Reload() {

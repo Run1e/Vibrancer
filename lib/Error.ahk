@@ -15,6 +15,8 @@
 	
 	FileAppend, % DateForm . "`n`n" . ErrorForm, % A_WorkingDir "\" LogsFolder "\" A_Now A_MSec ".txt"
 	
+	;p("Error:`n" ErrorForm)
+	
 	if Fatal {
 		Menu.Instances["Tray"].Destroy()
 		MsgBox,262192,ERROR,% "A fatal error has occured and " AppName " must close.`n`nAn error log has been written to the logs folder.`n`nSpecifically:`n" ErrorForm,5

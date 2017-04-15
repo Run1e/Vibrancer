@@ -7,7 +7,9 @@
 DetectHiddenWindows On
 SetRegView 64
 CoordMode, Mouse, Screen
+CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
+OnExit, Exit
 
 /*
 	todo:
@@ -17,7 +19,7 @@ SetTitleMatchMode 2
 
 /*
 	[size=150]v0.9.3[/size]
-	
+	p
 	[list]
 	[/list]
 	
@@ -34,26 +36,20 @@ SetTitleMatchMode 2
 */
 
 /*
-- Adding/selecting programs is done through a list (manual selection is still possible!)
-- Changed color and transparancy of rectangle tool to work better on whiter surfaces
-- .exe files can be dropped onto the Games tab to add them
-- Fixed a bug where keybinds were accidentally enabled
-- Tweaked logic on when pause/clear is allowed in the imgur queue
-- Moved WinHttp stuff into a separate class
-- Fixed issue where queue freezed if helper had to be restarted
-- Made new icon + fixed ico sizes (thanks tidbit!)
-- Misc fixes
-Reported by noname:
-- On shutdown main script threw a COM when attempting to exit upload helper
+	- Fixed tab-hotkeys not enabling before changing tabs
+	- Improved uploader status messages
+	- Fine tuned the rectangle tool behaviour
+	- Fixed a bug regarding traytips
+	- ToolMsg setting added (has to be enabled manually in Settings.json)
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog
-
-OnExit, Exit
+global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole
 
 AppName := "Power Play"
-AppVersion := [0, 9, 4]
+AppVersion := [0, 9, 5]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
+
+ForceConsole := false ; debug
 
 SetWorkingDir % A_ScriptDir
 if !FileExist(A_WorkingDir "\data") {
@@ -144,18 +140,31 @@ return ; super unnecessary return
 returnlabel:
 return
 
+p(text := "") {
+	static Handle, LastSpacer
+	if !ForceConsole && !Settings.Debug
+		return
+	if !Handle
+		Handle := DllCall("GetStdHandle", "UInt", (-11,DllCall("AllocConsole")), "UPtr")
+	Spacer := !!InStr(text, "`n")
+	FileOpen("CONOUT$", "w").Write((!LastSpacer&&Spacer?"`n":"") . text "`n" . (Spacer?"`n":""))
+	LastSpacer := Spacer
+	return
+}
+
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
 #Include lib\Class BigGUI.ahk
 #Include lib\Class BinderGUI.ahk
 #Include lib\Class Capture.ahk
-#Include lib\Class ConsoleGUI.ahk
 #Include lib\Class CustomImageList.ahk
 #Include lib\Class AppSelectGUI.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
 #Include lib\Class Menu.ahk
+#Include lib\Class MouseTip.ahk
+#Include lib\Class OnMouseMove.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class SettingsGUI.ahk
 #Include lib\Class Uploader.ahk
@@ -189,4 +198,5 @@ return
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
-#Include lib\third-party\FileSHA1.ahk
+#Include lib\third-party\FileSHA1.ahk																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
+

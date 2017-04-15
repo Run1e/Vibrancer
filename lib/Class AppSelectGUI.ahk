@@ -22,6 +22,9 @@
 		
 		this.ListViewCLV := ""
 		
+		if IsObject(Info)
+			p("Prog callback:`n" pa(Info))
+		
 		this.Callback.Call(Info)
 		
 		Prog := ""
@@ -63,7 +66,6 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 			continue
 		LV_Add("Icon" . IL_Add(ImageList, StrLen(App.DisplayIcon)?App.DisplayIcon:App.InstallLocation), App.DisplayName, Index)
 	}
-	
 	
 	Prog.Options("-MinimizeBox +Owner" Owner)
 	Prog.Show()

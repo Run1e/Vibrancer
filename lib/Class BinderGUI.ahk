@@ -193,6 +193,9 @@
 		
 		this.Destroy()
 		
+		if IsObject(Bind)
+			p("Binder callback for ID " ID " :`n" pa(Bind))
+		
 		this.Callback.Call(Bind, ID)
 	}
 	

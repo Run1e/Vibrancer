@@ -43,4 +43,10 @@ Class Plugin {
 	Call(func, param*) {
 		return %func%(param*)
 	}
+	
+	; print to debug console
+	p(text := "") {
+		ForceConsole := true
+		p(text)
+	}
 }

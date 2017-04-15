@@ -16,9 +16,8 @@ Run(file) {
 
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
-		TrayTip, % AppName " " AppVersionString, % Title
-	else
-		TrayTip, % Title, % Msg
+		Msg := Title, Title := AppName " " AppVersionString
+	TrayTip, % Title, % Msg
 }
 
 pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
@@ -126,16 +125,28 @@ SetCueBanner(HWND, STRING) { ; thaaanks tidbit
 	}
 }
 
-Cursor(cursor := "") {
-	static p, curs := {"IDC_ARROW": 32512, "IDC_IBEAM": 32513, "IDC_WAIT":32514, "IDC_CROSS":32515
-	, "IDC_UPARROW":32516, "IDC_SIZE":32640, "IDC_ICON":32641, "IDC_SIZENWSE":32642
-	, "IDC_SIZENESW":32643, "IDC_SIZEWE":32644, "IDC_SIZENS":32645, "IDC_SIZEALL":32646
-	, "IDC_NO":32648, "IDC_HAND":32649, "IDC_APPSTARTING":32650, "IDC_HELP":32651}
-	if !cursor
-		return DllCall("SystemParametersInfo", UInt, SPI_SETCURSORS := 0x57, UInt, 0, UInt ,0, UInt, 0)
-	else if (p = cursor)
-		return
-	hndl := DllCall("LoadCursor", Uint, 0, Int, p := curs[cursor])
-	for a, b in [32512,32513,32514,32515,32516,32640,32641,32642,32643,32644,32645,32646,32648,32649,32650,32651]
-		DllCall("SetSystemCursor", Uint, hndl, Int, b)
+Cursor(Cursor := "") {
+	static Cursors := 	{ "IDC_ARROW":32512		, "IDC_IBEAM":32513	, "IDC_WAIT":32514		, "IDC_CROSS":32515
+					, "IDC_UPARROW":32516	, "IDC_SIZE":32640	, "IDC_ICON":32641		, "IDC_SIZENWSE":32642
+					, "IDC_SIZENESW":32643	, "IDC_SIZEWE":32644, "IDC_SIZENS":32645	, "IDC_SIZEALL":32646
+					, "IDC_NO":32648		, "IDC_HAND":32649	, "IDC_APPSTARTING":32650, "IDC_HELP":32651}
+	
+	if !StrLen(Cursor)
+		return DllCall(  "SystemParametersInfo"
+					, UInt, 0x57 ; SPI_SETCURSORS
+					, UInt, 0
+					, UInt, 0
+					, UInt, 0)
+	
+	CursorHandle := DllCall("LoadCursor", Uint, 0, Int, Cursors[cursor])
+	
+	for Index, ID in [32512,32513,32514,32515,32516,32640,32641,32642,32643,32644,32645,32646,32648,32649,32650,32651]
+		DllCall("SetSystemCursor", Uint, CursorHandle, Int, ID)
+}
+
+RunClipboardKeybindText() {
+	if !Big.IsVisible
+		for Key, Bind in Keybinds
+			if (Bind.Func = "RunClipboard")
+				return "`nClipboard Keybind: " HotkeyToString(Key)
 }

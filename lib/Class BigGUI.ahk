@@ -90,8 +90,6 @@
 		
 		this.ImgurListViewSelection()
 		
-		this.ImgurStatus(i?i "/" ArraySize(Images) " image" (i>1?"s":"") " loaded!":"Uploads appear here!")
-		
 		this.LV_Colors_OnMessage(true)
 	}
 	
@@ -142,8 +140,6 @@
 		}
 		
 		this.ImgurFixOrder()
-		
-		return
 	}
 	
 	; when inserting to the first item position in a listview in icon mode, it doesn't add the item to the correct location (the first index).
@@ -212,7 +208,7 @@
 		}
 		
 		for Index, ImageIndex in this.ImgurGetSelected()
-			run % Images[ImageIndex].link
+			Run(Images[ImageIndex].link)
 		
 		if Settings.Imgur.CloseOnOpen && Index
 			this.Close()
@@ -220,7 +216,7 @@
 	
 	ImgurCopyLinks() {
 		for Index, ImageIndex in Selected := this.ImgurGetSelected()
-			links .= Images[ImageIndex].link " "
+			links .= Images[ImageIndex].link . Settings.Imgur.CopySeparator
 		
 		if !StrLen(links)
 			return
@@ -260,6 +256,8 @@
 	}
 	
 	ImgurStatus(Status) {
+		if !this.IsVisible && Settings.ToolMsg
+			MouseTip.Create(Status, 2000)
 		this.SetText(this.ImgurStatusHWND, Status)
 	}
 	
@@ -476,6 +474,7 @@
 		}
 		
 		Keybinds[Key] := Bind
+		
 		Keybinds(true)
 		
 		this.UpdateBindList(Key)
@@ -675,6 +674,7 @@
 		}
 		
 		this.SetTabColor(tab?tab:this.ActiveTab)
+		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 	}
 	
 	Save() {
@@ -830,9 +830,11 @@ CreateBigGUI() {
 	
 	Big.Font("s11")
 	
-	Big.ImgurStatusHWND := Big.Add("Text", "x" 6 " yp+2 w" TAB_WIDTH - 6 " h" BUTTON_HEIGHT - 2)
+	Big.ImgurStatusHWND := Big.Add("Text", "x" 6 " yp+2 w" TAB_WIDTH - 6 " h" BUTTON_HEIGHT - 2, "Uploads appear here!")
 	
 	Big.UpdateImgurList()
+	
+	; ==========================================
 	
 	Big.Tab(3)
 	Big.Margin(0, 0)

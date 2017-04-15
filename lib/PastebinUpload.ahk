@@ -7,6 +7,8 @@
 	if !StrLen(Settings.PastebinKey)
 		return TrayTip("No Pastebin key!", "Please enter your Pastebin API key in the settings.")
 	
+	p("Uploading clipboard to pastebin")
+	
 	POST := {api_dev_key:Settings.PastebinKey, api_option:"paste", api_paste_code:clipboard}
 	
 	; timeout of 6 should (emphasis on SHOULD) be enough for pretty much any paste
@@ -17,21 +19,14 @@
 	
 	if (InStr(Response, "https://pastebin.com") = 1) {
 		Title := "Clipboard uploaded!"
-		Msg := "Link copied to clipboard."
-		
-		if !Big.IsVisible {
-			for Key, Bind in Keybinds {
-				if (Bind.Func = "RunClipboard") {
-					Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
-					break
-				}
-			}
-		}
+		Msg := "Link copied to clipboard." . RunClipboardKeybindText()
 		
 		clipboard := StrReplace(Response, "https://pastebin.com/", "https://pastebin.com/raw/")
 		
+		p("Paste success")
+		
 	} else
-		Title := "Paste failed!", Msg := (Response?"Error: " Response:"Request timed out.")
+		Title := "Paste failed!", Msg := (Response?"Error: " Response:"Request timed out."), p("Paste failed: " Response)
 	
 	TrayTip(Title, Msg)
 }

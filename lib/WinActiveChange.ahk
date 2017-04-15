@@ -13,11 +13,10 @@ WinActiveChange(wParam, hwnd) {
 			if RulesEnabled
 				DisableRules()
 			
-			ApplyRules(Info), RulesEnabled := true
-			
 			if !StrLen(Info.Title) { ; save window title if not there yet
 				WinGetTitle, Title, ahk_id %hwnd%
 				GameRules[Process].Title := Title
+				Info.Title := Title
 				JSONSave("GameRules", GameRules)
 				Big.UpdateGameList()
 				
@@ -28,6 +27,7 @@ WinActiveChange(wParam, hwnd) {
 				;LV_Modify(A_Index, "Col1", Title)
 			}
 			
+			ApplyRules(Info), RulesEnabled := true
 			return
 		}
 	}
@@ -37,6 +37,7 @@ WinActiveChange(wParam, hwnd) {
 }
 
 ApplyRules(Info) {
+	p("Applying game rules for " Info.Title)
 	if !Settings.NvAPI_Fail
 		NvAPI.SetDVCLevelEx(Info.Vibrancy, Settings.VibrancyScreen)
 	
@@ -48,9 +49,13 @@ ApplyRules(Info) {
 }
 
 DisableRules() {
+	p("Disabling game rules")
+	
 	SysGet, MonitorCount, MonitorCount
+	
 	Loop % MonitorCount
 		NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index-1)
+	
 	Hotkey.Disable("LWin")
 	Hotkey.Disable("!Tab")
 }

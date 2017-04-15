@@ -81,7 +81,6 @@
 	
 	AddQueue(Pop) {
 		this.Queue.InsertAt(1, Pop)
-		
 		this.GuiSetStatus() ; update queue counter
 		if (this.Queue.MaxIndex() > 1)
 			this.GuiAllowPause(true)
@@ -150,9 +149,9 @@
 		this.GuiSetStatus(Pop.Event="Delete"?"Deleting..":"Starting..")
 		
 		if (Pop.Event = "Upload")
-			this.Worker.Upload(Pop.File)
+			this.Worker.Upload(Pop.File), p("Uploading " Pop.File)
 		else if (Pop.Event = "Delete")
-			this.Worker.Delete(Pop.Index, Pop.DeleteHash)
+			this.Worker.Delete(Pop.Index, Pop.DeleteHash), p("Deleting " Pop.Index " (" Pop.DeleteHash ")")
 	}
 	
 	UploadResponse(file, JSON_DATA) {
@@ -163,14 +162,12 @@
 		if (res.status = 200) { ; successful upload
 			
 			Index := A_Now "_" A_MSec
-			
 			SplitPath, file,,, extension
 			
 			if (extension = "gif") && Settings.Imgur.UseGifv
 				res.data.link .= "v"
 			
 			Images[Index] := {link:res.data.link, deletehash:res.data.deletehash, id:res.data.id, extension:extension}
-			
 			JSONSave("Images", Images)
 			
 			if (InStr(file, this.LocalImageFolder) = 1)
@@ -178,14 +175,17 @@
 			else
 				FileCopy, % file, % this.ImgurImageFolder "\" res.data.id "." extension, 1
 			
+			
+			; https://autohotkey.com/board/topic/27849-solved-animated-gui-windows-causing-clipboard-set-error/
+			DllCall("OpenClipboard", uint, 0)
+			DllCall("EmptyClipboard")
+			DllCall("CloseClipboard")
 			clipboard := res.data.link
 			
-			Big.LV_Colors_OnMessage(false)
-			Big.ImgurListAdd(Index)
-			Big.LV_Colors_OnMessage(true)
+			this.GuiAddImage(Index)
 			
 			this.UploadCount++
-			
+			p("Uploaded successfully")
 			this.StepQueue(true) ; advance in queue and continue
 			
 		} else ; post request succeeded, imgur threw an error
@@ -195,6 +195,7 @@
 	
 	; upload failed
 	UploadFailure(file, res) {
+		p("Upload failed")
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
 		} else { ; uploader threw the error
@@ -214,21 +215,26 @@
 			Image := Images.Delete(Index)
 			JSONSave("Images", Images)
 			
-			FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension
+			if Settings.Imgur.DeleteImages
+				FileDelete, % this.ImgurImageFolder "\" Image.id "." Image.extension
+			else
+				FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension
 			
 			this.GuiRemoveImage(Index)
 			
 			this.DeleteCount++
 			
+			p("Deleted successfully")
+			
 			this.StepQueue(true) ; advance in queue and continue
 			
 		} else
 			this.DeleteFailure(Index, res)
-		
 	}
 	
 	; deletion failed
 	DeleteFailure(Index, res) {
+		p("Deletion failed")
 		if IsObject(res) { ; imgur threw the error
 			this.ImgurError(res)
 		} else {
@@ -307,20 +313,9 @@
 		else if (this.UploadCount && !this.DeleteCount) { ; only uploads
 			
 			Title := (this.UploadCount>1?this.UploadCount " i":"I")"mage" (this.UploadCount>1?"s":"") " uploaded!"
-			if (this.UploadCount=1) {
-				
-				Msg := "Link copied to clipboard."
-				
-				; check for hotkey pointing to Action.RunClipboard()
-				; and show it in the traytip in that case to remind user that they have that hotkey
-				if !Big.IsVisible {
-					for Key, Bind in Keybinds {
-						if (Bind.Func = "RunClipboard") {
-							Msg .= "`nClipboard Keybind: " HotkeyToString(Key)
-							break
-				}}} ; I've never done this before. How exciting.
-				
-			} else
+			if (this.UploadCount=1)
+				Msg := "Link copied to clipboard." . RunClipboardKeybindText()
+			else
 				Msg := "Open the Imgur tab to see images."
 		}
 		else if (this.DeleteCount && !this.UploadCount) { ; only deletions
@@ -386,6 +381,12 @@
 	
 	; === Gui control ===
 	
+	GuiAddImage(Index) {
+		Big.LV_Colors_OnMessage(false)
+		Big.ImgurListAdd(Index)
+		Big.LV_Colors_OnMessage(true)
+	}
+	
 	GuiRemoveImage(Index) {
 		Big.LV_Colors_OnMessage(false)
 		Big.ImgurListRemove(Index)
@@ -394,9 +395,10 @@
 	
 	; text representation of what's going on (which is shown in the main gui)
 	GuiSetStatus(Status := "") {
-		static CurrentStatus
-		Big.ImgurStatus((this.Queue.MaxIndex()?"Queue: " this.Queue.MaxIndex() " - ":"") . (StrLen(Status)?Status:CurrentStatus))
-		CurrentStatus := Status
+		static LastStatus
+		Big.ImgurStatus((this.Queue.MaxIndex()?"Queue: " this.Queue.MaxIndex() " - ":"") . (StrLen(Status)?Status:LastStatus))
+		if StrLen(Status)
+			LastStatus := Status
 	}
 	
 	GuiSetPauseText(Text) {

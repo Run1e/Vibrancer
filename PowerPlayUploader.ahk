@@ -18,7 +18,7 @@ Uploader.api_access := Main.api_access
 return
 
 UploadUpdate(Percent, FileSize) {
-	static Sent
+	static Sent := 0
 	Percent := Round((Percent + 1) * 100)
 	Fives := (Round(percent / 5) * 5)
 	if (Percent < 5)
