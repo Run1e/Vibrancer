@@ -1,12 +1,12 @@
 ﻿Class CustomImageList {
 	__New(Width, Height, Flags, Initial := 20, Grow := 5) {
-		this.ImageList := DllCall("comctl32.dll\ImageList_Create", "int", Width, "int", Height, "uint", Flags, "int", Initial, "int", Grow)
+		this.ID := DllCall("comctl32.dll\ImageList_Create", "int", Width, "int", Height, "uint", Flags, "int", Initial, "int", Grow)
 		this.Width := Width
 		this.Height := Height
 	}
 	
 	Add(hBitmap, hbmMask := "") {
-		return DllCall("comctl32.dll\ImageList_Add", "uint", this.ImageList, "uint", hBitmap, "uint", hbmMask) + 1
+		return DllCall("comctl32.dll\ImageList_Add", "uint", this.ID, "uint", hBitmap, "uint", hbmMask) + 1
 	}
 	
 	AddImage(File) {
@@ -114,6 +114,6 @@
 	}
 	
 	Destroy() {
-		return DllCall("comctl32.dll\ImageList_Destroy", "uint", this.ImageList)
+		return DllCall("comctl32.dll\ImageList_Destroy", "uint", this.ID)
 	}
 }

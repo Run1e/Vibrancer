@@ -4,6 +4,17 @@ CtlColorBtns() {
 	return DllCall("gdi32.dll\CreateSolidBrush", "uint", 0xFFFFFF, "uptr")
 }
 
+ImageButtonApply(hwnd) {
+	static RoundPx := 0
+	static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
+					, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
+					, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click
+					, [3, "Gray", "Gray", "0x505050", RoundPx,, "Gray"]] ; disabled
+	
+	If !ImageButton.Create(hwnd, ButtonStyle*)
+		MsgBox, 0, ImageButton Error Btn2, % ImageButton.LastError
+}
+
 Run(file) {
 	if FileExist(file)
 		SplitPath, file,, dir
@@ -36,7 +47,7 @@ pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
 m(x*) {
 	for a, b in x
 		text .= (IsObject(b)?pa(b):b) "`n"
-	MsgBox, 0, % AppName, % text
+	MsgBox, 0, msgbox, % text
 }
 
 pas(array, seperator:=", ", depth=5, indentLevel:="") {
@@ -145,8 +156,7 @@ Cursor(Cursor := "") {
 }
 
 RunClipboardKeybindText() {
-	if !Big.IsVisible
-		for Key, Bind in Keybinds
-			if (Bind.Func = "RunClipboard")
-				return "`nClipboard Keybind: " HotkeyToString(Key)
+	for Key, Bind in Keybinds
+		if (Bind.Func = "RunClipboard")
+			return "`nClipboard Keybind: " HotkeyToString(Key)
 }

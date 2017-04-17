@@ -1,4 +1,4 @@
-﻿#SingleInstance force
+#SingleInstance force
 #MaxHotkeysPerInterval 200
 #UseHook
 #NoEnv
@@ -12,44 +12,46 @@ SetTitleMatchMode 2
 OnExit, Exit
 
 /*
-	todo:
-	console
-	rate limiting for imgur api (which will be impossible)	
+todo:
+console
+rate limiting for imgur api (which will be impossible)	
 */
 
 /*
-	[size=150]v0.9.3[/size]
-	p
-	[list]
-	[/list]
-	
-	[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
-	[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
-	[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
+[size=150]v0.9.3[/size]
+
+[list][/list]
+
+[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
+[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
+[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
 */
 
 /*
-	To update:
-	1. Exit PowerPlay
-	2. Overwrite the old executables (PowerPlay, PowerPlayUploader) with the new downloaded ones
-	3. Launch PowerPlay.exe again
+To update:
+1. Exit PowerPlay
+2. Overwrite the old executables (PowerPlay, PowerPlayUploader) with the new downloaded ones
+3. Launch PowerPlay.exe again
 */
 
 /*
-	- Fixed tab-hotkeys not enabling before changing tabs
-	- Improved uploader status messages
-	- Fine tuned the rectangle tool behaviour
-	- Fixed a bug regarding traytips
-	- ToolMsg setting added (has to be enabled manually in Settings.json)
+- Fixed issues with cursor hiding in the rect tool
+- Rewrote error handling of queue items
+- New gui concept in Imgur tab
+- Added support for .lnk files being dropped to the game list
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole
+global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Queue
 
 AppName := "Power Play"
-AppVersion := [0, 9, 5]
+AppVersion := [0, 9, 6]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
-ForceConsole := false ; debug
+; only compiled and tested in 32-bit.
+if (A_PtrSize = 8) {
+	msgbox Please run this script as 32-bit.
+	ExitApp
+}
 
 SetWorkingDir % A_ScriptDir
 if !FileExist(A_WorkingDir "\data") {
@@ -199,4 +201,5 @@ p(text := "") {
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\FileSHA1.ahk																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
+
 

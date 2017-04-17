@@ -1,5 +1,5 @@
-﻿Class GUI {
-	static Instances := [], Parameters := {   Size:["A_EventInfo", "A_GuiWidth", "A_GuiHeight"]
+﻿Class Gui {
+	static Instances := [], Parameters := 	{ Size:["A_EventInfo", "A_GuiWidth", "A_GuiHeight"]
 									, DropFiles:["A_GuiEvent", "A_EventInfo", "A_GuiControl", "A_GuiX", "A_GuiY"]
 									, ContextMenu:["A_GuiEvent", "A_EventInfo", "A_GuiControl", "A_GuiX", "A_GuiY"]}
 	
@@ -10,6 +10,16 @@
 		this.IsVisible := false
 		Gui % this.hwnd ": -E0x10" ; disable drag-drop by default
 		Gui.Instances[hwnd] := this
+		return this
+		
+		GuiSize:
+		GuiClose:
+		GuiEscape:
+		GuiDropFiles:
+		for Index, ParamName in Gui.Parameters[SubStr(A_ThisLabel, 4)], Params := []
+			Params.Insert(%ParamName%)
+		Gui.Instances[A_Gui][SubStr(A_ThisLabel, 4)](Params*)
+		return
 	}
 	
 	__Delete() {
@@ -17,7 +27,6 @@
 		Gui.Instances[hwnd] := ""
 	}
 	
-	; you can bind a function/method to a control with the Function parameter. example: Instance.Method.Bind(Instance, Param1, Param2, ...)
 	Add(ControlType, Options := "", Params := "", Function := "") {
 		Gui % this.hwnd ":Add", % ControlType, % Options " hwndControlHWND", % Params
 		if Function
@@ -75,8 +84,8 @@
 		return out
 	}
 	
-	Pos(x := "", y := "", w := "", h := "", NoActivate := true) {
-		Gui % this.hwnd ":Show", % (StrLen(x)?"x" x:"") (StrLen(y)?" y" y:"") (StrLen(w)?" w" w:"") (StrLen(h)?" h" h:"")
+	Pos(x := "", y := "", w := "", h := "") {
+		Gui % this.hwnd ":Show", % (StrLen(x)?"x" x:"") (StrLen(y)?" y" y:"") (StrLen(w)?" w" w:"") (StrLen(h)?" h" h:"") " NoActivate"
 		;WinMove, % this.ahk_id,, % x, % y, % w, % h
 	}
 	
@@ -128,6 +137,93 @@
 		WinSet, % Command, % Param, % this.ahkid
 	}
 	
+	Class ListView {
+		__New(Parent, Options, Headers, Function := "") {
+			this.Parent := Parent
+			this.Function := Function
+			this.hwnd := Parent.Add("ListView", Options, Headers, Function)
+			return this
+		}
+		
+		Add(Options := "", Fields*) {
+			this.SetDefault()
+			return LV_Add(Options, Fields*)
+		}
+		
+		Insert(Row, Options := "", Col*) {
+			this.SetDefault()
+			return LV_Insert(Row, Options, Col*)
+		}
+		
+		Delete(Row := "") {
+			this.SetDefault()
+			if StrLen(Row)
+				return LV_Delete(Row)
+			else
+				return LV_Delete()
+		}
+		
+		GetCount(Option := "") {
+			this.SetDefault()
+			return LV_GetCount(Option)
+		}
+		
+		GetNext(Start := "", Option := "") {
+			this.SetDefault()
+			return LV_GetNext(Start, Option)
+		}
+		
+		GetText(Row, Column := "") {
+			this.SetDefault()
+			LV_GetText(Text, Row, Column)
+			return Text
+		}
+		
+		Modify(Row, Options := "", NewCol*) {
+			this.SetDefault()
+			return LV_Modify(Row, Options, NewCol*)
+		}
+		
+		ModifyCol(Column := "", Options := "", Title := "") {
+			this.SetDefault()
+			return LV_ModifyCol(Column, Options, Title)
+		}
+		
+		Redraw(Toggle) {
+			this.SetDefault()
+			return this.Parent.Control((Toggle?"+":"-") "Redraw", this.hwnd)
+		}
+		
+		SetImageList(ID, LargeIcons := false) {
+			this.SetDefault()
+			return LV_SetImageList(ID, !LargeIcons)
+		}
+		
+		SetDefault() {
+			this.Parent.SetDefault()
+			this.Parent.Options("ListView", this.hwnd)
+		}
+	}
+	
+	Class ImageList {
+		static Instances := []
+		
+		__New(InitialCount := 5, GrowCount := 2, LargeIcons := false) {
+			this.ID := IL_Create(InitialCount, GrowCount, LargeIcons)
+			Gui.ListView.ImageList.Instances[this.ID] := this
+			return this
+		}
+		
+		__Destroy() {
+			Gui.ListView.ImageList.Instances.Remove(this.ID)
+			return IL_Destroy(this.ID)
+		}
+		
+		Add(File) {
+			return IL_Add(this.ID, File)
+		}
+	}
+	
 	/*
 		for more documentation on window events look here: https://autohotkey.com/docs/commands/Gui.htm#Labels
 			
@@ -135,7 +231,7 @@
 	*/
 	
 	Close() {
-		
+		this.Destroy()
 	}
 	
 	Escape() {
@@ -172,12 +268,3 @@
 	ContextMenu(IsRightClick, ControlInfo, ControlHWND, GuiX, GuiY) {
 	}
 }
-
-GuiSize:
-GuiClose:
-GuiEscape:
-GuiDropFiles:
-for Index, ParamName in Gui.Parameters[SubStr(A_ThisLabel, 4)], Params := []
-	Params.Insert(%ParamName%)
-Gui.Instances[A_Gui][SubStr(A_ThisLabel, 4)](Params*)
-return

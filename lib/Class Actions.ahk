@@ -70,6 +70,16 @@
 		m(Keybinds)
 	}
 	
+	GetDownloadCount() {
+		static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases"
+		if !HTTP.Get(URL, Data)
+			return TrayTip("Failed getting download count")
+		JSONData := JSON.Load(Data.ResponseText)
+		for a, b in JSONData
+			count += b.assets.1.download_count
+		MouseTip.Create(count)
+	}
+	
 	Reload() {
 		reload
 		ExitApp
