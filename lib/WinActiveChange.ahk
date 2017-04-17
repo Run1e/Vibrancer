@@ -19,12 +19,6 @@ WinActiveChange(wParam, hwnd) {
 				Info.Title := Title
 				JSONSave("GameRules", GameRules)
 				Big.UpdateGameList()
-				
-				; I'm having inconsistensies making the 'nice way' work, so I just refresh the while stupid listview instead
-				
-				;Big.SetDefault()
-				;Big.Control("ListView", Big.GameListViewHWND)
-				;LV_Modify(A_Index, "Col1", Title)
 			}
 			
 			ApplyRules(Info), RulesEnabled := true
@@ -52,7 +46,6 @@ DisableRules() {
 	p("Disabling game rules")
 	
 	SysGet, MonitorCount, MonitorCount
-	
 	Loop % MonitorCount
 		NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index-1)
 	

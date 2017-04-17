@@ -1,6 +1,7 @@
 ﻿Class BigGUI extends GUI {
 	static BindHistory := [], GamesHistory := [], MonitorHWND := []
 	static HALF_WIDTH := 270, TAB_HEIGHT := 32, LV_HEIGHT := 240, BUTTON_HEIGHT := 26, TAB_WIDTH := 180
+	static EXPAND_SIZE := 206
 	static AnimatedImages := {}
 	static AnimatedPositions := {}
 	static AnimatedEnabled := false
@@ -13,13 +14,21 @@
 	DropFiles(FileList, FileCount, ControlHWND, GuiX, GuiY) {
 		if (this.ActiveTab = 1) {
 			for Index, File in StrSplit(FileList, "`n") {
-				SplitPath, File,,, ext
+				SplitPath, File,,, ext, FileName
 				if (ext = "exe")
 					GameRules[File] := {BlockAltTab:false, BlockWinKey:true, Vibrancy:50}, AddFile := File
-			} if StrLen(AddFile)
+				else if (ext = "lnk") {
+					FileGetShortcut, % File, Target,,,, Icon
+					GameRules[Target] := {BlockAltTab:false, BlockWinKey:true, Vibrancy:50, Title: FileName}
+					if StrLen(Icon)
+						GameRules[Target].Icon := Icon
+					AddFile := Target
+				}
+			} if StrLen(AddFile) {
+				JSONSave("GameRules", GameRules)
 				this.UpdateGameList(AddFile)
-			else
-				TrayTip("Only .exe files are allowed!")
+			} else
+				TrayTip("Only exe and lnk files are allowed!")
 		} else if (this.ActiveTab = 2) {
 			for Index, File in StrSplit(FileList, "`n") {
 				SplitPath, File,,, ext
@@ -33,14 +42,11 @@
 	}
 	
 	ImgurGetSelected() {
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
-		
 		Indexes := []
 		
-		while (i:=LV_GetNext(i)) {
-			LV_GetText(index, i, 2)
-			Indexes[A_Index] := index
+		while (i:=this.ImgurLV.GetNext(i)) {
+			Index := this.ImgurLV.GetText(i, 2)
+			Indexes[A_Index] := Index
 		}
 		
 		return Indexes
@@ -61,20 +67,17 @@
 	UpdateImgurList() {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
-		
 		this.LV_Colors_OnMessage(false)
 		
 		this.ImgurImageWidth:=124
 		this.ImgurImageHeight:=70
 		
-		this.ImgurImageList := new CustomImageList(this.ImgurImageWidth, this.ImgurImageHeight, 0x20, 50, 5) ; custom res imagelist
+		this.ImgurLV.IL := new CustomImageList(this.ImgurImageWidth, this.ImgurImageHeight, 0x20, 50, 5) ; custom res imagelist
 		
-		this.ImgurImageList.GifPeriod := Settings.Imgur.GifPeriod
+		this.ImgurLV.IL.GifPeriod := Settings.Imgur.GifPeriod
 		
-		LV_SetImageList(this.ImgurImageList.ImageList, 0)
-		LV_Delete()
+		this.ImgurLV.SetImageList(this.ImgurLV.IL.ID, true)
+		this.ImgurLV.Delete()
 		
 		for Date, Image in Images, New := []
 			New.Push(Date)
@@ -86,7 +89,7 @@
 		
 		sep:=5 ; separator between images
 		
-		LV_EX_SetIconSpacing(this.ImgurListViewHWND, this.ImgurImageWidth + sep, this.ImgurImageHeight + sep)
+		LV_EX_SetIconSpacing(this.ImgurLV.hwnd, this.ImgurImageWidth + sep, this.ImgurImageHeight + sep)
 		
 		this.ImgurListViewSelection()
 		
@@ -95,29 +98,26 @@
 	
 	ImgurListAdd(Index, FixOrder := true, Insert := true) {
 		
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
-		
 		if !Images.HasKey(Index)
 			return false
 		
-		this.Control("-Redraw", this.ImgurListViewHWND)
+		this.ImgurLV.Redraw(false)
 		
 		Image := Images[Index]
 		
 		if (Image.extension = "gif") {
-			IconList := this.ImgurImageList.AddGif(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
+			IconList := this.ImgurLV.IL.AddGif(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
 			this.AnimatedImages[Index] := IconList
 			this.AnimatedPositions[Index] := 1
 			IconNumber := IconList.1
 		} else
-			IconNumber := this.ImgurImageList.AddImage(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
+			IconNumber := this.ImgurLV.IL.AddImage(Uploader.ImgurImageFolder "\" Image.id "." image.extension)
 		
 		if IconNumber {
 			if Insert
-				LV_Insert(1, "Icon" . IconNumber,, Index)
+				this.ImgurLV.Insert(1, "Icon" . IconNumber,, Index)
 			else
-				LV_Add("Icon" . IconNumber,, Index)
+				this.ImgurLV.Add("Icon" . IconNumber,, Index)
 		}
 		
 		if FixOrder
@@ -127,16 +127,13 @@
 	}
 	
 	ImgurListRemove(Index) {
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
+		this.ImgurLV.Redraw(false)
 		
-		this.Control("-Redraw", this.ImgurListViewHWND)
-		
-		Loop % LV_GetCount()
+		Loop % this.ImgurLV.GetCount()
 		{
-			LV_GetText(LV_Index, A_Index, 2)
+			LV_Index := this.ImgurLV.GetText(A_Index, 2)
 			if (LV_Index = Index)
-				LV_Delete(A_Index)
+				this.ImgurLV.Delete(A_Index)
 		}
 		
 		this.ImgurFixOrder()
@@ -145,22 +142,18 @@
 	; when inserting to the first item position in a listview in icon mode, it doesn't add the item to the correct location (the first index).
 	; so to fix, we change it to report view and back. and poof. magic.
 	ImgurFixOrder() {
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
 		
-		this.Control("+Report", this.ImgurListViewHWND)
+		this.Control("+Report", this.ImgurLV.hwnd)
 		sleep 1
-		this.Control("+Icon", this.ImgurListViewHWND)
+		this.Control("+Icon", this.ImgurLV.hwnd)
 		sleep 1
-		this.Control("+Redraw", this.ImgurListViewHWND)
+		this.ImgurLV.Redraw(true)
 		sleep 1
 		
-		LV_Modify(1, "Vis")
+		this.ImgurLV.Modify(1, "Vis")
 	}
 	
 	ImgurAnimateTick() {
-		this.SetDefault()
-		this.Options("ListView", this.ImgurListViewHWND)
 		
 		; find the next image to show for each animated image
 		for Index, Pos in this.AnimatedPositions {
@@ -173,13 +166,13 @@
 		; change to the next image for each gif
 		; later: figure out which images are onscreen and update accordingly
 		Loop {
-			LV_GetText(text, A_Index, 2)
+			text := this.ImgurLV.GetText(A_Index, 2)
 			if this.AnimatedPositions.HasKey(text)
-				LV_Modify(A_Index, "Icon" . this.AnimatedImages[text][this.AnimatedPositions[text]]) 
+				this.ImgurLV.Modify(A_Index, "Icon" . this.AnimatedImages[text][this.AnimatedPositions[text]]) 
 		} until !StrLen(text)
 	}
 	
-	ImgurListViewSelection(GuiEvent) {
+	ImgurListViewAction(Control, GuiEvent, EventInfo) {
 		if (GuiEvent = "DoubleClick")
 			this.ImgurCopyLinks()
 	}
@@ -256,9 +249,7 @@
 	}
 	
 	ImgurStatus(Status) {
-		if !this.IsVisible && Settings.ToolMsg
-			MouseTip.Create(Status, 2000)
-		this.SetText(this.ImgurStatusHWND, Status)
+		this.QueueLV.ModifyCol(1,, "Status: " Status)
 	}
 	
 	/*
@@ -268,7 +259,6 @@
 	; probably temporary (right?????)
 	AddProg() {
 		this.Disable()
-		
 		AppSelect(this.AddProgCallback.Bind(this), this.hwnd)
 	}
 	
@@ -294,8 +284,8 @@
 		
 		this.UpdateGameList(Info.InstallLocation)
 		
-		Loop % LV_GetCount() {
-			LV_GetText(LVKey, A_Index, 2)
+		Loop % this.GameLV.GetCount() {
+			LVKey := this.GameLV.GetText(A_Index, 2)
 			if (LVKey = Info.InstallLocation) {
 				this.GamesHistory.Insert({Event:"Addition", Key:Info.InstallLocation, Pos:A_Index})
 				break
@@ -304,12 +294,9 @@
 	}
 	
 	DeleteProg() {
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
+		Key := this.GameLV.GetText(Pos := this.GameLV.GetNext(), 2)
 		
-		LV_GetText(Key, Pos:=LV_GetNext(), 2)
-		
-		if (Key = "path") ; header is called path, defaults to "path" when none selected
+		if (Key = "path") || !StrLen(Key)
 			return
 		
 		if !IsObject(GameRules[Key]) {
@@ -317,8 +304,8 @@
 			return
 		}
 		
-		LV_Delete(Pos)
-		LV_Modify((LV_GetCount()<Pos?LV_GetCount():Pos), "Focus Select Vis")
+		this.GameLV.Delete(Pos)
+		this.GameLV.Modify((this.GameLV.GetCount()<Pos?this.GameLV.GetCount():Pos), "Focus Select Vis")
 		
 		if !IsObject(Prog:=GameRules.Remove(Key)) {
 			; shit
@@ -331,9 +318,6 @@
 	}
 	
 	RegretProg() {
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
-		
 		Info := this.GamesHistory.Pop()
 		
 		if !IsObject(Info)
@@ -342,11 +326,11 @@
 		if (Info.Event = "Deletion") {
 			GameRules[Info.Key] := Info.Prog
 			this.UpdateGameList()
-			LV_Modify(Info.Pos, "Focus Vis Select")
+			this.GameLV.Modify(Info.Pos, "Focus Vis Select")
 		} else if (Info.Event = "Addition") {
 			GameRules.Remove(Info.Key)
-			LV_Delete(Info.Pos)
-			LV_Modify(Info.Pos>LV_GetCount()?LV_GetCount():Info.Pos, "Select Focus Vis")
+			this.GameLV.Delete(Info.Pos)
+			this.GameLV.Modify(Info.Pos>this.GameLV.GetCount()?this.GameLV.GetCount():Info.Pos, "Select Focus Vis")
 		} this.GameListViewSize()
 	}
 	
@@ -372,34 +356,30 @@
 	}
 	
 	GamesGetKey() {
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
-		
 		LV_GetText(Key, LV_GetNext(), 2)
 		
-		if (Key = "path")
+		Key := this.GameLV.GetText(this.GameLV.GetNext(), 2)
+		
+		if (Key = "path") || !StrLen(Key)
 			return 
-		else if !IsObject(GameRules[Key]) {
-			Error("Key not found in GameRules Array", A_ThisFunc, "Key: " Key)
-			return
-		} else
+		else if !IsObject(GameRules[Key])
+			return Error("Key not found in GameRules Array", A_ThisFunc, "Key: " Key)
+		else
 			return Key
 	}
 	
 	UpdateGameList(FocusKey := "") {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
-		
 		this.LV_Colors_OnMessage(false)
 		
-		ImageList := IL_Create(5)
-		LV_SetImageList(ImageList)
+		IL := new this.ImageList(this.GameLV)
 		
-		this.Control("-Redraw", this.GameListViewHWND)
+		this.GameLV.SetImageList(IL.ID)
 		
-		LV_Delete()
+		this.GameLV.Redraw(false)
+		
+		this.GameLV.Delete()
 		
 		for Process, Info in GameRules {
 			if StrLen(Info.Title)
@@ -407,9 +387,9 @@
 			else
 				SplitPath, Process,,,, Title
 			
-			img := IL_Add(ImageList, StrLen(Info.Icon)?Info.Icon:Process)
+			img := IL.Add(StrLen(Info.Icon)?Info.Icon:Process)
 			
-			Pos := LV_Add("Icon" . img, StrLen(Title)?Title:FileName, Process)
+			Pos := this.GameLV.Add("Icon" . img, StrLen(Title)?Title:FileName, Process)
 			
 			if (FocusKey = Process)
 				Settings.GuiState.GameListPos := Pos
@@ -421,37 +401,31 @@
 		this.GameListViewSelection()
 		this.GameListViewSize()
 		
-		this.Control("+Redraw", this.GameListViewHWND)
+		this.GameLV.Redraw(true)
 	}
 	
-	GameListViewSelection() {
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
-		
-		Pos:=LV_GetNext()
-		
-		LV_Modify(Pos?Settings.GuiState.GameListPos:=Pos:Settings.GuiState.GameListPos, "Select Vis Focus")
-		
-		if Pos {
-			LV_GetText(Key, Pos, 2)
-			this.SetText("msctls_trackbar321", GameRules[Key].Vibrancy)
-			this.SetText("Button3", GameRules[Key].BlockWinKey)
-			this.SetText("Button4", GameRules[Key].BlockAltTab)
+	GameListViewAction(Control, GuiEvent, EventInfo) {
+		if (GuiEvent = "C") {
+			Pos := (EventInfo?EventInfo:this.GameLV.GetNext())
+			this.GameLV.Modify(Pos, "Select Vis Focus")
+			if Pos {
+				Key := this.GameLV.GetText(Pos, 2)
+				this.SetText("msctls_trackbar321", GameRules[Key].Vibrancy)
+				this.SetText("Button3", GameRules[Key].BlockWinKey)
+				this.SetText("Button4", GameRules[Key].BlockAltTab)
+			}
 		}
 	}
 	
 	GameListViewSize() {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.GameListViewHWND)
-		
-		if ((LV_EX_GetRowHeight(this.GameListViewHWND) * LV_GetCount()) > this.LV_HEIGHT)
-			LV_ModifyCol(1, this.HALF_WIDTH - VERT_SCROLL - 1)
+		if ((LV_EX_GetRowHeight(this.GameLV.hwnd) * this.GameLV.GetCount()) > this.LV_HEIGHT)
+			this.GameLV.ModifyCol(1, this.HALF_WIDTH - VERT_SCROLL - 1)
 		else
-			LV_ModifyCol(1, this.HALF_WIDTH - 1)
+			this.GameLV.ModifyCol(1, this.HALF_WIDTH - 1)
 		
-		LV_ModifyCol(2, 0)
+		this.GameLV.ModifyCol(2, 0)
 	}
 	
 	/*
@@ -479,11 +453,8 @@
 		
 		this.UpdateBindList(Key)
 		
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
-		
-		Loop % LV_GetCount() {
-			LV_GetText(LVKey, A_Index, 3)
+		Loop % this.BindLV.GetCount() {
+			LVKey := this.BindLV.GetText(A_Index, 3)
 			if (LVKey = Key) {
 				this.BindHistory.Insert({Event:"Addition", Key:Key, Pos:A_Index})
 				break
@@ -497,19 +468,16 @@
 	DeleteBind() {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
+		RealKey := this.BindLV.GetText(Pos:=this.BindLV.GetNext(), 3)
 		
-		LV_GetText(RealKey, Pos:=LV_GetNext(), 3)
-		
-		if (RealKey = "realkey") ; if list is empty, output defaults to header which is 'realkey'
+		if (RealKey = "realkey") || !StrLen(RealKey) ; if list is empty, it EITHER output defaults to header which is 'realkey', OR gets empty. it's weird
 			return
 		
 		this.BindHistory.Insert({Event:"Deletion", Key:RealKey, Bind:Keybinds[RealKey], Pos:Pos})
 		Keybinds.Remove(RealKey)
-		LV_Delete(Pos)
+		this.BindLV.Delete(Pos)
 		
-		LV_Modify((LV_GetCount()<Pos?LV_GetCount():Pos), "Focus Select Vis") ; select closest new row
+		this.BindLV.Modify((this.BindLV.GetCount()<Pos?this.BindLV.GetCount():Pos), "Focus Select Vis") ; select closest new row
 		
 		this.BindListViewSize()
 		
@@ -519,9 +487,6 @@
 	}
 	
 	RegretBind() {
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
-		
 		Info := this.BindHistory.Pop()
 		
 		if !IsObject(Info)
@@ -529,10 +494,10 @@
 		
 		if (Info.Event = "Deletion") {
 			Keybinds[Info.Key] := Info.Bind
-			LV_Insert(Info.Pos, "Focus Select Vis", HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
+			this.BindLV.Insert(Info.Pos, "Focus Select Vis", HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
 		} else if (Info.Event = "Addition") { ; a fine one
 			Keybinds.Remove(Info.Key)
-			LV_Delete(Info.Pos)
+			this.BindLV.Delete(Info.Pos)
 		}
 		
 		this.BindListViewSize()
@@ -544,22 +509,19 @@
 	UpdateBindList(FocusKey:= "") {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
-		
 		this.LV_Colors_OnMessage(false)
 		
-		this.Control("-Redraw", this.BindListViewHWND)
+		this.BindLV.Redraw(false)
 		
-		LV_Delete()
+		this.BindLV.Delete()
 		
 		for Key, Bind in Keybinds {
-			Pos := LV_Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
+			Pos := this.BindLV.Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
 			if (Key = FocusKey)
 				Settings.GuiState.BindListPos := Pos
 		}
 		
-		this.Control("+Redraw", this.BindListViewHWND)
+		this.BindLV.Redraw(true)
 		
 		this.LV_Colors_OnMessage(true)
 		
@@ -567,28 +529,21 @@
 		this.BindListViewSize()
 	}
 	
-	BindListViewSelection() {
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
-		
-		Pos:=LV_GetNext()
-		
-		LV_Modify(Pos?Settings.GuiState.BindListPos:=Pos:Settings.GuiState.BindListPos, "Select Vis Focus")
+	BindListViewAction(Control, GuiEvent, EventInfo) {
+		if (GuiEvent = "C")
+			this.BindLV.Modify(this.BindLV.GetNext(), "Select Vis Focus")
 	}
 	
 	BindListViewSize() {
 		Critical 500
 		
-		this.SetDefault()
-		this.Options("ListView", this.BindListViewHWND)
-		
-		if (LV_EX_GetRowHeight(this.BindListViewHWND)*LV_GetCount() > this.LV_HEIGHT)
-			LV_ModifyCol(2, this.HALF_WIDTH - VERT_SCROLL)
+		if (LV_EX_GetRowHeight(this.BindLV.hwnd)*LV_GetCount() > this.LV_HEIGHT)
+			this.BindLV.ModifyCol(2, this.HALF_WIDTH - VERT_SCROLL)
 		else
-			LV_ModifyCol(2, this.HALF_WIDTH)
+			this.BindLV.ModifyCol(2, this.HALF_WIDTH)
 		
-		LV_ModifyCol(1, this.HALF_WIDTH)
-		LV_ModifyCol(3, 0)
+		this.BindLV.ModifyCol(1, this.HALF_WIDTH)
+		this.BindLV.ModifyCol(3, 0)
 	}
 	
 	/*
@@ -596,8 +551,8 @@
 	*/
 	
 	LV_Colors_OnMessage(toggle) {
-		this.GameListViewCLV.OnMessage(toggle)
-		this.BindListViewCLV.OnMessage(toggle)
+		this.GameLV.CLV.OnMessage(toggle)
+		this.BindLV.CLV.OnMessage(toggle)
 	}
 	
 	TabAction() {
@@ -616,16 +571,19 @@
 			this.SelectScreen(Settings.VibrancyScreen + 1)
 			this.ImgurAnimate(false)
 			this.DropFilesToggle(true)
+			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 1)
 		} else if (tab = 2) {
-			this.Options("ListView", this.ImgurListViewHWND)
+			this.Options("ListView", this.ImgurLV.hwnd)
 			LV_Modify(1, "Vis") ; show first item
 			LV_Modify(0, "-Select") ; show first item
 			this.ImgurAnimate(true) ; animate gifs
 			this.DropFilesToggle(true)
+			this.ImgurExpand(this.ExpandState)
 		} else if (tab = 3) {
 			this.Control("Focus", "SysListView323")
 			this.ImgurAnimate(false)
 			this.DropFilesToggle(false)
+			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 1)
 		}
 		
 		this.SetTabHotkeys(tab)
@@ -645,6 +603,19 @@
 		}
 	}
 	
+	ImgurExpand(Expand) {
+		if Expand {
+			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + this.EXPAND_SIZE + 1)
+		} else {
+			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 25)
+		} this.ExpandState := Expand
+	}
+	
+	QueueListViewAction(Control, GuiEvent, EventInfo) {
+		if (GuiEvent = "ColClick") ; clicked on header
+			this.ImgurExpand(this.ExpandState := !this.ExpandState)
+	}
+	
 	SetTabColor(tab) {
 		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
 			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
@@ -661,10 +632,13 @@
 		
 		this.LV_Colors_OnMessage(true)
 		
+		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
+		
 		if tab
 			this.SetTab(tab)
 		
-		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
+		this.SetTabColor(tab?tab:this.ActiveTab)
+		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 		
 		if !IsShown {
 			this.SetTitle(AppName " " AppVersionString)
@@ -672,43 +646,29 @@
 			this.SetIcon(Icon("icon"))
 			IsShown := true
 		}
-		
-		this.SetTabColor(tab?tab:this.ActiveTab)
-		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 	}
 	
 	Save() {
+		Settings.GuiState.ActiveTab := this.ActiveTab
+		Settings.GuiState.ExpandState := this.ExpandState
 		JSONSave("Settings", Settings)
 		JSONSave("Keybinds", Keybinds)
 		JSONSave("GameRules", GameRules)
 	}
 	
 	Escape() {
-		this.Close()
+		if (this.ActiveTab = 2) && (this.ExpandState)
+			this.ImgurExpand(false)
+		else
+			this.Close()
 	}
 	
 	Close() {
-		Settings.GuiState.ActiveTab := this.ActiveTab
-		
 		this.Save()
 		this.Hide()
-		
 		this.ImgurAnimate(false)
-		
 		this.LV_Colors_OnMessage(false)
-		
 		Keybinds(true)
-	}
-	
-	ImageButtonApply(hwnd) {
-		static RoundPx := 0
-		static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
-						, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
-						, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click
-						, [3, "Gray", "Gray", "0x505050", RoundPx,, "Gray"]] ; disabled
-		
-		If !ImageButton.Create(hwnd, ButtonStyle*)
-			MsgBox, 0, ImageButton Error Btn2, % ImageButton.LastError
 	}
 }
 
@@ -725,16 +685,21 @@ CreateBigGUI() {
 	TAB_HEIGHT := Big.TAB_HEIGHT
 	LV_HEIGHT := Big.LV_HEIGHT
 	BUTTON_HEIGHT := Big.BUTTON_HEIGHT
+	EXPAND_SIZE := Big.EXPAND_SIZE
 	
+	; ==========================================
+	
+	; tab text controls
 	Big.GamesHWND := Big.Add("Text", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " 0x200 gSelectTab Center", "Games")
 	Big.ImgurHWND := Big.Add("Text", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " 0x200 gSelectTab Center", "Imgur")
 	Big.KeybindsHWND := Big.Add("Text", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1 " 0x200 gSelectTab Center", "Keybinds")
 	
+	; separators
 	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 0x08 w" HALF_WIDTH*2+5) ; big-ass sep
-	
 	Big.Add("Text", "x" TAB_WIDTH - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; first sep
 	Big.Add("Text", "x" TAB_WIDTH*2 - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; second sep
 	
+	; attach to ctlcolors
 	CtlColors.Attach(Big.GamesHWND,, "000000")
 	CtlColors.Attach(Big.ImgurHWND,, "000000")
 	CtlColors.Attach(Big.KeybindsHWND,, "000000")
@@ -745,14 +710,15 @@ CreateBigGUI() {
 	
 	Big.Tab(1)
 	Big.Font("s11")
-	Big.GameListViewCLV := new LV_Colors(Big.GameListViewHWND := Big.Add("ListView", "x" 0 " y" TAB_HEIGHT " w" HALF_WIDTH - 1 " h" LV_HEIGHT " -HDR -Multi -E0x200 AltSubmit -TabStop", "name|path", Big.GameListViewSelection.Bind(Big)))
+	Big.GameLV := new Big.ListView(Big, "x" 0 " y" TAB_HEIGHT " w" HALF_WIDTH - 1 " h" LV_HEIGHT " -HDR -Multi -E0x200 AltSubmit -TabStop", "name|path", Big.GameListViewAction.Bind(Big))
+	Big.GameLV.CLV := new LV_Colors(Big.GameLV.hwnd)
 	Big.Font("s10")
 	
 	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1, "Remove", Big.DeleteProg.Bind(Big))
-	Big.ImageButtonApply(Button)
+	ImageButtonApply(Button)
 	
 	Button := Big.Add("Button", "x" Round(HALF_WIDTH/5*2) + 1 " yp w" HALF_WIDTH - Round(HALF_WIDTH/5*2) - 1 " h" BUTTON_HEIGHT - 1, "Add Program", Big.AddProg.Bind(Big))
-	Big.ImageButtonApply(Button)
+	ImageButtonApply(Button)
 	
 	Big.Add("Text", "x" HALF_WIDTH-1 " y" TAB_HEIGHT " w1 h" LV_HEIGHT " 0x08") ; skille
 	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT/2 " w" HALF_WIDTH " h1 0x08") ; skille
@@ -800,37 +766,42 @@ CreateBigGUI() {
 		CtlColors.Change(Big.MonitorHWND.1, "FFFFFF", "000000")
 	}
 	
-	Big.GameListViewCLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
-	Big.GameListViewCLV.Critical := 500
+	Big.GameLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
+	Big.GameLV.CLV.Critical := 500
 	
 	Big.UpdateGameList()
 	
-	
 	; ==========================================
+	
+	/*
+		Big.Font("s10")
+		
+		SIXTH_WIDTH := HALF_WIDTH*2/6
+		
+		Big.StartStopButtonHWND := Big.Add("Button", "x" TAB_WIDTH " y" TAB_HEIGHT + LV_HEIGHT + 1 " w" SIXTH_WIDTH*3/4 - 1 " h" BUTTON_HEIGHT - 1 " Disabled", "Pause", Big.StartStopQueue.Bind(Big))
+		;this.ImageButtonApply(Big.StartStopButtonHWND)
+		
+		Big.ClearButtonHWND := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/4 " yp w" SIXTH_WIDTH*3/4 " h" BUTTON_HEIGHT - 1 " Disabled", "Clear", Big.ClearQueue.Bind(Big))
+		;this.ImageButtonApply(Big.ClearButtonHWND)
+		
+		Button := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/2 " yp w" HALF_WIDTH/2 - 1 " h" BUTTON_HEIGHT - 1, "Open in Browser", Big.ImgurOpenLinks.Bind(Big))
+		Big.ImageButtonApply(Button)
+		
+		Button := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/2 + HALF_WIDTH/2 " yp w" SIXTH_WIDTH " h" BUTTON_HEIGHT - 1, "Delete", Big.ImgurDelete.Bind(Big))
+		Big.ImageButtonApply(Button)
+		
+		Big.ImgurStatusHWND := Big.Add("Text", "x" 6 " yp+2 w" TAB_WIDTH - 6 " h" BUTTON_HEIGHT - 2, "Uploads appear here!")
+	*/
 	
 	Big.Tab(2)
 	Big.Font("s1")
-	Big.ImgurListViewHWND := Big.Add("ListView", "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop gImgurListViewAction +Background" Settings.Color.Dark, "empty|index") ; LVS_EX_HIDELABELS 0x00020000
-	
+	Big.ImgurLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT + BUTTON_HEIGHT + 1 " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop +Background" Settings.Color.Dark, "empty|index", Big.ImgurListViewAction.Bind(Big))
 	Big.Font("s10")
+	Big.QueueLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" HALF_WIDTH*2 " h" EXPAND_SIZE - BUTTON_HEIGHT " NoSort -Multi +LV0x4000 -E0x200 -LV0x10 -TabStop cWhite +Background" Settings.Color.Dark, "Click to open queue manager.", Big.QueueListViewAction.Bind(Big))
+	;Big.QueueLV.CLV := new LV_Colors(Big.QueueLV.hwnd)
 	
-	SIXTH_WIDTH := HALF_WIDTH*2/6
-	
-	Big.StartStopButtonHWND := Big.Add("Button", "x" TAB_WIDTH " y" TAB_HEIGHT + LV_HEIGHT + 1 " w" SIXTH_WIDTH*3/4 - 1 " h" BUTTON_HEIGHT - 1 " Disabled", "Pause", Big.StartStopQueue.Bind(Big))
-	;this.ImageButtonApply(Big.StartStopButtonHWND)
-	
-	Big.ClearButtonHWND := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/4 " yp w" SIXTH_WIDTH*3/4 " h" BUTTON_HEIGHT - 1 " Disabled", "Clear", Big.ClearQueue.Bind(Big))
-	;this.ImageButtonApply(Big.ClearButtonHWND)
-	
-	Button := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/2 " yp w" HALF_WIDTH/2 - 1 " h" BUTTON_HEIGHT - 1, "Open in Browser", Big.ImgurOpenLinks.Bind(Big))
-	Big.ImageButtonApply(Button)
-	
-	Button := Big.Add("Button", "x" TAB_WIDTH + SIXTH_WIDTH*3/2 + HALF_WIDTH/2 " yp w" SIXTH_WIDTH " h" BUTTON_HEIGHT - 1, "Delete", Big.ImgurDelete.Bind(Big))
-	Big.ImageButtonApply(Button)
-	
-	Big.Font("s11")
-	
-	Big.ImgurStatusHWND := Big.Add("Text", "x" 6 " yp+2 w" TAB_WIDTH - 6 " h" BUTTON_HEIGHT - 2, "Uploads appear here!")
+	Big.StartStopButtonHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" HALF_WIDTH " h" BUTTON_HEIGHT, "Pause", Big.StartStopQueue.Bind(Big))
+	Big.ClearButtonHWND := Big.Add("Button", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" HALF_WIDTH " h" BUTTON_HEIGHT, "Clear queue", Big.ClearQueue.Bind(Big))
 	
 	Big.UpdateImgurList()
 	
@@ -839,28 +810,29 @@ CreateBigGUI() {
 	Big.Tab(3)
 	Big.Margin(0, 0)
 	Big.Font("s11")
-	Big.BindListViewHWND := Big.Add("ListView", "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop", "desc|key|realkey", Big.BindListViewSelection.Bind(Big))
-	Big.BindListViewCLV := new LV_Colors(Big.BindListViewHWND)
-	Big.BindListViewCLV.Critical := 500
-	Big.BindListViewCLV.SelectionColors("0x" Settings.Color.Selection, "0xFFFFFF")
+	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop","desc|key|realkey", Big.BindListViewAction.Bind(Big))
+	Big.BindLV.CLV := new LV_Colors(Big.BindLV.hwnd)
+	Big.BindLV.CLV.Critical := 500
+	Big.BindLV.CLV.SelectionColors("0x" Settings.Color.Selection, "0xFFFFFF")
 	Big.Font("s10")
 	
 	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Delete Keybind", Big.DeleteBind.Bind(Big))
-	Big.ImageButtonApply(Button)
+	ImageButtonApply(Button)
 	
 	Button := Big.Add("Button", "x" HALF_WIDTH + 1 " yp w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Add a Keybind", Big.AddBind.Bind(Big))
-	Big.ImageButtonApply(Button)
+	ImageButtonApply(Button)
 	
 	Big.UpdateBindList()
 	
 	Big.ActiveTab := Settings.GuiState.ActiveTab
+	Big.ExpandState := Settings.GuiState.ExpandState
+	
+	; fake gui event to init lv positions
+	Big.GameListViewAction("", "C", Settings.GuiState.GameListPos)
+	Big.BindListViewAction("", "C", Settings.GuiState.BindListPos)
 	
 	Big.LV_Colors_OnMessage(false)
 	Big.Options("-MinimizeBox")
-	return
-	
-	ImgurListViewAction:
-	Big.ImgurListViewSelection(A_GuiEvent)
 	return
 	
 	SelectScreen:

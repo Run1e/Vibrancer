@@ -1,10 +1,11 @@
 ﻿GetActionsList() {
 	BuiltIn :=		{ 1: {Desc:"Run Clipboard", Func:"RunClipboard"}
 					, 2: {Desc:"Upload Clipboard Text", Func:"UploadClip"}
-					, 3: {Desc:"Open Games Tab", Func:"Open", Param:[1]}
-					, 4: {Desc:"Open Imgur Tab", Func:"Open", Param:[2]}
-					, 5: {Desc:"Open Keybinds Tab", Func:"Open", Param:[3]}
-					, 6: {Desc:"Open Settings", Func:"Settings"}}
+					, 3: {Desc:"Open GUI", Func:"Open"}
+					, 4: {Desc:"Open Games Tab", Func:"Open", Param:[1]}
+					, 5: {Desc:"Open Imgur Tab", Func:"Open", Param:[2]}
+					, 6: {Desc:"Open Keybinds Tab", Func:"Open", Param:[3]}
+					, 7: {Desc:"Open Settings", Func:"Settings"}}
 	
 	Imgur :=			{ 1: {Desc:"Capture Screen", Func:"Screenshot", Param:["Full"]}
 					, 2: {Desc:"Capture Window", Func:"Screenshot", Param:["Window"]}
