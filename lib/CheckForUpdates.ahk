@@ -28,7 +28,7 @@
 		p("Update avaliable: " GitJSON.tab_name)
 		MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to visit the download page?"
 		ifMsgBox yes
-		Run(GitJSON.html_url)
+			Run(GitJSON.html_url)
 	} else
 		TrayTip("You're up to date!"), p("Program up to date.")
 	

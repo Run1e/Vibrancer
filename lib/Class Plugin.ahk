@@ -5,7 +5,7 @@
 	to connect to the class do:
 	pp := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 	
-	now you can call Get, Call and the rest of the methods via the pp object
+	now you can call Get and Call.
 	
 	for example to disable keybinds you can use Call to call the Keybinds function
 	pp.Call("Keybinds", false)
@@ -35,7 +35,6 @@ Class Plugin {
 	}
 	
 	; get a global variable/object
-	; use listvars or the global declaration in powerplay.ahk
 	Get(ref) {
 		return _:=%ref%
 	}

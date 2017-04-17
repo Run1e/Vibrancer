@@ -43,11 +43,7 @@
 		StartDrag() {
 			this.Dragging := true
 			
-			Loop
-				DllCall("ShowCursor", "int", false)
-			until !GetCursorInfo()
-			
-			this.dick .= GetCursorInfo()
+			DllCall("ShowCursor", "int", false)
 			
 			MouseGetPos, x, y
 			this.sx := x, this.sy := y
@@ -88,9 +84,8 @@
 			; destroy window
 			this.Vis.Destroy()
 			this.Vis := ""
-			Loop
-				DllCall("ShowCursor", "int", true)
-			until GetCursorInfo()
+			
+			DllCall("ShowCursor", "int", true)
 			
 			Cursor() ; reset cursor
 			
@@ -241,14 +236,14 @@
 		
 		pBitmap := Gdip_BitmapFromScreen(x "|" y "|" w "|" h)
 		
-		Gdip_Success := Gdip_SaveBitmapToFile(pBitmap, File, this.ImageQuality)
+		Gdip_Success := Gdip_SaveBitmapToFile(pBitmap, File, Uploader.ImageQuality)
 		if (Gdip_Success < 0) {
 			Error := {  -1:"Extension supplied is not a supported file format"
 					, -2:"Could not get a list of encoders on system"
 					, -3:"Could not find matching encoder for specified file format"
 					, -4:"Could not get WideChar name of output file"
 					, -5:"Could not save file to disk"}[Gdip_Success]
-			return Error(Error, A_ThisFunc ": Gdip_SaveBitmapToFile", "File: " File "`nImageQuality: " this.ImageQuality, true)
+			return Error(Error, A_ThisFunc ": Gdip_SaveBitmapToFile", "File: " File "`nImageQuality: " Uploader.ImageQuality, true)
 		}
 		
 		Gdip_DisposeImage(pBitmap)
@@ -261,13 +256,4 @@
 		
 		return Name
 	}
-}
-
-; https://autohotkey.com/boards/viewtopic.php?t=29793 ty jNizM
-GetCursorInfo() ; https://msdn.microsoft.com/en-us/library/ms648381(v=vs.85).aspx
-{
-	NumPut(VarSetCapacity(CURSORINFO, 16 + A_PtrSize, 0), CURSORINFO, "uint")
-	if !(DllCall("user32\GetCursorInfo", "ptr", &CURSORINFO))
-		return A_LastError
-	return NumGet(CURSORINFO, 8, "ptr") ; hCursor
 }

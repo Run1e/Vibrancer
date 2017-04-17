@@ -81,7 +81,6 @@
 	
 	AddQueue(Pop) {
 		this.Queue.InsertAt(1, Pop)
-		this.GuiAddQueue(Pop)
 		this.GuiSetStatus() ; update queue counter
 		if (this.Queue.MaxIndex() > 1)
 			this.GuiAllowPause(true)
@@ -216,7 +215,7 @@
 			Image := Images.Delete(Index)
 			JSONSave("Images", Images)
 			
-			if Settings.Imgur.DeleteLocal
+			if Settings.Imgur.DeleteImages
 				FileDelete, % this.ImgurImageFolder "\" Image.id "." Image.extension
 			else
 				FileMove, % this.ImgurImageFolder "\" Image.id "." Image.extension, % this.DeletedImageFolder "\" Image.id "." Image.extension
@@ -273,11 +272,11 @@
 			this.QueueErrors.Push(error)
 			
 			if (this.LastHeaders["X-RateLimit-UserRemaining"] = 0) ; user has spent all credits
-				this.GuiError("Imgur error!", "You've uploaded too much.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
+				TrayTip("Imgur error!", "You've uploaded too much.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
 			else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) ; client_id credits is empty, we need a new one, kinda bad tbh
-				this.GuiError("Imgur error!", "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening.")
+				TrayTip("Imgur error!", "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening.")
 			else ; last error is IP spam prevention
-				this.GuiError("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
+				TrayTip("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(this.LastHeaders["X-Post-Rate-Limit-Reset"] / 60) " minutes.")
 			
 			this.StopQueue()
 			this.AllowStart("Imgur error")
@@ -307,9 +306,6 @@
 				MsgBox, 64, List of failed queue items:, % Errors
 				Shown := true
 			}
-			
-			if Settings.ToolMsg
-				MouseTip.Create("Queue item" (this.QueueErrors.MaxIndex()>1?"s":"") " failed")
 			
 			AllFail := true
 			
@@ -397,18 +393,12 @@
 		Big.LV_Colors_OnMessage(true)
 	}
 	
-	GuiAddQueue(Pop) {
-		return
-		if (Pop.Event = "Upload") {
-			Big.QueueLV.Add(, Pop.Event ": " Pop.File)
-		} else {
-			Big.QueueLV.Add(, Pop.Event ": " Pop.Index " (" Pop.DeleteHash ")")
-		}
-	}
-	
 	; text representation of what's going on (which is shown in the main gui)
 	GuiSetStatus(Status := "") {
-		Big.ImgurStatus(Status)
+		static LastStatus
+		Big.ImgurStatus((this.Queue.MaxIndex()?"Queue: " this.Queue.MaxIndex() " - ":"") . (StrLen(Status)?Status:LastStatus))
+		if StrLen(Status)
+			LastStatus := Status
 	}
 	
 	GuiSetPauseText(Text) {
