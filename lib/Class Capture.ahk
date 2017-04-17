@@ -46,11 +46,6 @@
 			Loop
 				DllCall("ShowCursor", "int", false)
 			until !GetCursorInfo()
-<<<<<<< HEAD
-=======
-			
-			this.dick .= GetCursorInfo()
->>>>>>> parent of 22ff37a... Revert "Implemented OOP approach to ListViews + misc fixes"
 			
 			MouseGetPos, x, y
 			this.sx := x, this.sy := y
