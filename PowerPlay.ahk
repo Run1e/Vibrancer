@@ -45,16 +45,7 @@ To update:
 */
 
 /*
-- *WIP* Queue can now be viewed in the imgur tab
-- Rewritten queue handler/uploading class to make new gui implementation easier
-- Added support for .lnk files being dropped to the game list
-- Added multi-monitor support to the vibrancy screen selection (hold shift or ctrl)
-- Fixed issues with cursor hiding in the rect tool
-- Significant improvements on the Gui OOP class, made controls like listviews and imagelists object oriented
-- Started work on new menu system
-- Many misc fixes/changes
-Reported by noname:
-- HTTPRequest function wasn't closing file handles properly
+
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
@@ -154,8 +145,6 @@ OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange
 
 ; bind hotkeys
 Keybinds(true)
-
-Big.Open()
 
 p()
 

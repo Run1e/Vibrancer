@@ -13,7 +13,7 @@
 	
 	__Delete() {
 		this.Destroy()
-		Gui.Instances[hwnd] := ""
+		Gui.Instances[this.hwnd] := ""
 	}
 	
 	Add(ControlType, Options := "", Params := "", Function := "") {
