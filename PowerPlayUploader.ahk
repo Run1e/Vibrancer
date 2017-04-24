@@ -2,7 +2,7 @@
 #Persistent
 #NoTrayIcon
 
-Uploader := new Uploader
+Worker := new Worker
 
 global Main
 
@@ -11,10 +11,9 @@ try
 catch e
 	ExitApp
 
-Main.Handshake(Uploader)
+Worker.client_id := Main.client_id
 
-Uploader.api_access := Main.api_access
-
+Main.Handshake(Worker)
 return
 
 UploadUpdate(Percent, FileSize) {
@@ -27,61 +26,51 @@ UploadUpdate(Percent, FileSize) {
 		Main.UploadUpdate(Sent := Fives)
 }
 
-Class Uploader {
+Class Worker {
 	__New() {
 		this.EndPoint := "https://api.imgur.com/3/image"
 		; this.ADODB := ComObjCreate("ADODB.Stream")
 		; this.ADODB.Type := 1 ; binary mode
 	}
 	
-	Upload(file) {
-		func := Uploader.UploadFile.Bind(Uploader, file)
+	Upload(File) {
+		func := Worker.UploadFile.Bind(Worker, File)
 		SetTimer, %func%, -1
-		return
 	}
 	
-	UploadFile(file) {
+	UploadFile(File) {
+		FileGetSize, FileSize, %File%
 		
-		FileGetSize, FileSize, %file%
-		if (FileSize > 10000000) ; 10mb is limit
-			return Main.UploadFailure(file, "Filesize too large (limit: 10mb)")
-		
-		SplitPath, file,,,, time
-		
-		DownloadedBytes := HTTPRequest(this.EndPoint "?title=" time
-								, data
-								, header := "Authorization: Client-ID " . this.api_access "`nContent-Length: " FileSize
+		DownloadedBytes := HTTPRequest( this.EndPoint
+								, Data
+								, Header := "Authorization: Client-ID " . this.client_id "`nContent-Length: " FileSize
 								, "Callback: UploadUpdate`nMethod: POST`nUpload: " file)
 		
-		if (DownloadedBytes > 0) && StrLen(data) {
-			Main.HeaderInfo(header)
-			Main.UploadResponse(file, data)
+		if (DownloadedBytes > 0) && StrLen(Data) {
+			Main.HeaderInfo(Header)
+			Main.UploadResponse(File, Data)
 		} else
-			Main.UploadFailure(file, header)
-		
-		
-		return
+			Main.UploadFailure(File, Header)
 	}
 	
 	Delete(Index, DeleteHash) {
-		func := Uploader.DeleteFile.Bind(Uploader, Index, DeleteHash)
+		func := Worker.DeleteFile.Bind(Worker, Index, DeleteHash)
 		SetTimer, %func%, -1
-		return
 	}
 	
 	DeleteFile(Index, DeleteHash) {
 		
 		DownloadedBytes := HTTPRequest(this.EndPoint "/" DeleteHash
-								, data
-								, header := "Authorization: Client-ID " . this.api_access
+								, Data
+								, Header := "Authorization: Client-ID " . this.client_id
 								, "Method: DELETE")
 		
 		
 		if (DownloadedBytes > 0) && StrLen(data) {
 			Main.HeaderInfo(header)
-			Main.DeleteResponse(Index, data)
+			Main.DeleteResponse(Index, Data)
 		} else
-			Main.DeleteFailure(Index, header)
+			Main.DeleteFailure(Index, Header)
 		
 		return
 	}
@@ -115,28 +104,5 @@ Class Uploader {
 Exit:
 ExitApp
 return
-
-pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
-	try {
-		for k,v in Array {
-			lst.= indentLevel "[" k "]"
-			if (IsObject(v) && depth>1)
-				lst.="`n" pa(v, depth-1, indentLevel . "    ")
-			else
-				lst.=" => " v
-			lst.="`n"
-		} return rtrim(lst, "`r`n `t")	
-	} return
-}
-
-pap(array) {
-	m(pa(array))
-}
-
-m(x*){
-	for a,b in x
-		text.=b "`n"
-	MsgBox,0,, % text
-}
 
 #Include lib\third-party\HTTPRequest.ahk

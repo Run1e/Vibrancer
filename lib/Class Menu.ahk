@@ -1,34 +1,34 @@
 ﻿Class Menu {
 	static Instances := []
 	
-	__New(MenuName, Handler := "MenuHandler") {
-		this.Name := MenuName
-		this.Handler := Handler
-		this.Menu := {}
-		Menu.Instances[MenuName] := this
-		if (MenuName = "Tray")
+	__New(Name) {
+		this.Name := Name
+		this.Map := {}
+		Menu.Instances[Name] := this
+		if (Name = "Tray")
 			this.Clear()
+	}
+	
+	__Destroy() {
+		this.Delete()
 	}
 	
 	Show(x := "", y := "") {
 		Menu % this.Name, Show, % x, % y
 	}
 	
-	Add(Item := "") {
+	Add(Item := "", Target := "", Icon := "") {
 		if IsObject(Item) { ; add menu
-			this.Menu.Insert(Item.Menu)
 			Menu % this.Name, Add, % Item.Name, % ":" Item.Name
 		} else { ; add item
-			Menu % this.Name, Add, % Item, % this.Handler
-			this.Menu.Insert(Item)
-		}
+			Menu % this.Name, Add, % Item, MenuHandler
+			this.Map[Item] := Target
+		} if StrLen(Icon)
+			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
 	}
 	
-	Delete(ItemName) {
+	Delete(ItemName := "") {
 		Menu % this.Name, Delete, % ItemName
-		for Index, Item in this.Menu
-			if (Item = ItemName)
-				return this.Menu.RemoveAt(Index)
 	}
 	
 	Icon(Item, Icon) {
@@ -69,4 +69,8 @@
 	SetDefault(item) {
 		Menu, % this.Name, Default, % item
 	}
+}
+
+MenuHandler(ItemName, ItemPos, MenuName) {
+	Menu.Instances[MenuName].Map[ItemName].Call()
 }

@@ -5,7 +5,7 @@ CtlColorBtns() {
 }
 
 ImageButtonApply(hwnd) {
-	static RoundPx := 0
+	static RoundPx := 2
 	static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
 					, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
 					, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click
@@ -29,6 +29,7 @@ TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
 		Msg := Title, Title := AppName " " AppVersionString
 	TrayTip, % Title, % Msg
+	p(Title "`n" Msg)
 }
 
 pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
@@ -108,9 +109,24 @@ Random(min, max) {
 	return out
 }
 
+RandB64(length) {
+	static pool := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+	Loop % length
+		str .= SubStr(pool, Random(1, 64), 1)
+	return str
+}
+
 RegRead(root, sub, value) {
 	RegRead, output, % root, % sub, % value
 	return output
+}
+
+Clipboard(clip) {
+	; https://autohotkey.com/board/topic/27849-solved-animated-gui-windows-causing-clipboard-set-error/
+	DllCall("OpenClipboard", uint, 0)
+	DllCall("EmptyClipboard")
+	DllCall("CloseClipboard")
+	clipboard := clip
 }
 
 ; https://autohotkey.com/boards/viewtopic.php?t=9093

@@ -35,17 +35,35 @@ To update:
 */
 
 /*
-- Fixed issues with cursor hiding in the rect tool
-- Rewrote error handling of queue items
-- New gui concept in Imgur tab
-- Added support for .lnk files being dropped to the game list
+	Queue manager features:
+	- Delete queue items (all except running queue item!)
+	- Queue errors turn red and stay around until queue manager is cleared
+	- Active queue items can be cleared, or the whole queue can be cleared
+	
+	bugs:
+	- after adding bind/game the lv isn't focused
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Queue
+/*
+- *WIP* Queue can now be viewed in the imgur tab
+- Rewritten queue handler/uploading class to make new gui implementation easier
+- Added support for .lnk files being dropped to the game list
+- Added multi-monitor support to the vibrancy screen selection (hold shift or ctrl)
+- Fixed issues with cursor hiding in the rect tool
+- Significant improvements on the Gui OOP class, made controls like listviews and imagelists object oriented
+- Started work on new menu system
+- Many misc fixes/changes
+Reported by noname:
+- HTTPRequest function wasn't closing file handles properly
+*/
+
+global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
 
 AppName := "Power Play"
 AppVersion := [0, 9, 6]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
+
+ForceConsole := false
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
@@ -78,7 +96,7 @@ if NvAPI.InitFail { ; NvAPI initialization failed, no nvidia card is installed
 		Error("NvAPI init failed, NvAPI features disabled.", A_ThisFunc, NvAPI.InitFail = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!")
 		a := Func("TrayTip").Bind(NvAPI.InitFail = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!", "Some features have been disabled.")
 		SetTimer, % a, -4000
-	} Settings.NvAPI_InitFail := 1 ; NvAPI.InitFail
+	} Settings.NvAPI_InitFail := NvAPI.InitFail ; NvAPI.InitFail
 }
 else if Settings.NvAPI_InitFail {
 	Settings.Remove("NvAPI_InitFail")
@@ -99,15 +117,21 @@ JSONSave("GameRules", GameRules)
 Images := JSONFile("Images", {})
 JSONSave("Images", Images)
 
-; detect window activations
-DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
-OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
-
 ; install icons
 IconInstall()
 
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
+
+/*
+	DllCall("LoadLibrary", str, A_WorkingDir "\USkin.dll")
+	DllCall("USkin.dll" . "\USkinInit", Int,0, Int,0, AStr, A_WorkingDir "\snas.msstyles")
+*/
+; milikymac
+; snas
+; pantherS
+; relapse
+
 
 ; create main gui
 CreateBigGUI()
@@ -124,8 +148,18 @@ if FileExist(Icon("icon"))
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
 
+; detect window activations
+DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
+OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
+
 ; bind hotkeys
 Keybinds(true)
+
+Big.Open()
+
+p()
+
+Autoexec := true
 return
 
 Exit:
@@ -135,7 +169,9 @@ Gdip_Shutdown(pToken) ; shut down gdip
 ; revoke COM objects
 ObjRegisterActive(Plugin, "")
 ObjRegisterActive(Uploader, "")
-Big.ImgurListView.Destroy()
+/*
+	DllCall("USkin.dll\USkinExit")
+*/
 ExitApp
 return ; super unnecessary return
 
@@ -178,7 +214,6 @@ p(text := "") {
 #Include lib\Functions.ahk
 #Include lib\JSONfunctions.ahk
 #Include lib\Keybinds.ahk
-#Include lib\MenuHandler.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk

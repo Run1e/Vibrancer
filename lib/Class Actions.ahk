@@ -80,6 +80,11 @@
 		MouseTip.Create(count)
 	}
 	
+	OpenConsole() {
+		ForceConsole := true
+		p()
+	}
+	
 	Reload() {
 		reload
 		ExitApp

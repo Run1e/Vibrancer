@@ -8,15 +8,6 @@
 		this.Close({InstallLocation:Game, Run:Game})
 	}
 	
-	ListView(GuiEvent) {
-		if (GuiEvent = "DoubleClick") {
-			LV_GetText(ID, LV_GetNext(), 2)
-			if (ID = "id") ; header name
-				return
-			this.Close(this.AppList[ID])
-		}
-	}
-	
 	Close(Info := "") {
 		this.Destroy()
 		
@@ -33,6 +24,14 @@
 	Escape() {
 		this.Close()
 	}
+	
+	AppListViewAction(Control, GuiEvent, EventInfo) {
+		if (GuiEvent = "DoubleClick") {
+			id := this.AppLV.GetText(this.AppLV.GetNext(), 2)
+			if (id) && StrLen(id)
+				this.Close(Prog.AppList[id])
+		}
+	}
 }
 
 AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
@@ -41,6 +40,7 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog.SetDefault()
 	
 	Prog.Font("s10", Settings.Font)
+	Prog.Color("FFFFFF", "FFFFFF")
 	
 	Prog.AppList := GetApplications()
 	Prog.Callback := Callback
@@ -48,23 +48,24 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	
 	Prog.Add("Text",, "Select a program:")
 	
-	Prog.ListViewHWND := Prog.Add("ListView", "w250 h265 -HDR -Multi gProgListView", "prog|id")
-	Prog.ListViewCLV := new LV_Colors(Prog.ListViewHWND)
-	Prog.ListViewCLV.SelectionColors("0x" Settings.Color.Selection, 0xFFFFFF)
+	Prog.AppLV := new Prog.ListView(Prog, "w250 h265 -HDR -Multi", "prog|id", Prog.AppListViewAction.Bind(Prog))
+	
+	Prog.AppLV.CLV := new LV_Colors(Prog.AppLV.hwnd)
+	Prog.AppLV.CLV.SelectionColors("0x" Settings.Color.Selection, 0xFFFFFF)
 	
 	Prog.Add("Text", "y+10", "Not in the list? Select manually: ")
 	Prog.Add("Button", "x193 yp-5", "Select exe", Prog.SelectFile.Bind(Prog))
 	
-	ImageList := IL_Create(20, 2, false)
+	IL := new Prog.ImageList
+	Prog.AppLV.SetImageList(IL.ID)
 	
-	LV_ModifyCol(1, 250 - VERT_SCROLL - 5)
-	LV_ModifyCol(2, 0)
-	LV_SetImageList(ImageList, 1)
+	Prog.AppLV.ModifyCol(1, 250 - VERT_SCROLL - 5)
+	Prog.AppLV.ModifyCol(2, 0)
 	
 	for Index, App in Prog.AppList {
 		if GameRules.HasKey(App.InstallLocation) && !IgnoreGameRules
 			continue
-		LV_Add("Icon" . IL_Add(ImageList, StrLen(App.DisplayIcon)?App.DisplayIcon:App.InstallLocation), App.DisplayName, Index)
+		Prog.AppLV.Add("Icon" . IL.Add(StrLen(App.DisplayIcon)?App.DisplayIcon:App.InstallLocation), App.DisplayName, Index)
 	}
 	
 	Prog.Options("-MinimizeBox +Owner" Owner)

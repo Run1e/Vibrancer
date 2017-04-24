@@ -32,8 +32,10 @@ WinActiveChange(wParam, hwnd) {
 
 ApplyRules(Info) {
 	p("Applying game rules for " Info.Title)
-	if !Settings.NvAPI_Fail
-		NvAPI.SetDVCLevelEx(Info.Vibrancy, Settings.VibrancyScreen)
+	
+	if !Settings.NvAPI_InitFail
+		for Index, Screen in Settings.VibrancyScreens
+			NvAPI.SetDVCLevelEx(Info.Vibrancy, Screen - 1)
 	
 	if Info.BlockWinKey
 		Hotkey.Bind("LWin", "returnlabel")
@@ -45,9 +47,9 @@ ApplyRules(Info) {
 DisableRules() {
 	p("Disabling game rules")
 	
-	SysGet, MonitorCount, MonitorCount
-	Loop % MonitorCount
-		NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index-1)
+	if !Settings.NvAPI_InitFail
+		Loop % SysGet("MonitorCount")
+			NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index - 1)
 	
 	Hotkey.Disable("LWin")
 	Hotkey.Disable("!Tab")

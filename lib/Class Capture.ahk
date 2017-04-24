@@ -11,7 +11,7 @@
 		
 		static CD := 160
 			, CircleLuma := 1
-			, RectLuma := 32
+			, RectLuma := 70
 		
 		Start() {
 			static WH_MOUSE_LL := 14
@@ -60,7 +60,7 @@
 		}
 		
 		OnMouseMove(x, y) {
-			static Offset := 6
+			static Offset := 10
 			if this.Dragging { ; draggin
 				this.Vis.Pos(	  this.dx := (x>=this.sx?this.sx:x-Offset)
 							, this.dy := (y>=this.sy?this.sy:y-Offset)
@@ -86,13 +86,14 @@
 			; destroy window
 			this.Vis.Destroy()
 			this.Vis := ""
-			Loop
-				DllCall("ShowCursor", "int", true)
-			until GetCursorInfo()
 			
 			Cursor() ; reset cursor
 			
 			Keybinds(true)
+			
+			Loop
+				DllCall("ShowCursor", "int", true)
+			until GetCursorInfo()
 			
 			; capture
 			if Upload {
@@ -137,9 +138,7 @@
 		
 		Start() {
 			
-			SysGet, MonitorCount, MonitorCount
-			
-			if (MonitorCount = 1)
+			if (SysGet("MonitorCount") = 1)
 				return this.CaptureMonitor(1)
 			
 			Keybinds(false)
@@ -235,7 +234,7 @@
 			return Error("Invalid parameters passed", A_ThisFunc, x ", " y ", " w ", " h, true)
 		
 		Name := A_Now A_MSec
-		File := Uploader.LocalImageFolder "\" Name ".png" ; save to local image folder
+		File := Uploader.LocalFolder "\" Name ".png" ; save to local image folder
 		
 		pBitmap := Gdip_BitmapFromScreen(x "|" y "|" w "|" h)
 		

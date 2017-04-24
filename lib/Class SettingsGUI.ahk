@@ -68,7 +68,7 @@ Settings() {
 	
 	; groupboxes
 	SetGUI.Add("Groupbox", "xm y2 h142 w180", AppName)
-	SetGUI.Add("Groupbox", "xm y+6 h134 w180", "Imgur")
+	SetGUI.Add("Groupbox", "xm y+6 h136 w180", "Imgur")
 	
 	; bottom buttons
 	SetGUI.Add("Button",, "Check for updates", Func("CheckForUpdates"))

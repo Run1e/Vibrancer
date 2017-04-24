@@ -1,7 +1,5 @@
 ﻿Class Gui {
-	static Instances := [], Parameters := 	{ Size:["A_EventInfo", "A_GuiWidth", "A_GuiHeight"]
-									, DropFiles:["A_GuiEvent", "A_EventInfo", "A_GuiControl", "A_GuiX", "A_GuiY"]
-									, ContextMenu:["A_GuiEvent", "A_EventInfo", "A_GuiControl", "A_GuiX", "A_GuiY"]}
+	static Instances := []
 	
 	__New(Title := "AutoHotkey Window", Options := "") {
 		Gui, New, % "+hwndHWND " Options, % Title
@@ -11,15 +9,6 @@
 		Gui % this.hwnd ": -E0x10" ; disable drag-drop by default
 		Gui.Instances[hwnd] := this
 		return this
-		
-		GuiSize:
-		GuiClose:
-		GuiEscape:
-		GuiDropFiles:
-		for Index, ParamName in Gui.Parameters[SubStr(A_ThisLabel, 4)], Params := []
-			Params.Insert(%ParamName%)
-		Gui.Instances[A_Gui][SubStr(A_ThisLabel, 4)](Params*)
-		return
 	}
 	
 	__Delete() {
@@ -224,47 +213,41 @@
 		}
 	}
 	
-	/*
-		for more documentation on window events look here: https://autohotkey.com/docs/commands/Gui.htm#Labels
-			
-		window event labels call the instance method. GuiClose will call Instance.Close() and GuiDropFiles will call Instance.DropFiles() with all the appropriate parameters.
-	*/
-	
-	Close() {
-		this.Destroy()
-	}
-	
 	Escape() {
 		this.Close()
-	}	
-	
-	/*
-		FileList = list of files, separated by linefeed (`n)
-		FileCount = number of files dropped
-		ControlHWND = name of control under mouse when files were dropped
-		GuiX = X position on gui where files were dropped
-		GuiY = Y position
-	*/
-	DropFiles(FileList, FileCount, ControlHWND, GuiX, GuiY) {
 	}
-	
-	/*
-		EventInfo = 0: The window has been restored, or resized normally such as by dragging its edges, 1: The window has been minimized, 2: The window has been maximized.
-		GuiWidth = new width of the gui
-		GuiHeight = new height of the gui
-		
-		if you need the x/y position you can use WinGetPos, GuiX, GuiY,,, % this.ahkid 
-	*/
-	Size(EventInfo, GuiWidth, GuiHeight) {
-	}
-	
-	/*
-			ControlHWND = control that received the ContextMenu EventInfo
-		ControlInfo = info from the control, for example the clicked row in a listview
-		IsRightClick = Contains "RightClick" if the Gui was right-clicked and "Normal" if the menu was triggered by the Apps key or Shift-F10
-		GuiX = X position of the event
-		GuiY = Y position of the event
-	*/
-	ContextMenu(IsRightClick, ControlInfo, ControlHWND, GuiX, GuiY) {
-	}
+}
+
+GuiClose(GuiHwnd) {
+	Instance := Gui.Instances[GuiHwnd]
+	Instance.Close.Call(Instance)
+}
+
+GuiEscape(GuiHwnd) {
+	Instance := Gui.Instances[GuiHwnd]
+	Instance.Escape.Call(Instance)
+}
+
+GuiSize(GuiHwnd, EventInfo, Width, Height) {
+	Instance := Gui.Instances[GuiHwnd]
+	Instance.Size.Call(	  Instance
+					, EventInfo
+					, Width
+					, Height)
+}
+
+GuiDropFiles(GuiHwnd, FileArray, CtrlHwnd, X, Y) {
+	Instance := Gui.Instances[GuiHwnd]
+	Instance.DropFiles.Call(Instance, FileArray, CtrlHwnd, X, Y)
+}
+
+; this method is superior since it passes on control hwnd's instead of names
+GuiContextMenu(GuiHwnd, CtrlHwnd, EventInfo, IsRightClick, X, Y) {
+	Instance := Gui.Instances[GuiHwnd]
+	Instance.ContextMenu.Call( Instance
+						, CtrlHwnd
+						, EventInfo
+						, IsRightClick
+						, X
+						, Y)
 }

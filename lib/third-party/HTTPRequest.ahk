@@ -784,6 +784,10 @@ HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="", Options="
 		DllCall( "WinINet\HttpEndRequest" W_A, Ptr, hRequest, Ptr, 0, DW, 0, Ptr, 0 )
 	}
 	
+	; edit by RUNIE: forcely close the file handle since some logic above is most likely flawed?
+	if Do_File_Upload
+		DllCall( "CloseHandle", Ptr, Do_File_Upload )
+	
 ; Step 9: Wait until data is available, then get the response headers.
 	Content_Length := size := rbuffsz := 0
 	If ( MyErrors = "" )

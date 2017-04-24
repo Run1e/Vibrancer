@@ -21,7 +21,7 @@
 		Title := "Clipboard uploaded!"
 		Msg := "Link copied to clipboard." . RunClipboardKeybindText()
 		
-		clipboard := StrReplace(Response, "https://pastebin.com/", "https://pastebin.com/raw/")
+		Clipboard(StrReplace(Response, "https://pastebin.com/", "https://pastebin.com/raw/"))
 		
 		p("Paste success")
 		
