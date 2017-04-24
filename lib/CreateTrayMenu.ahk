@@ -53,7 +53,7 @@ CreateTrayMenu() {
 		}
 	}
 	
-	if ArraySize(TrayMenu)
+	if Index
 		Tray.Add()
 	
 	Tray.Add("Exit", Actions.Exit.Bind(Actions), Icon("x"))

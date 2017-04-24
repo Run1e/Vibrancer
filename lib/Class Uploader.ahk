@@ -302,6 +302,12 @@
 		}
 	}
 	
+	Free() {
+		try ; attempt to close worker
+			this.Worker.Exit()
+		sleep 50
+	}
+	
 	/*
 		=== GUI CONTROL METHODS ===
 	*/
