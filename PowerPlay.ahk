@@ -75,6 +75,9 @@ if !FileExist(A_WorkingDir "\data") {
 if !FileExist(A_WorkingDir "\menus")
 	FileCreateDir % A_WorkingDir "\menus"
 
+; install necessary files
+InstallFiles()
+
 pToken := Gdip_Startup()
 
 Plugin := new Plugin
@@ -108,9 +111,6 @@ JSONSave("GameRules", GameRules)
 Images := JSONFile("Images", {})
 JSONSave("Images", Images)
 
-; install icons
-IconInstall()
-
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
 
@@ -122,7 +122,6 @@ VERT_SCROLL := SysGet(2)
 ; snas
 ; pantherS
 ; relapse
-
 
 ; create main gui
 CreateBigGUI()
@@ -206,7 +205,6 @@ p(text := "") {
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk
-#Include lib\IconInstall.ahk
 #Include lib\GetActionsList.ahk
 #Include lib\GetApplications.ahk
 #Include lib\ApplySettings.ahk
@@ -227,3 +225,5 @@ p(text := "") {
 #Include lib\third-party\FileSHA1.ahk																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
 
 
+
+#Include lib\InstallFiles.ahk
