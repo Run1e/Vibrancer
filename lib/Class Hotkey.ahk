@@ -6,7 +6,8 @@
 		if this.Keys[Key].Disabled ; disable if hotkey already exists
 			this.Enable(Key)
 		Hotkey, IfWinActive, % ((HWND+=0) ? "ahk_id" HWND : "") ; HWND+=0 forces hex to dec
-		Hotkey, % Key, % (IsLabel(Target) ? Target : "HotkeyHandler"), UseErrorLevel
+		Label := IsLabel(Target) ? Target : this.Handler.Bind(this, Key)
+		Hotkey, % Key, % Label, UseErrorLevel
 		return !ErrorLevel ? this.Keys[Key] := {Target:Target, HWND:HWND} : ErrorLevel
 	}
 	
@@ -24,14 +25,20 @@
 		return ErrorLevel ? ErrorLevel : !(this.Keys[Key].Disabled := true)
 	}
 	
+	Delete(Key) {
+		this.Disable(Key)
+		this.Keys[Key] := ""
+	}
+	
 	; rebind an existing hotkey
 	Rebind(Key, NewKey) {
 		if a := this.Disable(Key)
 			return a
 		return this.Bind(NewKey, this.Keys[Key].target, this.Keys[Key].HWND)
 	}
+	
+	; not called, used for calling the target
+	Handler(Key) {
+		this.Keys[Key].Target.Call()
+	}
 }
-
-HotkeyHandler:
-Hotkey.Keys[A_ThisHotkey].Target.Call()
-return

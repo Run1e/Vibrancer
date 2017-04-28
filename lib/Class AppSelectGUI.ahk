@@ -9,9 +9,9 @@
 	}
 	
 	Close(Info := "") {
-		this.Destroy()
-		
+		this.IL.Destroy()
 		this.ListViewCLV := ""
+		this.Destroy()
 		
 		if IsObject(Info)
 			p("Prog callback:`n" pa(Info))
@@ -57,6 +57,7 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog.Add("Button", "x193 yp-5", "Select exe", Prog.SelectFile.Bind(Prog))
 	
 	IL := new Prog.ImageList
+	Prog.IL := IL
 	Prog.AppLV.SetImageList(IL.ID)
 	
 	Prog.AppLV.ModifyCol(1, 250 - VERT_SCROLL - 5)

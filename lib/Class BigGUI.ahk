@@ -77,7 +77,7 @@
 	
 	ImgurAnimate(Toggle) {
 		if Toggle && !this.AnimatedEnabled
-			SetTimer, ImgurAnimateTick, % Settings.Imgur.GifPeriod
+			SetTimer, ImgurAnimateTick, % this.ImgurLV.IL.GifPeriod
 		else if this.AnimatedEnabled
 			SetTimer, ImgurAnimateTick, Off
 		return
@@ -97,7 +97,7 @@
 		
 		this.ImgurLV.IL := new CustomImageList(this.ImgurImageWidth, this.ImgurImageHeight, 0x20, 50, 5) ; custom res imagelist
 		
-		this.ImgurLV.IL.GifPeriod := Settings.Imgur.GifPeriod
+		this.ImgurLV.IL.GifPeriod := 200 ; 5fps
 		
 		this.ImgurLV.SetImageList(this.ImgurLV.IL.ID, true)
 		this.ImgurLV.Delete()
@@ -622,6 +622,9 @@
 		this.ActiveTab := tab
 		this.Control("Choose", "SysTabControl321", tab)
 		
+		this.SetTabColor(tab)
+		this.SetTabHotkeys(tab)
+		
 		if (tab = 1) {
 			this.Control("Focus", "SysListView321")
 			this.ColorScreens()
@@ -642,8 +645,6 @@
 			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 1)
 		}
 		
-		this.SetTabHotkeys(tab)
-		this.SetTabColor(tab)
 	}
 	
 	SetTabHotkeys(tab) {
@@ -664,11 +665,8 @@
 	}
 	
 	ImgurExpand(Expand) {
-		if Expand {
-			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + this.EXPAND_SIZE + 1)
-		} else {
-			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 25)
-		} this.ExpandState := Expand
+		this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + (Expand?this.EXPAND_SIZE+1:25))
+		this.ExpandState := Expand
 	}
 	
 	QueueListViewAction(Control, GuiEvent, EventInfo) {

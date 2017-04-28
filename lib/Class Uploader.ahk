@@ -146,7 +146,7 @@
 		; add to the queuesucceed queue
 		this.AddSucceed({Event:"Upload", Index: Index, ID: ID}) ; ID is filename
 		
-		Clipboard(res.data.link)
+		Clipboard(res.data.link . ((SubStr(res.data.link, -2) = "gif")&&Settings.Imgur.UseGifv?"v":""))
 		
 		this.GuiAddImage(Index)
 		

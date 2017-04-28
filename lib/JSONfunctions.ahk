@@ -18,30 +18,35 @@
 }
 
 JSONSave(Name, Obj) {
-	FileDelete % A_WorkingDir "\data\" Name ".json"
+	File := A_WorkingDir "\data\" Name ".json"
+	FileRead, Contents, % File
+	FileDelete % File
 	
 	try
 		JSONdump := JSON.Dump(Obj,, A_Tab)
-	catch error ; failed dumping object to file, quit program
+	catch error {
 		ErrorEx(error,, true)
+		FileAppend, % Contents, % File
+		return
+	}
 	
 	FileAppend % JSONdump, % A_WorkingDir "\data\" Name ".json"
 }
 
 ; fill missing key/val pairs in ArrToFill, parsed over from ReferenceArr
-FillArr(ByRef ArrToFill, ReferenceArr, path:="") { ; RECURSIVE FUCKING GOODNESS FUCK YES
+FillArr(ByRef FillArr, ReferenceArr, path:="") { ; RECURSIVE FUCKING GOODNESS FUCK YES
 	if !IsObject(path)
 		path:=[]
 	for Key, Value in ReferenceArr {
-		HasKey := (path.MaxIndex()?ArrToFill[path*].HasKey(Key):ArrToFill.HasKey(Key))
+		HasKey := (path.MaxIndex()?FillArr[path*].HasKey(Key):FillArr.HasKey(Key))
 		if IsObject(Value) && HasKey
-			path.Insert(Key), FillArr(ArrToFill, Value, path), path.Pop()
+			path.Insert(Key), FillArr(FillArr, Value, path), path.Pop()
 		else {
 			if !HasKey {
 				if path.MaxIndex()
-					ArrToFill[path*][Key] := Value
+					FillArr[path*][Key] := Value
 				else
-					ArrToFill[Key] := Value
+					FillArr[Key] := Value
 			}
 		}
 	}

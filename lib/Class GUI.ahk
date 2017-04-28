@@ -8,18 +8,16 @@
 		this.IsVisible := false
 		Gui % this.hwnd ": -E0x10" ; disable drag-drop by default
 		Gui.Instances[hwnd] := this
+		this.Controls := []
 		return this
-	}
-	
-	__Delete() {
-		this.Destroy()
-		Gui.Instances[this.hwnd] := ""
 	}
 	
 	Add(ControlType, Options := "", Params := "", Function := "") {
 		Gui % this.hwnd ":Add", % ControlType, % Options " hwndControlHWND", % Params
-		if Function
+		if Function {
 			GuiControl, +g, % ControlHWND, % Function ; ty geekdude for this amazing godsent knowledge, may the darkness of labels be eternally abolished
+			this.Controls.Push(ControlHWND)
+		}
 		return ControlHWND
 	}
 	
@@ -87,6 +85,9 @@
 	Destroy() {
 		this.IsVisible := false
 		Gui % this.hwnd ":Destroy"
+		Gui.Instances[this.hwnd] := ""
+		for Index, Control in this.Controls
+			GuiControl, -g, % Control
 	}
 	
 	Color(BackgroundColor := "", ControlColor := "") {
@@ -124,6 +125,10 @@
 	
 	WinSet(Command, Param) {
 		WinSet, % Command, % Param, % this.ahkid
+	}
+	
+	Escape() {
+		this.Close()
 	}
 	
 	Class ListView {
@@ -203,7 +208,7 @@
 			return this
 		}
 		
-		__Destroy() {
+		Destroy() {
 			Gui.ListView.ImageList.Instances.Remove(this.ID)
 			return IL_Destroy(this.ID)
 		}
@@ -212,39 +217,29 @@
 			return IL_Add(this.ID, File)
 		}
 	}
-	
-	Escape() {
-		this.Close()
-	}
 }
 
 GuiClose(GuiHwnd) {
-	Instance := Gui.Instances[GuiHwnd]
-	Instance.Close.Call(Instance)
+	(Instance := Gui.Instances[GuiHwnd]).Close.Call(Instance)
 }
 
 GuiEscape(GuiHwnd) {
-	Instance := Gui.Instances[GuiHwnd]
-	Instance.Escape.Call(Instance)
+	(Instance := Gui.Instances[GuiHwnd]).Escape.Call(Instance)
 }
 
 GuiSize(GuiHwnd, EventInfo, Width, Height) {
-	Instance := Gui.Instances[GuiHwnd]
-	Instance.Size.Call(	  Instance
+	(Instance := Gui.Instances[GuiHwnd]).Size.Call(	  Instance
 					, EventInfo
 					, Width
 					, Height)
 }
 
 GuiDropFiles(GuiHwnd, FileArray, CtrlHwnd, X, Y) {
-	Instance := Gui.Instances[GuiHwnd]
-	Instance.DropFiles.Call(Instance, FileArray, CtrlHwnd, X, Y)
+	(Instance := Gui.Instances[GuiHwnd]).DropFiles.Call(Instance, FileArray, CtrlHwnd, X, Y)
 }
 
-; this method is superior since it passes on control hwnd's instead of names
 GuiContextMenu(GuiHwnd, CtrlHwnd, EventInfo, IsRightClick, X, Y) {
-	Instance := Gui.Instances[GuiHwnd]
-	Instance.ContextMenu.Call( Instance
+	(Instance := Gui.Instances[GuiHwnd]).ContextMenu.Call( Instance
 						, CtrlHwnd
 						, EventInfo
 						, IsRightClick

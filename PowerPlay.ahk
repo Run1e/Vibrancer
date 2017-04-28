@@ -30,8 +30,8 @@ rate limiting for imgur api (which will be impossible)
 /*
 To update:
 1. Exit PowerPlay
-2. Overwrite the old executables (PowerPlay, PowerPlayUploader) with the new downloaded ones
-3. Launch PowerPlay.exe again
+2. Overwrite the old executable (PowerPlay)
+3. Launch PowerPlay
 */
 
 /*
@@ -45,16 +45,19 @@ To update:
 */
 
 /*
-
+- Fixed UseGifv option when copying to clipboard after upload
+- Fixed GifPeriod to 200 (5fps)
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
 
+QPC(true)
+
 AppName := "Power Play"
-AppVersion := [0, 9, 6]
+AppVersion := [0, 9, 7]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
-ForceConsole := false
+ForceConsole := true
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
@@ -145,7 +148,7 @@ OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange
 ; bind hotkeys
 Keybinds(true)
 
-p()
+p("Startup time: " QPC(false) "s")
 
 Autoexec := true
 return
@@ -157,9 +160,16 @@ Gdip_Shutdown(pToken) ; shut down gdip
 ; revoke COM objects
 ObjRegisterActive(Plugin, "")
 ObjRegisterActive(Uploader, "")
-/*
-	DllCall("USkin.dll\USkinExit")
-*/
+
+; destroy all imageslists and references
+for hwnd, Instance in Gui.ImageList.Instances
+	Instance.Destroy()
+
+; destroy all guis and references
+for hwnd, Instance in Gui.Instances
+	Instance.Destroy()
+
+; DllCall("USkin.dll\USkinExit")
 ExitApp
 return ; super unnecessary return
 
@@ -178,13 +188,14 @@ p(text := "") {
 	return
 }
 
+#Include lib\ApplySettings.ahk
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
+#Include lib\Class AppSelectGUI.ahk
 #Include lib\Class BigGUI.ahk
 #Include lib\Class BinderGUI.ahk
 #Include lib\Class Capture.ahk
 #Include lib\Class CustomImageList.ahk
-#Include lib\Class AppSelectGUI.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
@@ -195,19 +206,19 @@ p(text := "") {
 #Include lib\Class SettingsGUI.ahk
 #Include lib\Class Uploader.ahk
 #Include lib\CreateTrayMenu.ahk
+#Include lib\DefaultGameRules.ahk
 #Include lib\DefaultKeybinds.ahk
 #Include lib\DefaultSettings.ahk
-#Include lib\DefaultGameRules.ahk
 #Include lib\Error.ahk
 #Include lib\Functions.ahk
+#Include lib\GetActionsList.ahk
+#Include lib\GetApplications.ahk
+#Include lib\InstallFiles.ahk
 #Include lib\JSONfunctions.ahk
 #Include lib\Keybinds.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk
-#Include lib\GetActionsList.ahk
-#Include lib\GetApplications.ahk
-#Include lib\ApplySettings.ahk
 
 #Include *i lib\client_id.ahk
 #Include *i Custom.ahk
@@ -225,5 +236,3 @@ p(text := "") {
 #Include lib\third-party\FileSHA1.ahk																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
 
 
-
-#Include lib\InstallFiles.ahk
