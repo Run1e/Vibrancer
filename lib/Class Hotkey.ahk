@@ -6,11 +6,13 @@ Class Hotkey {
 	__New(Key, Target, Win := false, Type := "Active") {
 		
 		; check input
+		if !StrLen(Win)
+			Win := false
 		if !StrLen(Key)
 			return false, ErrorLevel := 2
 		if !(Bind := IsLabel(Target) ? Target : this.Handler.Bind(this))
 			return false, ErrorLevel := 1
-		if !(Type ~= "i)(Active|NotActive|Exist|NotExist)$")
+		if !(Type ~= "im)^(Not)?(Active|Exist)$")
 			return false, ErrorLevel := 4
 		
 		; set values
@@ -28,17 +30,17 @@ Class Hotkey {
 			return false
 		
 		this.Enabled := true ; set to enabled
-		Hotkey.Keys[Type, Win, Key] := this ; save instance in Keys object
-		return this
+		return Hotkey.Keys[Type, Win, Key] := this
 	}
 	
 	; 'delete' a hotkey. call this when you're done with a hotkey
 	; this is superior to Disable() as it releases the function references
 	Delete() {
-		if this.Disable() {
-			Hotkey.Keys[this.Type, this.Win].Remove(this.Key)
-			return true
-		} return false
+		static JunkFunc := Func("WinActive")
+		if this.Disable()
+			if this.Apply(JunkFunc)
+				return true, Hotkey.Keys[this.Type, this.Win].Remove(this.Key)
+		return false
 	}
 	
 	; enable hotkey

@@ -10,12 +10,10 @@
 	Class RectClass {
 		
 		static CD := 160
-			, CircleLuma := 1
-			, RectLuma := 70
+		static CircleLuma := 1
+		static RectLuma := 70
 		
 		Start() {
-			static WH_MOUSE_LL := 14
-			
 			Keybinds(false)
 			
 			this.Finishing := false
@@ -130,14 +128,13 @@
 	Class ScreenClass {
 		
 		static Width := A_ScreenWidth / 1.8
-			, Height := A_ScreenHeight / 1.8
-			, Margin := 10
-			, Outline := 2
-			, OutlineColor := 0xFFFFFFFF ; white with no transparency
-			, Separator := 10
+		static Height := A_ScreenHeight / 1.8
+		static Margin := 10
+		static Outline := 2
+		static OutlineColor := 0xFFFFFFFF ; white with no transparency
+		static Separator := 10
 		
 		Start() {
-			
 			if (SysGet("MonitorCount") = 1)
 				return this.CaptureMonitor(1)
 			
