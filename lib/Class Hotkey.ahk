@@ -10,14 +10,13 @@ Class Hotkey {
 			Win := false
 		if !StrLen(Key)
 			return false, ErrorLevel := 2
-		if !(Bind := IsLabel(Target) ? Target : this.Handler.Bind(this))
+		if !(Bind := IsLabel(Target) ? Target : this.CallFunc.Bind(this, Target))
 			return false, ErrorLevel := 1
 		if !(Type ~= "im)^(Not)?(Active|Exist)$")
 			return false, ErrorLevel := 4
 		
 		; set values
 		this.Key := Key
-		this.Target := Target
 		this.Win := Win
 		this.Type := Type
 		
@@ -52,10 +51,9 @@ Class Hotkey {
 	
 	; disable hotkey
 	Disable() {
-		if this.Apply("Off") {
-			this.Enabled := false
-			return true
-		} return false
+		if this.Apply("Off")
+			return true, this.Enabled := false
+		return false
 	}
 	
 	; toggle enabled/disabled
@@ -97,8 +95,8 @@ Class Hotkey {
 		}
 	}
 	
-	Handler() {
-		this.Target.Call()
+	CallFunc(Target) {
+		Target.Call()
 	}
 	
 	Apply(Label) {
