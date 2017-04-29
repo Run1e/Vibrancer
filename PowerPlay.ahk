@@ -9,7 +9,7 @@ SetRegView 64
 CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
-OnExit, Exit
+OnExit("Exit")
 
 /*
 todo:
@@ -45,6 +45,8 @@ To update:
 */
 
 /*
+- Rewrote Hotkey class based on A_AhkUser's ideas/code
+- GUI hotkeys are now context sensitive, and user hotkeys are always active (except when bindinga new key)
 - Fixed UseGifv option when copying to clipboard after upload
 - Fixed GifPeriod to 200 (5fps)
 */
@@ -153,28 +155,25 @@ p("Startup time: " QPC(false) "s")
 Autoexec := true
 return
 
-Exit:
-CtlColors.Free() ; free ctlcolors
-Uploader.Free() ; close upload helper
-Gdip_Shutdown(pToken) ; shut down gdip
-; revoke COM objects
-ObjRegisterActive(Plugin, "")
-ObjRegisterActive(Uploader, "")
+Exit() {
+	CtlColors.Free() ; free ctlcolors
+	Uploader.Free() ; close upload helper
+	Gdip_Shutdown(pToken) ; shut down gdip
+	; revoke COM objects
+	ObjRegisterActive(Plugin, "")
+	ObjRegisterActive(Uploader, "")
 
-; destroy all imageslists and references
-for hwnd, Instance in Gui.ImageList.Instances
-	Instance.Destroy()
+	; destroy all imageslists and references
+	for hwnd, Instance in Gui.ImageList.Instances
+		Instance.Destroy()
 
-; destroy all guis and references
-for hwnd, Instance in Gui.Instances
-	Instance.Destroy()
+	; destroy all guis and references
+	for hwnd, Instance in Gui.Instances
+		Instance.Destroy()
 
-; DllCall("USkin.dll\USkinExit")
-ExitApp
-return ; super unnecessary return
-
-returnlabel:
-return
+	; DllCall("USkin.dll\USkinExit")
+	ExitApp
+}
 
 p(text := "") {
 	static Handle, LastSpacer

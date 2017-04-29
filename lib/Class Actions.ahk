@@ -70,6 +70,10 @@
 		m(Keybinds)
 	}
 	
+	PrintHotkeys() {
+		m(Hotkey.Keys)
+	}
+	
 	GetDownloadCount() {
 		static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases"
 		if !HTTP.Get(URL, Data)

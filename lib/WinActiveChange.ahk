@@ -38,11 +38,14 @@ ApplyRules(Info) {
 			NvAPI.SetDVCLevelEx(Info.Vibrancy, Screen - 1)
 	
 	if Info.BlockWinKey
-		Hotkey.Bind("LWin", "returnlabel")
+		new Hotkey("LWin", "returnlabel")
 	
 	if Info.BlockAltTab
-		Hotkey.Bind("!Tab", "returnlabel")
+		new Hotkey("!Tab", "returnlabel")
 }
+
+returnlabel:
+return
 
 DisableRules() {
 	p("Disabling game rules")
@@ -51,6 +54,6 @@ DisableRules() {
 		Loop % SysGet("MonitorCount")
 			NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index - 1)
 	
-	Hotkey.Disable("LWin")
-	Hotkey.Disable("!Tab")
+	Hotkey.GetGlobal("LWin").Delete()
+	Hotkey.GetGlobal("!Tab").Delete()
 }

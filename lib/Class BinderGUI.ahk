@@ -160,12 +160,13 @@
 		if GetKeyState("ALT", "P")
 			Key .= "!"
 		
-		Key .= "Del"
+		Key .= "Delete"
 		
 		Binder.SetText("msctls_hotkey321", Key)
 		
 		; check if in use
 		this.HotkeyChange()
+		
 	}
 	
 	; check for dupe hotkey
@@ -265,11 +266,10 @@ CreateNugget(Callback, HotkeyMode := true, Owner := "") {
 	
 	FrameShadow(Binder.hwnd)
 	
-	Hotkey.Bind("*Delete", Binder.DeletePress.Bind(Binder), Binder.hwnd)
+	new Hotkey("*Delete", Binder.DeletePress.Bind(Binder), Binder.ahkid)
 	
 	if (OwnerPos := WinGetPos("ahk_id" Owner))
 		Binder.Show("x" OwnerPos.X + OwnerPos.W/2 - 182/2 " y" OwnerPos.Y + OwnerPos.H/2 - 218/2 + 15 " w" WIDTH " h" HEIGHT)
 	else
 		Binder.Show()
-	
 }

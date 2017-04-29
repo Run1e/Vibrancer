@@ -533,9 +533,7 @@
 		
 		this.BindListViewSize()
 		
-		; disable the hotkey if it isn't a gui hotkey
-		if (RealKey != "Delete") && (RealKey != "^z")
-			Hotkey.Disable(RealKey)
+		Hotkey.GetGlobal(RealKey).Disable()
 	}
 	
 	BindRegret() {
@@ -546,16 +544,18 @@
 		
 		if (Info.Event = "Deletion") {
 			Keybinds[Info.Key] := Info.Bind
-			this.BindLV.Insert(Info.Pos, "Focus Select Vis", HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
+			NewPos := this.BindLV.Insert(Info.Pos, "Focus Select Vis", HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
+			new Hotkey(Info.Key, Actions[Info.Bind.Func].Bind(Actions, Info.Bind.Param*))
 		} else if (Info.Event = "Addition") { ; a fine one
 			Keybinds.Remove(Info.Key)
-			this.BindLV.Delete(Info.Pos)
+			this.BindLV.Delete(NewPos := Info.Pos)
+			Hotkey.GetGlobal(Info.Key).Delete()
 		}
 		
-		this.BindListViewSize()
+		;p(newpos, ((NewPos > Keybinds.MaxIndex()) ? Keybinds.MaxIndex() : NewPos))
 		
-		if (Info.Key != "Delete") && (Info.Key != "^z")
-			Hotkey.Bind(Info.Key, Actions[Info.Bind.Func].Bind(Actions, Info.Bind.Param*))
+		this.BindListViewSize()
+		this.BindListViewAction("", "C", (NewPos > ArraySize(Keybinds) ? ArraySize(Keybinds) : NewPos))
 	}
 	
 	UpdateBindList(FocusKey:= "") {
@@ -576,8 +576,8 @@
 		
 		this.LV_Colors_OnMessage(true)
 		
-		this.BindListViewAction("", "C", Settings.GuiState.BindListPos)
 		this.BindListViewSize()
+		this.BindListViewAction("", "C", Settings.GuiState.BindListPos)
 		
 		this.BindLV.Redraw(true)
 	}
@@ -649,14 +649,14 @@
 	
 	SetTabHotkeys(tab) {
 		if (tab = 1) {
-			Hotkey.Bind("Delete", this.GameDelete.Bind(this), this.hwnd)
-			Hotkey.Bind("^z", this.GameRegret.Bind(this), this.hwnd)
+			new Hotkey("Delete", this.GameDelete.Bind(this), this.ahkid)
+			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
 		} else if (tab = 2) {
-			Hotkey.Bind("Delete", this.ImgurDelete.Bind(this), this.hwnd)
-			Hotkey.Disable("^z")
+			new Hotkey("Delete", this.ImgurDelete.Bind(this), this.ahkid)
+			Hotkey.GetGlobal("^z").Delete()
 		} else if (tab = 3) {
-			Hotkey.Bind("Delete", this.BindDelete.Bind(this), this.hwnd)
-			Hotkey.Bind("^z", this.BindRegret.Bind(this), this.hwnd)
+			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
+			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
 		}
 	}
 	
@@ -716,12 +716,10 @@
 	}
 	
 	Escape() {
-		/*
-			if (this.ActiveTab = 2) && (this.ExpandState)
-				this.ImgurExpand(false)
-			else
-		*/
-		this.Close()
+		if (this.ActiveTab = 2) && (this.ExpandState)
+			this.ImgurExpand(false)
+		else
+			this.Close()
 	}
 	
 	Close() {

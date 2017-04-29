@@ -35,7 +35,7 @@
 			
 			Cursor("IDC_CROSS")
 			
-			Hotkey.Bind("LButton", this.StartDrag.Bind(this))
+			new Hotkey("LButton", this.StartDrag.Bind(this))
 			
 			this.MouseHook := new OnMouseMove(this.OnMouseMove.Bind(this))
 		}
@@ -56,7 +56,7 @@
 			
 			this.OnMouseMove(x, y)
 			
-			Hotkey.Bind("LButton Up", this.Close.Bind(this, true))
+			new Hotkey("LButton Up", this.Close.Bind(this, true))
 		}
 		
 		OnMouseMove(x, y) {
@@ -145,7 +145,7 @@
 			
 			this.Capturing := true
 			
-			Hotkey.Bind("Escape", this.Close.Bind(this))
+			new Hotkey("Escape", this.Close.Bind(this))
 			
 			this.Vis := new GUI
 			this.Vis.Parent := this
