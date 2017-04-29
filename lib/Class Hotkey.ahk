@@ -110,9 +110,12 @@ Class Hotkey {
 	}
 	
 	CallAll(Method) {
+		Instances := []
 		for Index, Type in Hotkey.Keys
 			for Index, Win in Type
 				for Index, Htk in Win
-					Htk[Method]()
+					Instances.Push(Htk)
+		for Index, Instance in Instances
+			Instance[Method].Call(Instance)
 	}
 }
