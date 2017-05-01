@@ -12,12 +12,6 @@ SetTitleMatchMode 2
 OnExit("Exit")
 
 /*
-todo:
-console
-rate limiting for imgur api (which will be impossible)	
-*/
-
-/*
 [size=150]v0.9.3[/size]
 
 [list][/list]
@@ -46,9 +40,21 @@ To update:
 
 /*
 - Rewrote Hotkey class based on A_AhkUser's ideas/code
-- GUI hotkeys are now context sensitive, and user hotkeys are always active (except when bindinga new key)
+- Added custom binds for Spotify (Play/Pause, Vol Up/Down, Next/Prev Song, Seek Forwards/Backwards) (thanks, qwerty12!)
+- Re-implemented imgur error handling
+- Failed queue items can be re-entered by double-clicking on them
+- Failed queue items can be cleared
+- Improved queue handler highlighting
+- Re-added open/copy imgur link(s) buttons
+- GUI hotkeys are now context sensitive, and user hotkeys are always active (except when binding a new key)
+- Improved bind descriptions
 - Fixed UseGifv option when copying to clipboard after upload
 - Fixed GifPeriod to 200 (5fps)
+- Removed "Rebind Key" bind option
+- Added a few icons for custom menus
+- Uploader exits when failing to communicate with main script
+- Fixed ToolMsg messages
+- Many misc. fixes
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
@@ -59,7 +65,7 @@ AppName := "Power Play"
 AppVersion := [0, 9, 7]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
-ForceConsole := true
+ForceConsole := !A_IsCompiled && false
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
@@ -80,8 +86,9 @@ if !FileExist(A_WorkingDir "\data") {
 if !FileExist(A_WorkingDir "\menus")
 	FileCreateDir % A_WorkingDir "\menus"
 
-; install necessary files
-InstallFiles()
+; install necessary files, if we're uncompiled
+if A_IsCompiled
+	InstallFiles()
 
 pToken := Gdip_Startup()
 
@@ -232,6 +239,4 @@ p(text := "") {
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
-#Include lib\third-party\FileSHA1.ahk																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
-
-
+#Include lib\third-party\FileSHA1.ahk

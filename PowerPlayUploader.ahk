@@ -23,7 +23,33 @@ UploadUpdate(Percent, FileSize) {
 	if (Percent < 5)
 		Sent:=0
 	if (Fives > Sent)
-		Main.UploadUpdate(Sent := Fives)
+		CallMain("UploadUpdate", Sent := Fives)
+}
+/*
+	Res:
+	[data]
+	[error]
+	[code] => 429
+	[exception]
+	
+	[message] => You are uploading too fast. Please wait 40 more minutes.
+	[type] => ImgurException
+	[method] => POST
+	[request] => /3/image
+	[status] => 400
+	[success] => 0
+	
+	Headers:
+	[X-Post-Rate-Limit-Limit] => 1250
+	[X-Post-Rate-Limit-Remaining] => 1190
+	[X-Post-Rate-Limit-Reset] => 2355
+*/
+
+CallMain(Func, Param*) {
+	try
+		Main[Func](Param*)
+	catch e
+		ExitApp
 }
 
 Class Worker {
@@ -47,10 +73,10 @@ Class Worker {
 								, "Callback: UploadUpdate`nMethod: POST`nUpload: " file)
 		
 		if (DownloadedBytes > 0) && StrLen(Data) {
-			Main.HeaderInfo(Header)
-			Main.UploadResponse(File, Data)
+			CallMain("HeaderInfo", Header)
+			CallMain("UploadResponse", File, Data)
 		} else
-			Main.UploadFailure(File, Header)
+			CallMain("UploadFailure", File, Header)
 	}
 	
 	Delete(Index, DeleteHash) {
@@ -67,10 +93,10 @@ Class Worker {
 		
 		
 		if (DownloadedBytes > 0) && StrLen(data) {
-			Main.HeaderInfo(header)
-			Main.DeleteResponse(Index, Data)
+			CallMain("HeaderInfo", Header)
+			CallMain("DeleteResponse", Index, Data)
 		} else
-			Main.DeleteFailure(Index, Header)
+			CallMain("DeleteFailure", Index, Header)
 		
 		return
 	}

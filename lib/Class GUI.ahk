@@ -2,8 +2,8 @@
 	static Instances := []
 	
 	__New(Title := "AutoHotkey Window", Options := "") {
-		Gui, New, % "+hwndHWND " Options, % Title
-		this.hwnd := HWND
+		Gui, New, % "+hwndhwnd " Options, % Title
+		this.hwnd := hwnd
 		this.ahkid := "ahk_id" hwnd
 		this.IsVisible := false
 		Gui % this.hwnd ": -E0x10" ; disable drag-drop by default
@@ -55,12 +55,6 @@
 		Gui % this.hwnd ":-Disabled"
 	}
 	
-	SetTitle(NewTitle) {
-		;WinSetTitle, % this.ahkid,, % NewTitle
-		this.Show(this.IsVisible?"":"Hide", NewTitle)
-		;tooltip % errorlevel
-	}
-	
 	ControlGet(Command, Value := "", Control := "") {
 		ControlGet, out, % Command, % (StrLen(Value) ? Value : ""), % (StrLen(Control) ? Control : ""), % this.ahkid
 		return out
@@ -106,8 +100,8 @@
 		Gui % this.hwnd ":Font", % Options, % Font
 	}
 	
-	Submit(Options := "") {
-		Gui % this.hwnd ":Submit", % Options
+	Submit(Hide := false, Options := "") {
+		Gui % this.hwnd ":Submit", % (this.IsVisible:=!Hide ? "" : "NoHide") " " Options
 	}
 	
 	GetText(Control) {

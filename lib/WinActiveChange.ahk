@@ -38,13 +38,13 @@ ApplyRules(Info) {
 			NvAPI.SetDVCLevelEx(Info.Vibrancy, Screen - 1)
 	
 	if Info.BlockWinKey
-		new Hotkey("LWin", "returnlabel")
+		new Hotkey("LWin", "scaryvoid")
 	
 	if Info.BlockAltTab
-		new Hotkey("!Tab", "returnlabel")
+		new Hotkey("!Tab", "scaryvoid")
 }
 
-returnlabel:
+scaryvoid:
 return
 
 DisableRules() {

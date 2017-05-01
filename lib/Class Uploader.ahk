@@ -30,20 +30,16 @@
 	}
 	
 	Upload(File) {
+		p("UPLOAD: " file)
 		Info := {Event: "Upload", ID: File}
-		if !FileExist(File)
-			this.AddFail((Info, Info.Error := "File doesn't exist"))
-		else if !(File ~= this.AllowedExt)
-			this.AddFail((Info, Info.Error := "Disallowed extension: " Ext))
-		else
+		if FileExist(File)
 			this.AddQueue(Info)
 	}
 	
 	Delete(Index) {
+		p("DELETE: " index)
 		Info := {Event: "Delete", ID: Index, DeleteHash: Images[Index].deletehash}
-		if !Images[Index]
-			this.AddFail((Info, Info.Error := "Image index not found in database"))
-		else
+		if Images[Index]
 			this.AddQueue(Info)
 	}
 	
@@ -69,16 +65,26 @@
 	
 	; adds an item to the queue of failed items
 	AddFail(Info, Error) {
-		FormatTime, Date,, H:m d/M/yyyy
-		this.QueueFail.InsertAt(1, {Error: Error, Date: Date, Event: Info.Event, ID: Info.ID})
-		this.GuiUpdate()
+		this.QueueFail.InsertAt(1, {Error: Error, Event: Info.Event, ID: Info.ID})
+	}
+	
+	StartStop() {
+		if (this.Status = 1) {
+			Uploader.StopQueue()
+			Big.Control("Disable", Big.PauseButtonHWND)
+			Big.SetText(Big.PauseButtonHWND, "Pausing..")
+		} else if (this.Status = 0) && (this.Queue.MaxIndex())
+			this.StartQueue()
 	}
 	
 	; set to running if we're idling
 	StartQueue() {
 		if (this.Status = 0) {
+			p("starting queue")
 			this.SetStatus(1)
+			this.GuiAllowPause(true)
 			this.GuiAllowClear(false)
+			this.GuiAllowFailedClear(false)
 			this.GuiUpdate()
 			this.StepQueue()
 		}
@@ -86,45 +92,85 @@
 	
 	; set to pause if we're running
 	StopQueue() {
-		if (this.Status = 1)
+		if (this.Status = 1) {
+			p("stopping queue")
 			this.SetStatus(2)
+		}
 	}
 	
 	StepQueue() {
 		p("stepping queue")
 		
 		; stop if we said to stop, or if the queue is empty
-		if (this.Status = 2) || !this.Queue.MaxIndex()
-			return this.FinishQueue()
+		if (this.Status = 2)
+			this.SetStatus(0), this.GuiSetStatus("Paused..")
 		
 		if !this.CheckAlive()
 			return
 		
+		this.GuiCheckButtons()
+		this.GuiUpdate()
+		
+		if (this.Status != 1)
+			return
+		
+		if  !this.Queue.MaxIndex()
+			return this.FinishQueue()
+		
 		this.GuiAllowPause((this.Queue.MaxIndex() > 1))
-		this.GuiSetStaus("Starting..")
 		
 		; get the next queue item
 		Info := this.Queue.1
 		
+		this.GuiSetStatus(Info.Event="Upload"?"Starting..":"Deleting..")
+		
 		; pass them to the worker
-		if (Info.Event = "Upload")
-			this.Worker.Upload(Info.ID), p("Uploading " Info.ID)
-		else if (Info.Event = "Delete")
-			this.Worker.Delete(Info.ID, Info.DeleteHash), p("Deleting " Info.ID " (" Info.DeleteHash ")")
+		if (Info.Event = "Upload") {
+			this.Worker.Upload(Info.ID)
+			p("Uploading " Info.ID)
+		}
+		
+		else if (Info.Event = "Delete") {
+			this.Worker.Delete(Info.ID, Info.DeleteHash)
+			p("Deleting " Info.ID " (" Info.DeleteHash ")")
+		}
+	}
+	
+	AdvanceQueue() {
+		this.Queue.RemoveAt(1)
+	}
+	
+	ClearQueue() {
+		if (this.Status = 1)
+			return
+		
+		this.Queue := []
+		this.GuiUpdate()
+		this.FinishQueue()
+		this.GuiCheckButtons()
+	}
+	
+	ClearFailedQueue() {
+		if (this.Status = 1)
+			return
+		
+		this.QueueFail := []
+		this.GuiUpdate()
+		this.GuiCheckButtons()
 	}
 	
 	; response from imgur
 	UploadResponse(ID, Data) {
-		res := JSON.Load(Data)
+		try
+			res := JSON.Load(Data)
 		
-		if (res.status = 200)
-			this.UploadSuccess(ID, res)
-		else {
-			this.UploadFailure(ID, res.data.error, false)
-			Error("Imgur threw an error on upload", A_ThisFunc, pa(res))
-		}
-		
-		this.GuiUpdate()
+		if res.status { ; response from imgur
+			if (res.status = 200) 
+				this.UploadSuccess(ID, res)
+			else ; other status code
+				this.ImgurError({Event:"Upload", ID:ID}, res)
+		} else
+			this.UploadFailure(ID, Data, true)
 	}
 	
 	; successful upload
@@ -140,9 +186,6 @@
 		else
 			FileCopy % ID, % this.ImgurFolder "\" res.data.id "." extension
 		
-		; remove the item from the queue
-		this.Queue.RemoveAt(1)
-		
 		; add to the queuesucceed queue
 		this.AddSucceed({Event:"Upload", Index: Index, ID: ID}) ; ID is filename
 		
@@ -151,33 +194,30 @@
 		this.GuiAddImage(Index)
 		
 		p("Uploaded successfully")
+		
+		this.AdvanceQueue()
 		this.StepQueue() ; advance in queue and continue
 	}
 	
 	; upload failed
-	UploadFailure(ID, Error, UploadError := true) {
-		this.Queue.RemoveAt(1)
-		
-		this.AddFail({Event:"Upload", ID:ID}, UploadError?"Failed connecting to imgur":Error)
+	UploadFailure(ID, Error) {
+		this.AdvanceQueue()
+		this.AddFail({Event:"Upload", ID:ID}, Error)
 		p("Upload failed")
-		
-		if UploadError
-			Error("Failed uploading image", A_ThisFunc, Error)
-		
-		this.StepQueue()
+		Error("Failed uploading image", A_ThisFunc, Error)
 	}
 	
 	DeleteResponse(ID, Data) {
-		res := JSON.Load(Data)
+		try
+			res := JSON.Load(Data)
 		
-		if (res.status = 200)
-			this.DeleteSuccess(ID)
-		else {
-			this.DeleteFailure(ID, res.data.error, false)
-			Error("Imgur threw an error on deleting", A_ThisFunc, pa(res))
-		}
-		
-		this.GuiUpdate()
+		if res.status { ; response from imgur
+			if (res.status = 200) ; success
+				this.DeleteSuccess(ID, res)
+			else ; other status code
+				this.ImgurError({Event:"Delete", ID:ID}, res)
+		} else
+			this.DeleteFailure(ID, Data, true)
 	}
 	
 	DeleteSuccess(ID) {
@@ -187,11 +227,12 @@
 		; move the image regardless of whether saveimages is enabled or not
 		if FileExist(this.ImgurFolder "\" Image.id "." Image.extension)
 			FileMove, % this.ImgurFolder "\" Image.id "." Image.extension, % this.DeletedFolder "\" Image.id "." Image.extension
-		
+		p("del " id)
 		this.GuiRemoveImage(ID)
-		this.Queue.RemoveAt(1)
 		this.AddSucceed({Event: "Delete", ID: ID}) ; ID is index
 		p("Deleted successfully")
+		
+		this.AdvanceQueue()
 		this.StepQueue() ; advance in queue and continue
 	}
 	
@@ -205,12 +246,89 @@
 		
 		if !UploadError
 			Error("Failed deleting image", A_ThisFunc, Error)
+		else
+			this.ImgurError(Error)
 		
 		this.StepQueue()
 	}
 	
-	ImgurError() {
+	; takes an imgur error status and decides what to do
+	ImgurError(Info, res) {
 		
+		status := res.status
+		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
+		
+		p("IMGUR ERROR " status " " error)
+		
+		Error("Imgur threw an error", A_ThisFunc, "Error: " error "`nFile: " file "`n`nRes:`n" pa(res) "`n`nHeaders:`n" pa(this.LastHeaders))
+		
+		if (status = "400") {
+			
+			if (InStr(error, "You are uploading too fast. Please wait ") = 1) { ; rate limit, fake it as status 429
+				res.status := 429
+				this.ImgurError(Info, res)
+			} else {
+				this.AdvanceQueue()
+				this.StepQueue()
+			}
+			
+		} else if (status = 429) { ; rate limit reached or ip temporarily blocked
+			
+			Time := this.LastHeaders["X-Post-Rate-Limit-Reset"]
+			
+			this.ResetTime := A_Now
+			this.ResetTime += Time, Seconds
+			
+			if (this.LastHeaders["X-RateLimit-UserRemaining"] = 0) ; user has spent all credits
+				this.GuiNotify("Imgur error!", "You've uploaded too much.`nImgur will allow more uploads in " Round(Time/60) " minutes.")
+			
+			else if (this.LastHeaders["X-RateLimit-ClientRemaining"] = 0) ; client_id credits is empty, we need a new one, kinda bad tbh
+				this.GuiNotify("Imgur error!", "Client rate limits have been reached.`nEmail me at runar-borge@hotmail.com if this continues happening.")
+			
+			else ; last error is IP spam prevention
+				this.GuiNotify("Imgur is panicking!", "Imgur doesn't like you uploading this fast.`nImgur will allow more uploads in " Round(Time/60) " minutes.")
+			
+			this.SetStatus(0)
+			this.GuiSetStatus("Imgur rate limit reached.")
+			this.GuiUpdate()
+			this.GuiCheckButtons()
+			
+			if !this.RateAlertTimer {
+				this.RateAlertTimer := true
+				RateAlert := this.RateLimitAlert.Bind(this)
+				SetTimer, % RateAlert, % "-" Time * 1000
+			}
+			
+		} else if (status ~= "^(401|403|404)$") { ; step on 40x and 500 errors
+			
+			this.AdvanceQueue()
+			this.StepQueue()
+			
+		} else if (status = 500) {
+			
+			if (Info.Event = "Upload")
+				this.UploadFailure(Info.ID, error)
+			else
+				this.DeleteFailure(Info.ID, error)
+			
+			this.AdvanceQueue()
+			this.StepQueue()
+			
+		}
+	}
+	
+	RateLimitAlert() {
+		this.RateAlertTimer := false
+		TrayTip("Rate limit removed", "Ready to upload!")
+		this.GuiSetStatus("Ready to upload!")
+	}
+	
+	HeaderInfo(header) { ; save headers to this.LastHeaders
+		for index, text in StrSplit(header, "`n"), hdr := [] {
+			line := StrSplit(text, ": ")
+			if (InStr(line[1], "X-") = 1)
+				hdr[line[1]] := line[2]
+		} this.LastHeaders := hdr
 	}
 	
 	; run when queue is paused/finished
@@ -226,7 +344,7 @@
 				Msg := "Upload succeeded!" . RunClipboardKeybindText()
 			else
 				Msg := "Deletion succeeded!"
-		} 
+		}
 		
 		else if (this.QueueSucceed.MaxIndex() > 1) { ; several succeeded items
 			Title := "Queue report:"
@@ -250,7 +368,6 @@
 			Msg := trim(Msg, "`n")
 		}
 		
-		;if !Big.IsVisible
 		TrayTip(Title, Msg)
 		
 		; save images file
@@ -259,8 +376,7 @@
 		; reset infos
 		this.QueueSucceed := []
 		
-		this.GuiAllowClear(!!this.Queue.MaxIndex())
-		this.GuiAllowPause(!!this.Queue.MaxIndex())
+		this.GuiCheckButtons()
 		this.GuiSetStatus("Queue finished!")
 		this.GuiUpdate()
 	}
@@ -313,19 +429,35 @@
 	*/
 	
 	GuiAddImage(Index) {
-		Big.LV_Colors_OnMessage(false)
 		Big.ImgurListAdd(Index)
-		Big.LV_Colors_OnMessage(true)
 	}
 	
 	GuiRemoveImage(Index) {
-		Big.LV_Colors_OnMessage(false)
 		Big.ImgurListRemove(Index)
-		Big.LV_Colors_OnMessage(true)
+	}
+	
+	/*
+		when to allow pause:
+		when status = 0 and there's queue items in the list
+		when status = 1 and there's more than one item in the list
+		
+		when to allow clear:
+		when status = 0 and there's items in the list
+		
+		when to allow failed clear
+		when status = 1 and there's items in the list
+	*/
+	
+	GuiCheckButtons() {
+		this.GuiAllowPause(!!((this.Status = 0 && this.Queue.MaxIndex())||(this.Status = 1 && (this.Queue.MaxIndex() > 1))))
+		this.GuiAllowClear(!!(this.Queue.MaxIndex() && this.Status = 0))
+		this.GuiAllowClearFailed(!!(this.QueueFail.MaxIndex() && this.Status = 0))
 	}
 	
 	UploadUpdate(per) {
-		this.GuiSetStatus(Per > 99 ? "Working.." : "Progress: "(Per) "%")
+		this.GuiSetStatus(Per > 99 ? "Working.." : "Progress: " (Per) "%")
+		if Settings.ToolMsg && !Big.IsVisible
+			MouseTip.Create(Per > 99 ? "Working.." : Per "%")
 	}
 	
 	GuiUpdate() {
@@ -337,15 +469,21 @@
 			Color := [Settings.Color.Selection, "FF2525", "25AA25"][Index]
 			for Index2, Info in Arr {
 				SplitPath, % Info.ID, FileName
-				Pos := Big.QueueLV.Add(, Info.Event, (Info.Error?Info.Error:(FileName?FileName:Info.ID)), Info.Date)
+				Pos := Big.QueueLV.Add(, Info.Event, (Info.Error?Info.Error:(FileName?FileName:Info.ID)), Info.ID)
 				FileName:=""
-				Big.QueueLV.CLV.Row(Pos, "0x" (Index=1?(this.Status = 1?Color:"505050"):Settings.Color.Dark), 0xFFFFFF)
+				Big.QueueLV.CLV.Row(Pos, "0x" (Index=1?(this.Status = 1 && Index2 = 1?Color:"505050"):Color[2]), 0xFFFFFF)
 			}
 		}
 		
 		Big.QueueLV.ModifyCol(1, 100)
-		Big.QueueLV.ModifyCol(2, Big.HALF_WIDTH*2 - 250)
-		Big.QueueLV.ModifyCol(3, 150)
+		Big.QueueLV.ModifyCol(2, (Big.HALF_WIDTH*2) - 100 - (Big.QueueLV.GetCount() > 6 ? VERT_SCROLL : 0))
+		Big.QueueLV.ModifyCol(3, 0)
+		
+		this.GuiAllowFailedClear(!!this.QueueFail.MaxIndex())
+	}
+	
+	GuiNotify(ErrorTitle, ErrorDesc) {
+		TrayTip(ErrorTitle, ErrorDesc)
 	}
 	
 	GuiSetStatus(Status) {
@@ -354,10 +492,14 @@
 	
 	GuiAllowPause(Allow) {
 		Big.Control(Allow?"Enable":"Disable", Big.PauseButtonHWND)
-		Big.SetText(Big.PauseButtonHWND, (this.Status=0?"Start":"Pause"))
+		Big.SetText(Big.PauseButtonHWND, (this.Status = 1?"Pause":"Start"))
 	}
 	
 	GuiAllowClear(Allow) {
 		Big.Control(Allow?"Enable":"Disable", Big.ClearButtonHWND)
+	}
+	
+	GuiAllowClearFailed(Allow) {
+		Big.Control(Allow?"Enable":"Disable", Big.ClearFailedButtonHWND)
 	}
 }

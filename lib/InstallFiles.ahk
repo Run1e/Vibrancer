@@ -1,12 +1,8 @@
 ﻿; octicons from github, can be used when adding a menu item via a plugin
 InstallFiles() {
 	
-	; only install files if script is compiled
-	if !A_IsCompiled
-		return
-	
 	ico_sha := "52614380F058B92408A9125AA4EA7EE023364865"
-	exe_sha := "1951CF372BE01143FE75E06377CEC686F892BC7C"
+	exe_sha := "AA6D31F4531E7B3A91845C1ED40495C3F784E60B"
 	
 	if !FileExist("icons") 
 		FileCreateDir icons
@@ -25,6 +21,12 @@ InstallFiles() {
 	FileInstall, D:\Documents\Scripts\octicons\device-desktop.ico, icons\octicons\device-desktop.ico
 	FileInstall, D:\Documents\Scripts\octicons\plus.ico, icons\octicons\plus.ico
 	FileInstall, D:\Documents\Scripts\octicons\dash.ico, icons\octicons\dash.ico
+	FileInstall, D:\Documents\Scripts\octicons\flame.ico, icons\octicons\flame.ico
+	FileInstall, D:\Documents\Scripts\octicons\list-unordered.ico, icons\octicons\list-unordered.ico
+	FileInstall, D:\Documents\Scripts\octicons\three-bars.ico, icons\octicons\three-bars.ico
+	FileInstall, D:\Documents\Scripts\octicons\trashcan.ico, icons\octicons\trashcan.ico
+	FileInstall, D:\Documents\Scripts\octicons\book.ico, icons\octicons\book.ico
+	FileInstall, D:\Documents\Scripts\octicons\file.ico, icons\octicons\file.ico
 	
 	; install uploader exe if compiled and file has changed
 	if (FileSHA1("PowerPlayUploader.exe") != exe_sha) {
@@ -32,7 +34,7 @@ InstallFiles() {
 		while !FileExist("PowerPlayUploader.exe")
 			sleep 50
 	}
-		
+	
 }
 
 Icon(name := "") {

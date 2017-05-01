@@ -29,7 +29,9 @@ TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
 		Msg := Title, Title := AppName " " AppVersionString
 	TrayTip, % Title, % Msg
-	p(Title "`n" Msg)
+	p(title "`n" msg)
+	if Settings.ToolMsg
+		MouseTip.Create(Msg)
 }
 
 pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
@@ -51,8 +53,8 @@ m(x*) {
 	MsgBox, 0, msgbox, % text
 }
 
-pas(array, seperator:=", ", depth=5, indentLevel:="") {
-	return StrReplace(pa(array, depth, indentLevel), "`n", seperator)
+pas(array, separator:=", ", depth=5, indentLevel:="") {
+	return StrReplace(pa(array, depth, indentLevel), "`n", separator)
 }
 
 as(arr) {

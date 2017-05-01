@@ -1,6 +1,7 @@
 ﻿Class BinderGUI extends GUI {
-	static DDLAssignments := "Built-in|Multimedia|Imgur|Mouse Function|Launch Application"
-	static EditAssignments := "Send Text|Launch Website|Launch File/Program"
+	static DDLAssignments := "^(Built-in|Multimedia|Imgur|Mouse Function|Launch Application|Spotify)$"
+	static EditAssignments := "^(Send Text|Launch Website|Launch File/Program)$"
+	static IgnoreDescAssignments := "^(Built-in|Mouse Function|Imgur)$"
 	static WIDTH := 180, HEIGHT := 215, CONTROL_HEIGHT := 26
 	
 	AddButton() {
@@ -22,9 +23,16 @@
 		; create nugget
 		if (this.Assignment ~= this.DDLAssignments) { ; assignment used a dll control, get the data from it
 			
-			for Index, Action in Actions.List[this.Assignment]
-				if (Action.Desc = this.Function)
-					Bind := Action
+			for Index, Action in Actions.List[this.Assignment] {
+				if (Action.Desc = this.Function) {
+					Bind := ObjClone(Action)
+					if (this.Assignment = "Launch Application")
+						Bind.Desc := "Launch: " Action.Desc
+					else
+						Bind.Desc := (this.Assignment ~= this.IgnoreDescAssignments ? "" : this.Assignment ": ") . Action.Desc
+				}
+				
+			}
 			
 		} else if (this.Assignment ~= this.EditAssignments) { ; assignment used an edit control
 			
@@ -35,26 +43,22 @@
 			
 			if (this.Assignment = "Launch Website")
 				Bind := {Desc:"Website: " EditText, Func:"Run", Param:[EditText]}
+			
 			else if (this.Assignment = "Send Text")
 				Bind := {Desc:"Send Text: " EditText, Func:"SendRaw", Param:[EditText]}
+			
 			else if (this.Assignment = "Launch File/Program") {
 				if !StrLen(this.CustomFileName)
 					SplitPath, EditText, FileName
 				else
 					FileName := this.CustomFileName
-				Bind := {Desc:"Launch " FileName, Func:"Run", Param:[EditText]}
+				Bind := {Desc:"Launch: " FileName, Func:"Run", Param:[EditText]}
 			}
-			
-		} else if (this.Assignment = "Rebind Key") {
-			if !StrLen(Rebind) {
-				SoundPlay, *-64
-				return
-			} Bind := {Desc:"Rebound to: " HotkeyToString(Rebind), Func:"Send", Param:[Rebind]}
 		}
 		
 		if !IsObject(Bind) || !StrLen(Bind.Desc) { ; throw an error if we don't have a bind object
-			Error("Unable to create Bind nugget", A_ThisFunc, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText "`nRebind: " Rebind)
-			TrayTip("Unable to create create nugget.`nAn error log has been saved.")
+			Error("Unable to create bind", A_ThisFunc, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText "`nRebind: " Rebind)
+			TrayTip("Unable to create create bind.`nAn error log has been saved.")
 			this.Close()
 		} else
 			this.Close(Bind, Key)
@@ -109,10 +113,7 @@
 				this.Control("Move", "Edit1", "w" this.WIDTH - 16 - this.CONTROL_HEIGHT)
 				this.Control("+ReadOnly", "Edit1")
 			}
-		} else if (Assignment = "Rebind Key") {
-			this.SetText(Binder.AssignmentTextHWND, "Rebind to:")
-			this.ControlShow(Binder.BindHotkeyHWND)
-		} 
+		}
 	}
 	
 	ControlShow(SelectControl) {
@@ -211,9 +212,9 @@ CreateNugget(Callback, HotkeyMode := true, Owner := "") {
 	AssignmentList := [	  "Multimedia"
 					, "Imgur"
 					, "Built-in"
+					, "Spotify"
 					, "Mouse Function"
 					, "Send Text"
-					, "Rebind Key"
 					, "Launch File/Program"
 					, "Launch Website"
 					, "Launch Application"]
@@ -253,7 +254,6 @@ CreateNugget(Callback, HotkeyMode := true, Owner := "") {
 	Binder.Font("s9", "Wingdings")
 	Binder.Add("Button", "x" WIDTH - 6 - CONTROL_HEIGHT " yp-1 w" CONTROL_HEIGHT " h" CONTROL_HEIGHT + 2, "1", Binder.SelectFile.Bind(Binder))
 	Binder.Font("s10", Settings.Font)
-	Binder.BindHotkeyHWND := Binder.Add("Hotkey", "x6 yp+1 w" WIDTH - 12 " h" CONTROL_HEIGHT " w" WIDTH-12)
 	
 	Binder.Margin(6, 10)
 	Binder.Add("Text", "x6 yp+" 8+CONTROL_HEIGHT " w" WIDTH-12 " h1 0x08") ; separator

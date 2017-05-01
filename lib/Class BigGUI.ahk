@@ -75,22 +75,8 @@
 		return Indexes
 	}
 	
-	ImgurAnimate(Toggle) {
-		if Toggle && !this.AnimatedEnabled
-			SetTimer, ImgurAnimateTick, % this.ImgurLV.IL.GifPeriod
-		else if this.AnimatedEnabled
-			SetTimer, ImgurAnimateTick, Off
-		return
-		
-		ImgurAnimateTick:
-		Big.ImgurAnimateTick()
-		return
-	}
-	
 	UpdateImgurList() {
 		Critical 500
-		
-		this.LV_Colors_OnMessage(false)
 		
 		this.ImgurImageWidth:=124
 		this.ImgurImageHeight:=70
@@ -102,8 +88,16 @@
 		this.ImgurLV.SetImageList(this.ImgurLV.IL.ID, true)
 		this.ImgurLV.Delete()
 		
-		for Date, Image in Images, New := []
-			New.Push(Date)
+		New := [], Rem := []
+		for Date, Image in Images {
+			if (FileExist(Uploader.ImgurFolder "\" Image.id  "." Image.extension) != "A")
+				Rem.Push(Date)
+			else
+				New.Push(Date)
+		}
+		
+		for Index, Date in Rem
+			Images.Remove(Date)
 		
 		Loop % Settings.Imgur.ListViewMax
 			this.ImgurListAdd(New[New.MaxIndex() - A_Index + 1], false, false)
@@ -115,8 +109,6 @@
 		LV_EX_SetIconSpacing(this.ImgurLV.hwnd, this.ImgurImageWidth + sep, this.ImgurImageHeight + sep)
 		
 		this.ImgurListViewSelection()
-		
-		this.LV_Colors_OnMessage(true)
 	}
 	
 	ImgurListAdd(Index, FixOrder := true, Insert := true) {
@@ -159,6 +151,14 @@
 				this.ImgurLV.Delete(A_Index)
 		}
 		
+		if this.AnimatedImages.HasKey(Index) {
+			this.AnimatedImages.Delete(Index)
+			this.AnimatedPositions.Delete(Index)
+		}
+		
+		; note: is it possible removing images from an imagelist?
+		; ^ would free memory when deleting images and especially large gifs
+		
 		this.ImgurFixOrder()
 	}
 	
@@ -174,6 +174,20 @@
 		sleep 1
 		
 		this.ImgurLV.Modify(1, "Vis")
+	}
+	
+	ImgurAnimate(Toggle) {
+		if Toggle && !this.AnimatedEnabled {
+			SetTimer, ImgurAnimateTick, % this.ImgurLV.IL.GifPeriod
+			this.AnimatedEnabled := true
+		} else if this.AnimatedEnabled {
+			SetTimer, ImgurAnimateTick, Off
+			this.AnimatedEnabled := false
+		} return
+		
+		ImgurAnimateTick:
+		Big.ImgurAnimateTick()
+		return
 	}
 	
 	ImgurAnimateTick() {
@@ -241,7 +255,7 @@
 			if Settings.Imgur.UseGifv
 				if (SubStr(link, -2) = "gif")
 					link .= "v"
-			links .= link . Settings.Imgur.CopySeparator
+			links .= link . (StrLen(Settings.Imgur.CopySeparator) ? Settings.Imgur.CopySeparator : " ")
 		}
 		
 		if !StrLen(links)
@@ -258,19 +272,15 @@
 	}
 	
 	StartStopQueue() {
-		if (Uploader.Status = 1) {
-			Uploader.StopQueue()
-			this.Control("Disable", this.PauseButtonHWND)
-			this.SetText(this.PauseButtonHWND, "Pausing..")
-		} else if (Uploader.Status = 0) && (Uploader.Queue.MaxIndex()) {
-			Uploader.StartQueue()
-		}
+		Uploader.StartStop()
 	}
 	
 	ClearQueue() {
-		Uploader.Queue := []
-		Uploader.QueueFail := []
-		Uploader.FinishQueue()
+		Uploader.ClearQueue()
+	}
+	
+	ClearFailedQueue() {
+		Uploader.ClearFailedQueue()
 	}
 	
 	ImgurStatus(Status) {
@@ -420,14 +430,10 @@
 	UpdateGameList(FocusKey := "") {
 		Critical 500
 		
-		this.LV_Colors_OnMessage(false)
-		
 		IL := new this.ImageList(this.GameLV)
 		
-		this.GameLV.SetImageList(IL.ID)
-		
 		this.GameLV.Redraw(false)
-		
+		this.GameLV.SetImageList(IL.ID)
 		this.GameLV.Delete()
 		
 		for Process, Info in GameRules {
@@ -445,11 +451,8 @@
 		}
 		
 		
-		this.LV_Colors_OnMessage(true)
-		
 		this.GameListViewAction("", "C", Settings.GuiState.GameListPos)
 		this.GameListViewSize()
-		
 		this.GameLV.Redraw(true)
 	}
 	
@@ -561,10 +564,7 @@
 	UpdateBindList(FocusKey:= "") {
 		Critical 500
 		
-		this.LV_Colors_OnMessage(false)
-		
 		this.BindLV.Redraw(false)
-		
 		this.BindLV.Delete()
 		
 		for Key, Bind in Keybinds {
@@ -574,11 +574,8 @@
 				Settings.GuiState.BindListPos := Pos
 		}
 		
-		this.LV_Colors_OnMessage(true)
-		
 		this.BindListViewSize()
 		this.BindListViewAction("", "C", Settings.GuiState.BindListPos)
-		
 		this.BindLV.Redraw(true)
 	}
 	
@@ -605,12 +602,6 @@
 		*** TABS / OTHER ***
 	*/
 	
-	LV_Colors_OnMessage(toggle) {
-		this.GameLV.CLV.OnMessage(toggle)
-		this.BindLV.CLV.OnMessage(toggle)
-		this.QueueLV.CLV.OnMessage(toggle)
-	}
-	
 	TabAction(Control, GuiEvent, EventInfo) {
 		this.SetDefault()
 		this.SetTab((Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3)))
@@ -626,25 +617,24 @@
 		this.SetTabHotkeys(tab)
 		
 		if (tab = 1) {
-			this.Control("Focus", "SysListView321")
 			this.ColorScreens()
 			this.ImgurAnimate(false)
 			this.DropFilesToggle(true)
 			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 1)
+			this.Control("Focus", "SysListView321")
 		} else if (tab = 2) {
-			this.Options("ListView", this.ImgurLV.hwnd)
-			LV_Modify(1, "Vis") ; show first item
-			LV_Modify(0, "-Select") ; show first item
+			this.ImgurLV.Modify(1, "Vis")
+			this.ImgurLV.Modify(0, "-Vis")
 			this.ImgurAnimate(true) ; animate gifs
 			this.DropFilesToggle(true)
 			this.ImgurExpand(this.ExpandState)
+			this.Control("Focus", "SysListView322")
 		} else if (tab = 3) {
-			this.Control("Focus", "SysListView323")
 			this.ImgurAnimate(false)
 			this.DropFilesToggle(false)
 			this.Pos(,,, this.TAB_HEIGHT + this.LV_HEIGHT + this.BUTTON_HEIGHT + 1)
+			this.Control("Focus", "SysListView324")
 		}
-		
 	}
 	
 	SetTabHotkeys(tab) {
@@ -669,41 +659,34 @@
 		this.ExpandState := Expand
 	}
 	
-	QueueListViewAction(Control, GuiEvent, EventInfo) {
-		return
-		if (GuiEvent = "ColClick") ; clicked on header
-			this.ImgurExpand(this.ExpandState := !this.ExpandState)
-	}
-	
 	SetTabColor(tab) {
 		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
 			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
 	}
 	
 	Open(tab := "") {
-		static IsShown := false
-		
 		if this.IsVisible
 			return this.Activate()
 		
 		if SetGUI.IsVisible
 			return
 		
-		this.LV_Colors_OnMessage(true)
-		
-		if tab
-			this.SetTab(tab)
-		
+		this.SetTab(tab?tab:this.ActiveTab)
 		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
-		
 		this.SetTabColor(tab?tab:this.ActiveTab)
 		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 		
-		if !IsShown {
-			this.SetTitle(AppName " " AppVersionString)
-			this.SetTab(tab?tab:this.ActiveTab)
-			this.SetIcon(Icon("icon"))
-			IsShown := true
+		; init CLV here because of coloring issues
+		if !this.GameLV.CLV {
+			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)
+			this.GameLV.CLV.Critical := 500
+			this.GameLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
+		}
+		
+		if !this.BindLV.CLV {
+			this.BindLV.CLV := new LV_Colors(this.BindLV.hwnd)
+			this.BindLV.CLV.Critical := 500
+			this.BindLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
 		}
 	}
 	
@@ -723,17 +706,42 @@
 	}
 	
 	Close() {
-		this.Save()
 		this.Hide()
 		this.ImgurAnimate(false)
-		this.LV_Colors_OnMessage(false)
 		Keybinds(true)
+		this.Save()
+	}
+	
+	QueueListViewAction(Control, GuiEvent, EventInfo) {
+		
+		if (GuiEvent ~= "^(Normal|C|I)$")
+			this.QueueLV.Modify(EventInfo, "-Select")
+		
+		if (GuiEvent = "DoubleClick") {
+			if (Uploader.Status = 1)
+				return
+			
+			Type := this.QueueLV.GetText(EventInfo, 1)
+			ID := this.QueueLV.GetText(EventInfo, 3)
+			
+			if (ID != "id") {
+				for Index, Info in Uploader.QueueFail {
+					if (Info.ID = ID) {
+						Uploader.QueueFail.RemoveAt(Index)
+						Uploader.Queue.Push({Event:Type, ID:ID})
+						Uploader.GuiUpdate()
+						Uploader.GuiCheckButtons()
+						break
+					}
+				}
+			}
+		}
 	}
 }
 
 CreateBigGUI() {
 	
-	Big := new BigGUI
+	Big := new BigGUI(AppName " " AppVersionString)
 	
 	Big.Font("s14", Settings.Font)
 	Big.Color("FFFFFF")
@@ -770,7 +778,7 @@ CreateBigGUI() {
 	Big.Tab(1)
 	Big.Font("s11")
 	Big.GameLV := new Big.ListView(Big, "x" 0 " y" TAB_HEIGHT " w" HALF_WIDTH - 1 " h" LV_HEIGHT " -HDR -Multi +LV0x4000 -E0x200 AltSubmit -TabStop", "name|path", Big.GameListViewAction.Bind(Big))
-	Big.GameLV.CLV := new LV_Colors(Big.GameLV.hwnd)
+	
 	Big.Font("s10")
 	
 	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1, "Remove", Big.GameDelete.Bind(Big))
@@ -808,8 +816,7 @@ CreateBigGUI() {
 					. " h" Mon.H
 					. " +Border 0x200 Center", MonID, Big.SelectScreen.Bind(Big, MonID))
 			Big.MonitorHWND[MonID] := HWND
-		}
-		
+		}	
 	}
 	
 	if Settings.NvAPI_InitFail { ; no nvidia card detected, grey out/disable some controls..
@@ -825,9 +832,6 @@ CreateBigGUI() {
 		CtlColors.Change(Big.MonitorHWND.1, "FFFFFF", "000000")
 	}
 	
-	Big.GameLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
-	Big.GameLV.CLV.Critical := 500
-	
 	Big.UpdateGameList()
 	
 	; ==========================================
@@ -837,18 +841,21 @@ CreateBigGUI() {
 	Big.ImgurLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT + BUTTON_HEIGHT + 1 " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop +Background" Settings.Color.Dark, "empty|index", Big.ImgurListViewAction.Bind(Big))
 	Big.Font("s10")
 	
-	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" HALF_WIDTH*2 " h24 +Left", " Click to view queue manager", Big.ImgurExpandToggle.Bind(Big))
+	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH*2 " h24 +Left", " Click to view queue manager", Big.ImgurExpandToggle.Bind(Big))
+	
+	Big.Add("Button", "x" TAB_WIDTH*2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Copy link(s)", Big.ImgurCopyLinks.Bind(Big))
+	Big.Add("Button", "x" TAB_WIDTH*2 + TAB_WIDTH/2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Open link(s)", Big.ImgurOpenLinks.Bind(Big))
 	
 	Big.Font("s11")
 	
-	Big.QueueLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 25 " w" HALF_WIDTH*2 " h" EXPAND_SIZE - BUTTON_HEIGHT - 24 " NoSort -Hdr -Multi +LV0x4000 -E0x200 -LV0x10 -TabStop cWhite +Background" Settings.Color.Dark, "updown|filename|date", Big.QueueListViewAction.Bind(Big))
+	Big.QueueLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 25 " w" HALF_WIDTH*2 " h" EXPAND_SIZE - BUTTON_HEIGHT - 24 " AltSubmit NoSort -Hdr -Multi +LV0x4000 -E0x200 -LV0x10 -TabStop cWhite +Background" Settings.Color.Dark, "updown|filename|id", Big.QueueListViewAction.Bind(Big))
 	Big.QueueLV.CLV := new LV_Colors(Big.QueueLV.hwnd)
 	
 	Big.Font("s10")
 	
-	Big.PauseButtonHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" HALF_WIDTH " h" BUTTON_HEIGHT " Disabled", "Pause", Big.StartStopQueue.Bind(Big))
-	Big.ClearButtonHWND := Big.Add("Button", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" HALF_WIDTH " h" BUTTON_HEIGHT " Disabled", "Clear queue", Big.ClearQueue.Bind(Big))
-	;Big.ClearFailedButtonHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" TAB_WIDTH " h" BUTTON_HEIGHT " Disabled", "Clear failed items", Big.ClearFailedQueue.Bind(Big))
+	Big.PauseButtonHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" TAB_WIDTH " h" BUTTON_HEIGHT " Disabled", "Pause", Big.StartStopQueue.Bind(Big))
+	Big.ClearButtonHWND := Big.Add("Button", "x" TAB_WIDTH " y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" TAB_WIDTH " h" BUTTON_HEIGHT " Disabled", "Clear queue", Big.ClearQueue.Bind(Big))
+	Big.ClearFailedButtonHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y" TAB_HEIGHT + LV_HEIGHT + EXPAND_SIZE + 1 " w" TAB_WIDTH " h" BUTTON_HEIGHT " Disabled", "Clear failed items", Big.ClearFailedQueue.Bind(Big))
 	
 	Big.UpdateImgurList()
 	
@@ -857,10 +864,9 @@ CreateBigGUI() {
 	Big.Tab(3)
 	Big.Margin(0, 0)
 	Big.Font("s11")
+	
 	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop","desc|key|realkey", Big.BindListViewAction.Bind(Big))
-	Big.BindLV.CLV := new LV_Colors(Big.BindLV.hwnd)
-	Big.BindLV.CLV.Critical := 500
-	Big.BindLV.CLV.SelectionColors("0x" Settings.Color.Selection, "0xFFFFFF")
+	
 	Big.Font("s10")
 	
 	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Delete Keybind", Big.BindDelete.Bind(Big))
@@ -874,21 +880,24 @@ CreateBigGUI() {
 	Big.ActiveTab := Settings.GuiState.ActiveTab
 	Big.ExpandState := Settings.GuiState.ExpandState
 	
+	Big.Options("-MinimizeBox")
+	Big.SetIcon(Icon("icon"))
+	
 	if (Settings.GuiState.GameListPos > ArraySize(GameRules))
-		Big.GameListViewAction("", "C", ArraySize(GameRules))
+		Pos := ArraySize(GameRules)
 	else if !Settings.GuiState.GameListPos
-		Big.GameListViewAction("", "C", 1)
+		Pos := 1
 	else
-		Big.GameListViewAction("", "C", Settings.GuiState.GameListPos)
+		Pos := Settings.GuiState.GameListPos
+	Big.GameListViewAction("", "C", Pos)
 	
 	if (Settings.GuiState.BindListPos > ArraySize(Keybinds))
-		Big.BindListViewAction("", "C", ArraySize(Keybinds))
+		Pos := ArraySize(Keybinds)
 	else if !Settings.GuiState.BindListPos
-		Big.BindListViewAction("", "C", 1)
+		Pos := 1
 	else
-		Big.BindListViewAction("", "C", Settings.GuiState.BindListPos)
+		Pos := Settings.GuiState.BindListPos
+	Big.BindListViewAction("", "C", Pos)
 	
-	Big.LV_Colors_OnMessage(false)
-	Big.Options("-MinimizeBox")
 	return
 }

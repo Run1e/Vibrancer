@@ -7,13 +7,13 @@
 					, 6: {Desc:"Open Keybinds Tab", Func:"Open", Param:[3]}
 					, 7: {Desc:"Open Settings", Func:"Settings"}}
 	
-	Imgur :=			{ 1: {Desc:"Capture Screen", Func:"Screenshot", Param:["Full"]}
-					, 2: {Desc:"Capture Window", Func:"Screenshot", Param:["Window"]}
-					, 3: {Desc:"Capture Rectangle", Func:"Screenshot", Param:["Area"]}}
+	Imgur :=			{ 1: {Desc:"Capture/Upload Screen", Func:"Screenshot", Param:["Full"]}
+					, 2: {Desc:"Capture/Upload Window", Func:"Screenshot", Param:["Window"]}
+					, 3: {Desc:"Capture/Upload Selection", Func:"Screenshot", Param:["Area"]}}
 	
 	Multimedia :=		{ 1: {Desc:"Play/Pause", Func:"Send", Param:["{Media_Play_Pause}"]}
-					, 2: {Desc:"Next Song", Func:"Send", Param:["{Media_Next}"]}
-					, 3: {Desc:"Previous Song", Func:"Send", Param:["{Media_Prev}"]}
+					, 2: {Desc:"Next", Func:"Send", Param:["{Media_Next}"]}
+					, 3: {Desc:"Previous", Func:"Send", Param:["{Media_Prev}"]}
 					, 4: {Desc:"Volume Up", Func:"Send", Param:["{Volume_Up}"]}
 					, 5: {Desc:"Volume Down", Func:"Send", Param:["{Volume_Down}"]}
 					, 6: {Desc:"Volume Mute", Func:"Send", Param:["{Volume_Mute}"]}}
@@ -29,15 +29,21 @@
 					, 9: {Desc:"Scroll Left", Func:"Send", Param:["{WheelLeft}"]}
 					, 10:{Desc:"Scroll Right", Func:"Send", Param:["{WheelRight}"]}}
 	
-	LaunchApplication :={ 1: {Desc:"Launch Task Manager", Func:"Run", Param:["Taskmgr"]}
-					, 2: {Desc:"Launch Control Panel", Func:"Run", Param:["control"]}
-					, 3: {Desc:"Launch Command Prompt", Func:"Run", Param:["cmd"]}
-					, 4: {Desc:"Launch My Computer", Func:"Run", Param:["::{20d04fe0-3aea-1069-a2d8-08002b30309d}"]}
-					, 5: {Desc:"Launch Recycle Bin", Func:"Run", Param:["::{645ff040-5081-101b-9f08-00aa002f954e}"]}
-					, 6: {Desc:"Launch Notepad", Func:"Run", Param:["notepad"]}
-					, 7: {Desc:"Launch Registry Editor", Func:"Run", Param:["regedt32"]}
-					, 8: {Desc:"Launch Event Viewer", Func:"Run", Param:["eventvwr"]}
-					, 9: {Desc:"Launch Windows Features", Func:"Run", Param:["OptionalFeatures"]}}
+	Spotify :=		{ 1: {Desc:"Play/Pause", Func:"Spotify", Param:[0xE0000]}
+					, 2: {Desc:"Next", Func:"Spotify", Param:[0xB0000]}
+					, 3: {Desc:"Previous", Func:"Spotify", Param:[0xC0000]}
+					, 4: {Desc:"Volume Up", Func:"SpotifyItem", Param:["Playback", "Volume Up"]}
+					, 5: {Desc:"Volume Down", Func:"SpotifyItem", Param:["Playback", "Volume Down"]}}
 	
-	return {"Built-in": BuiltIn, "Imgur": Imgur, "Multimedia": Multimedia, "Mouse Function": MouseFunction, "Launch Application": LaunchApplication}
+	LaunchApplication :={ 1: {Desc:"Task Manager", Func:"Run", Param:["Taskmgr"]}
+					, 2: {Desc:"Control Panel", Func:"Run", Param:["control"]}
+					, 3: {Desc:"Command Prompt", Func:"Run", Param:["cmd"]}
+					, 4: {Desc:"My Computer", Func:"Run", Param:["::{20d04fe0-3aea-1069-a2d8-08002b30309d}"]}
+					, 5: {Desc:"Recycle Bin", Func:"Run", Param:["::{645ff040-5081-101b-9f08-00aa002f954e}"]}
+					, 6: {Desc:"Notepad", Func:"Run", Param:["notepad"]}
+					, 7: {Desc:"Registry Editor", Func:"Run", Param:["regedt32"]}
+					, 8: {Desc:"Event Viewer", Func:"Run", Param:["eventvwr"]}
+					, 9: {Desc:"Windows Features", Func:"Run", Param:["OptionalFeatures"]}}
+	
+	return {"Built-in": BuiltIn, "Imgur": Imgur, "Multimedia": Multimedia, "Mouse Function": MouseFunction, "Spotify": Spotify, "Launch Application": LaunchApplication}
 }

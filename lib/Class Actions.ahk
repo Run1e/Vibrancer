@@ -14,6 +14,18 @@
 			Error("Run() failed.", A_ThisFunc, param, true)
 	}
 	
+	Spotify(CMD) {
+		PostMessage, 0x319,, % CMD,, ahk_class SpotifyMainWindow ; 0x319 = WM_APPCOMMAND
+	}
+	
+	SpotifySend(Key) {
+		ControlSend, ahk_parent, % Key, ahk_class SpotifyMainWindow
+	}
+	
+	SpotifyItem(Top, Sub) {
+		WinMenuSelectItem, ahk_class SpotifyMainWindow, Chrome Legacy Window, % Top, % Sub
+	}
+	
 	Screenshot(Size) {
 		if (Size = "Area")
 			Capture.Rect()
@@ -23,12 +35,12 @@
 			Capture.Screen()
 	}
 	
-	; if running the clipboard fails (ie, not a file/link), it googles it
+	; if running the clipboard fails (ie, not a file/link), it googles the clipboard text
 	RunClipboard() {
 		if !StrLen(clipboard)
 			return TrayTip("Clipboard is empty!")
 		
-		if !Run(clipboard) ; running the clipboard failed, just google the contents
+		if !Run(clipboard) ; running the clipboard failed, google the contents
 			Run("https://www.google.com/#q=" HTTP.UriEncode(clipboard))
 	}
 	
