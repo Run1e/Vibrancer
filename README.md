@@ -5,12 +5,11 @@ Power Play is a Windows application which allows you to:
 - Delete and manage uploaded images
 - Easily create powerful keybinds such as multimedia controls
 
-[Download here](https://github.com/Run1e/PowerPlay/releases/latest)
- 
-
 <img src="https://i.imgur.com/hyqhjUx.png">
 <img src="https://i.imgur.com/YgIuvRg.png">
 <img src="https://i.imgur.com/0KCxFLG.png">
+
+[Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
 
 # Thanks to:
 
