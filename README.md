@@ -22,7 +22,7 @@ If you want to try the code, you'll need to create a function called client_id w
 # Thanks to:
 
 - jNizM for his [NvAPI wrapper](https://github.com/jNizM/AHK_NVIDIA_NvAPI)
-- 'just me' for his [LV_Colors class](https://github.com/AHK-just-me/Class_LV_Colors), [ImageButton class](https://github.com/AHK-just-me/Class_ImageButton) and [LV_EX library](https://autohotkey.com/boards/viewtopic.php?t=1256)
+- 'just me' for his [LV_Colors class](https://github.com/AHK-just-me/Class_LV_Colors), [ImageButton class](https://github.com/AHK-just-me/Class_ImageButton), [CtlColors class](https://github.com/AHK-just-me/Class_CtlColors) and [LV_EX library](https://autohotkey.com/boards/viewtopic.php?t=1256)
 - Coco for his [JSON class](https://github.com/cocobelgica/AutoHotkey-JSON)
 - tic for his [Gdip wrapper](https://autohotkey.com/boards/viewtopic.php?t=6517)
 - VxE for his [HTTPRequest function](https://autohotkey.com/board/topic/67989-func-httprequest-for-web-apis-ahk-b-ahk-lunicodex64/)
