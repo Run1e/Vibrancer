@@ -10,7 +10,7 @@
 <img src="https://i.imgur.com/YgIuvRg.png">
 <img src="https://i.imgur.com/0KCxFLG.png">
 
-[Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
+## [Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
 
 # Thanks to:
 
