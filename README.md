@@ -6,9 +6,9 @@
 - Delete and manage uploaded images
 - Easily create powerful keybinds such as multimedia controls
 
-<img src="https://i.imgur.com/hyqhjUx.png">
-<img src="https://i.imgur.com/YgIuvRg.png">
-<img src="https://i.imgur.com/0KCxFLG.png">
+<img src="https://i.imgur.com/3yQgCbY.png">
+<img src="https://i.imgur.com/tMfiVyf.png">
+<img src="https://i.imgur.com/ND59laF.png">
 
 ## [Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
 
