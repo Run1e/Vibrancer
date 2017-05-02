@@ -1,6 +1,6 @@
-# <img src="http://i.imgur.com/OX90ale.png"></img> Power Play
+# <img src="http://i.imgur.com/OX90ale.png"> Power Play
 
-A Windows application which allows you to:
+Power Play is a Windows application which allows you to:
 - Boost ingame vibrancy for any game/program via NVIDIA's API
 - Block alt-tab/windows key when ingame
 - Capture and upload images to imgur
