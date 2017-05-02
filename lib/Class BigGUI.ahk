@@ -497,7 +497,6 @@
 	; bug, when overwriting, it doesn't default the focus to the window
 	BindCallback(Bind := "", Key := "") {
 		
-		
 		if !IsObject(Bind) {
 			this.Enable()
 			this.Options("-AlwaysOnTop")
@@ -646,7 +645,7 @@
 			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
 		} else if (tab = 2) {
 			new Hotkey("Delete", this.ImgurDelete.Bind(this), this.ahkid)
-			Hotkey.GetKey("^z").Delete()
+			Hotkey.GetKey("^z", this.ahkid).Delete()
 		} else if (tab = 3) {
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
