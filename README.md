@@ -7,7 +7,8 @@ Power Play is a Windows application which allows you to:
 - Delete and manage uploaded images
 - Easily create powerful keybinds such as multimedia controls
 
-# [Download here](https://github.com/Run1e/PowerPlay/releases/latest)
+ # [Download here](https://github.com/Run1e/PowerPlay/releases/latest)
+ 
 
 <img src="https://i.imgur.com/hyqhjUx.png">
 <img src="https://i.imgur.com/YgIuvRg.png">
@@ -23,4 +24,4 @@ Power Play is a Windows application which allows you to:
 - Klark92 for his [FrameShadow function](https://autohotkey.com/boards/viewtopic.php?f=6&t=29117)
 - tidbit for creative help!
 
-# Written in [AutoHotkey v1.1](https://autohotkey.com/)
+# Written in [AutoHotkey_L](https://autohotkey.com/)
