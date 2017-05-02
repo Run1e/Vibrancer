@@ -1,3 +1,4 @@
+[Download here](https://github.com/Run1e/PowerPlay/releases/latest)   [Source code](https://github.com/Run1e/PowerPlay)
 # <img src="http://i.imgur.com/OX90ale.png"> Power Play
 
 Power Play is a Windows application which allows you to:
