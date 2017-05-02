@@ -1,4 +1,5 @@
-Power Play is a Windows application which allows you to:
+# Power Play
+
 - Boost ingame vibrancy for any game/program via NVIDIA's API
 - Block alt-tab/windows key when ingame
 - Capture and upload images to imgur
