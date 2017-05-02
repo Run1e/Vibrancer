@@ -489,6 +489,7 @@
 	
 	AddBind() {
 		this.Disable()
+		this.Options("+AlwaysOnTop")
 		Keybinds(false)
 		CreateNugget(this.BindCallback.Bind(this), true, this.hwnd) ; callback, hotkeycontrol, owner
 	}
@@ -498,7 +499,9 @@
 		
 		
 		if !IsObject(Bind) {
-			this.Enable(), Keybinds(true)
+			this.Enable()
+			this.Options("-AlwaysOnTop")
+			Keybinds(true)
 			return
 		}
 		
@@ -536,7 +539,7 @@
 		
 		this.BindListViewSize()
 		
-		Hotkey.GetGlobal(RealKey).Disable()
+		Hotkey.GetKey(RealKey).Disable()
 	}
 	
 	BindRegret() {
@@ -552,7 +555,7 @@
 		} else if (Info.Event = "Addition") { ; a fine one
 			Keybinds.Remove(Info.Key)
 			this.BindLV.Delete(NewPos := Info.Pos)
-			Hotkey.GetGlobal(Info.Key).Delete()
+			Hotkey.GetKey(Info.Key).Delete()
 		}
 		
 		;p(newpos, ((NewPos > Keybinds.MaxIndex()) ? Keybinds.MaxIndex() : NewPos))
@@ -643,7 +646,7 @@
 			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
 		} else if (tab = 2) {
 			new Hotkey("Delete", this.ImgurDelete.Bind(this), this.ahkid)
-			Hotkey.GetGlobal("^z").Delete()
+			Hotkey.GetKey("^z").Delete()
 		} else if (tab = 3) {
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)

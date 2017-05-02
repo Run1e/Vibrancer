@@ -29,32 +29,12 @@ To update:
 */
 
 /*
-	Queue manager features:
-	- Delete queue items (all except running queue item!)
-	- Queue errors turn red and stay around until queue manager is cleared
-	- Active queue items can be cleared, or the whole queue can be cleared
-	
 	bugs:
 	- after adding bind/game the lv isn't focused
 */
 
 /*
-- Rewrote Hotkey class based on A_AhkUser's ideas/code
-- Added custom binds for Spotify (Play/Pause, Vol Up/Down, Next/Prev Song, Seek Forwards/Backwards) (thanks, qwerty12!)
-- Re-implemented imgur error handling
-- Failed queue items can be re-entered by double-clicking on them
-- Failed queue items can be cleared
-- Improved queue handler highlighting
-- Re-added open/copy imgur link(s) buttons
-- GUI hotkeys are now context sensitive, and user hotkeys are always active (except when binding a new key)
-- Improved bind descriptions
-- Fixed UseGifv option when copying to clipboard after upload
-- Fixed GifPeriod to 200 (5fps)
-- Removed "Rebind Key" bind option
-- Added a few icons for custom menus
-- Uploader exits when failing to communicate with main script
-- Fixed ToolMsg messages
-- Many misc. fixes
+
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
@@ -162,26 +142,6 @@ p("Startup time: " QPC(false) "s")
 Autoexec := true
 return
 
-Exit() {
-	CtlColors.Free() ; free ctlcolors
-	Uploader.Free() ; close upload helper
-	Gdip_Shutdown(pToken) ; shut down gdip
-	; revoke COM objects
-	ObjRegisterActive(Plugin, "")
-	ObjRegisterActive(Uploader, "")
-
-	; destroy all imageslists and references
-	for hwnd, Instance in Gui.ImageList.Instances
-		Instance.Destroy()
-
-	; destroy all guis and references
-	for hwnd, Instance in Gui.Instances
-		Instance.Destroy()
-
-	; DllCall("USkin.dll\USkinExit")
-	ExitApp
-}
-
 p(text := "") {
 	static Handle, LastSpacer
 	if !ForceConsole && !Settings.Debug
@@ -216,6 +176,7 @@ p(text := "") {
 #Include lib\DefaultKeybinds.ahk
 #Include lib\DefaultSettings.ahk
 #Include lib\Error.ahk
+#Include lib\Exit.ahk
 #Include lib\Functions.ahk
 #Include lib\GetActionsList.ahk
 #Include lib\GetApplications.ahk

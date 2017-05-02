@@ -5,7 +5,7 @@
 	
 	SteamDir := GetSteamDir()
 	Games[SteamDir "\steamapps\common\Counter-Strike Global Offensive"].Vibrancy := 85
-	Games[SteamDir "\steamapps\common\H1Z1 King of the Kill"].Vibrancy := 65
+	Games[SteamDir "\steamapps\common\H1Z1 King of the Kill"].Vibrancy := 75
 	return Games
 }
 

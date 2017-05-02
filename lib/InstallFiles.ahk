@@ -31,8 +31,9 @@ InstallFiles() {
 	; install uploader exe if compiled and file has changed
 	if (FileSHA1("PowerPlayUploader.exe") != exe_sha) {
 		FileInstall, D:\Documents\Scripts\PowerPlay\PowerPlayUploader.exe, PowerPlayUploader.exe, 1
-		while !FileExist("PowerPlayUploader.exe")
-			sleep 50
+		if ErrorLevel {
+			Error("Failed installing Uploader script", A_ThisFunc,, true, true)
+		}
 	}
 	
 }

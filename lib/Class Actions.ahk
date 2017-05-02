@@ -96,6 +96,16 @@
 		MouseTip.Create(count)
 	}
 	
+	CopyUploaderSHA() {
+		clipboard(FileSHA1(A_ScriptDir "\PowerPlayUploader.exe"))
+		SoundBeep
+	}
+	
+	CopyIconSHA() {
+		clipboard(FileSHA1(A_ScriptDir "\icons\powerplay.ico"))
+		SoundBeep
+	}
+	
 	OpenConsole() {
 		ForceConsole := true
 		p()

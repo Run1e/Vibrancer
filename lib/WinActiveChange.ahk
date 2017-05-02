@@ -54,6 +54,6 @@ DisableRules() {
 		Loop % SysGet("MonitorCount")
 			NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index - 1)
 	
-	Hotkey.GetGlobal("LWin").Delete()
-	Hotkey.GetGlobal("!Tab").Delete()
+	Hotkey.GetKey("LWin").Delete()
+	Hotkey.GetKey("!Tab").Delete()
 }

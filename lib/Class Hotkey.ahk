@@ -1,13 +1,39 @@
-﻿; all methods return false on failure
+﻿/*
+	Class Hotkey
+	Written by: Runar "RUNIE" Borge with help from A_AhkUser
+	
+	Usage: check out the example.
+	
+	Methods:
+	__New(Key, Target [, Window, Type])		- create a new hotkey instance
+	Key		- The key to bind
+	Target	- Function referece, boundfunc or label name to run when Key is pressed
+	Window	- *OPTIONAL* The window the hotkey should be related to
+	Type		- *OPTIONAL* What context the hotkey has to the window (Active, Exist, NotActive, NotExist)
+	
+	Delete()		- Delete hotkey. Do this when you're done with the hotkey. It differs from Disable() since it releases the object the key is bound to.
+	Enable()		- Enable hotkey
+	Disable()		- Disable hotkey
+	Toggle()		- Enable/Disable toggle
+	
+	Base object methods:
+	Hotkey.GetKey(Key, Window [, Type])	- Parameters are the same as in __New() without the Target param.
+	Hotkey.DeleteAll()		- Delete all hotkeys
+	Hotkey.EnableAll()		- Enable all disabled hotkeys
+	Hotkey.DisableAll()		- Disable all enabled hotkeys
+*/
+
+; all methods return false on failure
 Class Hotkey {
 	static Keys := {} ; keep track of instances
 	static KeyEnabled := {} ; keep track of state of hotkeys
 	
-	__New(Key, Target, Win := false, Type := "Active") {
+	; create a new hotkey
+	__New(Key, Target, Window := false, Type := "Active") {
 		
 		; check input
-		if !StrLen(Win)
-			Win := false
+		if !StrLen(Window)
+			Window := false
 		if !StrLen(Key)
 			return false, ErrorLevel := 2
 		if !(Bind := IsLabel(Target) ? Target : this.CallFunc.Bind(this, Target))
@@ -17,11 +43,11 @@ Class Hotkey {
 		
 		; set values
 		this.Key := Key
-		this.Win := Win
+		this.Window := Window
 		this.Type := Type
 		
 		; enable if previously disabled
-		if (Hotkey.KeyEnabled[Type, Win, Key] = false)
+		if (Hotkey.KeyEnabled[Type, Window, Key] = false)
 			this.Apply("On")
 		
 		; bind the key
@@ -29,7 +55,7 @@ Class Hotkey {
 			return false
 		
 		this.Enabled := true ; set to enabled
-		return Hotkey.Keys[Type, Win, Key] := this
+		return Hotkey.Keys[Type, Window, Key] := this
 	}
 	
 	; 'delete' a hotkey. call this when you're done with a hotkey
@@ -38,14 +64,14 @@ Class Hotkey {
 		static JunkFunc := Func("WinActive")
 		if this.Disable()
 			if this.Apply(JunkFunc)
-				return true, Hotkey.Keys[this.Type, this.Win].Remove(this.Key)
+				return true, Hotkey.Keys[this.Type, this.Window].Remove(this.Key)
 		return false
 	}
 	
 	; enable hotkey
 	Enable() {
 		if this.Apply("On")
-			return this.Enabled := true
+			return true, this.Enabled := true
 		return false
 	}
 	
@@ -58,7 +84,7 @@ Class Hotkey {
 	
 	; toggle enabled/disabled
 	Toggle() {
-		return this.Apply(this.Enabled ? "Off" : "On")
+		return this[this.Enabled ? "Disable" : "Enable"].Call(this)
 	}
 	
 	; ===== CALLED VIA BASE OBJECT =====
@@ -78,20 +104,20 @@ Class Hotkey {
 		Hotkey.CallAll("Delete")
 	}
 	
-	; get a global hotkey from it's key name
-	GetGlobal(Key) {
-		return Hotkey.Keys["Active", false, Key]
+	; get a hotkey instance from it's properties
+	GetKey(Key, Window := false, Type := "Active") {
+		return Hotkey.Keys[Type, Window, Key]
 	}
 	
 	; ===== PRIVATE =====
 	
 	Enabled[] {
 		get {
-			return Hotkey.KeyEnabled[this.Type, this.Win, this.Key]
+			return Hotkey.KeyEnabled[this.Type, this.Window, this.Key]
 		}
 		
 		set {
-			return Hotkey.KeyEnabled[this.Type, this.Win, this.Key] := value
+			return Hotkey.KeyEnabled[this.Type, this.Window, this.Key] := value
 		}
 	}
 	
@@ -100,7 +126,7 @@ Class Hotkey {
 	}
 	
 	Apply(Label) {
-		Hotkey, % "IfWin" this.Type, % this.Win ? this.Win : ""
+		Hotkey, % "IfWin" this.Type, % this.Window ? this.Window : ""
 		if ErrorLevel
 			return false
 		Hotkey, % this.Key, % Label, UseErrorLevel
@@ -112,8 +138,8 @@ Class Hotkey {
 	CallAll(Method) {
 		Instances := []
 		for Index, Type in Hotkey.Keys
-			for Index, Win in Type
-				for Index, Htk in Win
+			for Index, Window in Type
+				for Index, Htk in Window
 					Instances.Push(Htk)
 		for Index, Instance in Instances
 			Instance[Method].Call(Instance)
