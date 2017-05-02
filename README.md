@@ -13,14 +13,6 @@ Power Play is a Windows application which allows you to:
 <img src="https://i.imgur.com/YgIuvRg.png">
 <img src="https://i.imgur.com/0KCxFLG.png">
 
-Currently WIP, installer will be avaliable at "launch".
-
-If you want to try the code, you'll need to create a function called client_id which returns your [Imgur API OAuth2.0](https://api.imgur.com/oauth2/addclient) client id as such:
-
-	client_id() {
-		return "client_id_here"
-	}
-
 # Thanks to:
 
 - jNizM for his [NvAPI wrapper](https://github.com/jNizM/AHK_NVIDIA_NvAPI)
@@ -31,4 +23,4 @@ If you want to try the code, you'll need to create a function called client_id w
 - Klark92 for his [FrameShadow function](https://autohotkey.com/boards/viewtopic.php?f=6&t=29117)
 - tidbit for creative help!
 
-# Written in [AutoHotkey_L](https://autohotkey.com/)
+# Written in [AutoHotkey v1.1](https://autohotkey.com/)
