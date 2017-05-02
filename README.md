@@ -1,5 +1,3 @@
-# <img src="http://i.imgur.com/OX90ale.png"> Power Play
-
 Power Play is a Windows application which allows you to:
 - Boost ingame vibrancy for any game/program via NVIDIA's API
 - Block alt-tab/windows key when ingame
@@ -7,7 +5,7 @@ Power Play is a Windows application which allows you to:
 - Delete and manage uploaded images
 - Easily create powerful keybinds such as multimedia controls
 
- # [Download here](https://github.com/Run1e/PowerPlay/releases/latest)
+[Download here](https://github.com/Run1e/PowerPlay/releases/latest)
  
 
 <img src="https://i.imgur.com/hyqhjUx.png">
