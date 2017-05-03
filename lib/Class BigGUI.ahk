@@ -222,7 +222,7 @@
 		
 		MsgBox, 52, Image deletion, % Selected.MaxIndex() " image" (Selected.MaxIndex()>1?"s":"") " selected.`nProceed with deletion?"
 		ifMsgBox no
-		return
+			return
 		
 		for Index, ImageIndex in Selected
 			Uploader.Delete(ImageIndex)
@@ -234,7 +234,7 @@
 		if (ArraySize(Selected) > 7) { ; display a warning at 8+ images
 			MsgBox,262196,Warning!,% "Are you sure you want to open " ArraySize(Selected) " images?"
 			ifMsgBox no
-			return
+				return
 		}
 		
 		for Index, ImageIndex in this.ImgurGetSelected() {
@@ -265,7 +265,7 @@
 		
 		Size := ArraySize(Selected)
 		
-		TrayTip("Link" (Size>1?"s":"") " copied!", (Size>1?Size " links were copied to your clipboard":clipboard))
+		TrayTip("Link" (Size>1?"s":"") " copied!", (Size>1?Size " links were copied to your clipboard.":clipboard))
 		
 		if Settings.Imgur.CloseOnCopy && StrLen(links)
 			this.Close()
@@ -341,7 +341,6 @@
 		this.GameLV.Modify(NewPos := (this.GameLV.GetCount()<Pos?this.GameLV.GetCount():Pos), "Focus Select Vis")
 		
 		if !IsObject(Prog:=GameRules.Remove(Key)) {
-			; shit
 			return
 		}
 		
@@ -415,13 +414,14 @@
 	}
 	
 	GamesGetKey() {
-		LV_GetText(Key, LV_GetNext(), 2)
-		
 		Key := this.GameLV.GetText(this.GameLV.GetNext(), 2)
 		
+		; check if key clicked
 		if (Key = "path") || !StrLen(Key)
 			return 
-		else if !IsObject(GameRules[Key])
+		
+		; check if key exists in gamerules
+		if !IsObject(GameRules[Key])
 			return Error("Key not found in GameRules Array", A_ThisFunc, "Key: " Key)
 		else
 			return Key
@@ -457,17 +457,31 @@
 	}
 	
 	GameListViewAction(Control, GuiEvent, EventInfo) {
+		static ControlsDisabled
 		if (GuiEvent = "C") || (GuiEvent = "I") {
 			Pos := (EventInfo?EventInfo:this.GameLV.GetNext())
 			if Pos {
 				Key := this.GameLV.GetText(Pos, 2)
-				if (Key = "path") || !StrLen(Key)
+				if (Key = "path") || !StrLen(Key) {
+					this.Control("Disable", "msctls_trackbar321")
+					this.Control("Disable", "Button3")
+					this.Control("Disable", "Button4")
+					ControlsDisabled := true
 					return
+				} else if ControlsDisabled {
+					if !Settings.NvAPI_InitFail
+						this.Control("Enabled", "msctls_trackbar321")
+					this.Control("Enabled", "Button3")
+					this.Control("Enabled", "Button4")
+					ControlsDisabled := false
+				}
 				this.SetText("msctls_trackbar321", GameRules[Key].Vibrancy)
 				this.SetText("Button3", GameRules[Key].BlockWinKey)
 				this.SetText("Button4", GameRules[Key].BlockAltTab)
 				Settings.GuiState.GameListPos := Pos
-			} if (GuiEvent = "C")
+			}
+			
+			if (GuiEvent = "C")
 				this.GameLV.Modify(Pos?Pos:Settings.GuiState.GameListPos, "Select Vis Focus")
 		}
 	}
@@ -475,6 +489,7 @@
 	GameListViewSize() {
 		Critical 500
 		
+		; removed width if scroll is visible
 		if ((LV_EX_GetRowHeight(this.GameLV.hwnd) * this.GameLV.GetCount()) > this.LV_HEIGHT)
 			this.GameLV.ModifyCol(1, this.HALF_WIDTH - VERT_SCROLL - 1)
 		else
@@ -496,18 +511,17 @@
 	
 	; bug, when overwriting, it doesn't default the focus to the window
 	BindCallback(Bind := "", Key := "") {
+		this.Options("-AlwaysOnTop")
 		
 		if !IsObject(Bind) {
-			this.Enable()
-			this.Options("-AlwaysOnTop")
 			Keybinds(true)
+			this.Enable()
+			this.Activate()
 			return
 		}
 		
 		Keybinds[Key] := Bind
-		
 		Keybinds(true)
-		
 		this.UpdateBindList(Key)
 		
 		Loop % this.BindLV.GetCount() {
@@ -606,7 +620,7 @@
 	
 	TabAction(Control, GuiEvent, EventInfo) {
 		this.SetDefault()
-		this.SetTab((Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3)))
+		this.SetTab(Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3))
 	}
 	
 	SetTab(tab) {
@@ -643,13 +657,21 @@
 		if (tab = 1) {
 			new Hotkey("Delete", this.GameDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
+			Hotkey.GetKey("Space", this.ahkid).Delete()
 		} else if (tab = 2) {
 			new Hotkey("Delete", this.ImgurDelete.Bind(this), this.ahkid)
+			new Hotkey("Space", this.ImgurExpandToggle.Bind(this), this.ahkid)
 			Hotkey.GetKey("^z", this.ahkid).Delete()
 		} else if (tab = 3) {
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
+			Hotkey.GetKey("Space", this.ahkid).Delete()
 		}
+	}
+	
+	SetTabColor(tab) {
+		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
+			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
 	}
 	
 	ImgurExpandToggle() {
@@ -661,11 +683,6 @@
 		this.ExpandState := Expand
 	}
 	
-	SetTabColor(tab) {
-		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
-			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
-	}
-	
 	Open(tab := "") {
 		if this.IsVisible
 			return this.Activate()
@@ -675,6 +692,7 @@
 		
 		this.SetTab(tab?tab:this.ActiveTab)
 		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
+		
 		this.SetTabColor(tab?tab:this.ActiveTab)
 		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 		
@@ -690,6 +708,12 @@
 			this.BindLV.CLV.Critical := 500
 			this.BindLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
 		}
+		
+		; fix coloration in case LV_Colors failed
+		if (this.ActiveTab = 1)
+			this.GameListViewAction("", "C", "")
+		else if (this.ActiveTab = 3)
+			this.BindListViewAction("", "C", "")
 	}
 	
 	Save() {
@@ -701,10 +725,7 @@
 	}
 	
 	Escape() {
-		if (this.ActiveTab = 2) && (this.ExpandState)
-			this.ImgurExpand(false)
-		else
-			this.Close()
+		this.Close()
 	}
 	
 	Close() {

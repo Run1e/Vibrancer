@@ -41,8 +41,13 @@
 				return
 			}
 			
-			if (this.Assignment = "Launch Website")
+			if (this.Assignment = "Launch Website") {
+				if !RegExMatch(EditText, "^(https?://|www\.)[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$") {
+					TrayTip("Keybind creation failed", "Website is not a valid URL!")
+					return
+				}
 				Bind := {Desc:"Website: " EditText, Func:"Run", Param:[EditText]}
+			}
 			
 			else if (this.Assignment = "Send Text")
 				Bind := {Desc:"Send Text: " EditText, Func:"SendRaw", Param:[EditText]}

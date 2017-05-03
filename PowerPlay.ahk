@@ -34,7 +34,9 @@ To update:
 */
 
 /*
-
+- Space now toggles the queue manager visibility
+- Added a regex to the website binding feature
+- Fixed: Alt+Z hotkey wasn't disabled in the Imgur tab
 */
 
 global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
@@ -45,7 +47,7 @@ AppName := "Power Play"
 AppVersion := [0, 9, 7]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
-ForceConsole := !A_IsCompiled && false
+ForceConsole := false
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {

@@ -227,6 +227,7 @@
 		; move the image regardless of whether saveimages is enabled or not
 		if FileExist(this.ImgurFolder "\" Image.id "." Image.extension)
 			FileMove, % this.ImgurFolder "\" Image.id "." Image.extension, % this.DeletedFolder "\" Image.id "." Image.extension
+		
 		p("del " id)
 		this.GuiRemoveImage(ID)
 		this.AddSucceed({Event: "Delete", ID: ID}) ; ID is index

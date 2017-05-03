@@ -25,25 +25,6 @@ UploadUpdate(Percent, FileSize) {
 	if (Fives > Sent)
 		CallMain("UploadUpdate", Sent := Fives)
 }
-/*
-	Res:
-	[data]
-	[error]
-	[code] => 429
-	[exception]
-	
-	[message] => You are uploading too fast. Please wait 40 more minutes.
-	[type] => ImgurException
-	[method] => POST
-	[request] => /3/image
-	[status] => 400
-	[success] => 0
-	
-	Headers:
-	[X-Post-Rate-Limit-Limit] => 1250
-	[X-Post-Rate-Limit-Remaining] => 1190
-	[X-Post-Rate-Limit-Reset] => 2355
-*/
 
 CallMain(Func, Param*) {
 	try
