@@ -1,7 +1,9 @@
 ﻿Exit() {
 	CtlColors.Free() ; free ctlcolors
 	Uploader.Free() ; close upload helper
+	
 	Gdip_Shutdown(pToken) ; shut down gdip
+	
 	; revoke COM objects
 	ObjRegisterActive(Plugin, "")
 	ObjRegisterActive(Uploader, "")
@@ -13,7 +15,6 @@
 	; destroy all guis and references
 	for hwnd, Instance in Gui.Instances
 		Instance.Destroy()
-	
-	; DllCall("USkin.dll\USkinExit")
+
 	ExitApp
 }

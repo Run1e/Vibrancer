@@ -6,6 +6,7 @@
 #NoTrayIcon
 DetectHiddenWindows On
 SetRegView 64
+SetWinDelay -1
 CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
@@ -34,8 +35,11 @@ To update:
 */
 
 /*
-- Space now toggles the queue manager visibility
-- Added a regex to the website binding feature
+- Space now toggles the queue manager visibility in the imgur tab
+- Added a regex to the website binding feature to check the URL
+- Fixed: Cursor is completely hidden now in the selection capture tool
+- Fixed: ListViews could be un-colored in specific situations (thanks 'just me' and jNizM)
+- Fixed: flickering when resetting GUI position
 - Fixed: Alt+Z hotkey wasn't disabled in the Imgur tab
 */
 
@@ -44,7 +48,7 @@ global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Bi
 QPC(true)
 
 AppName := "Power Play"
-AppVersion := [0, 9, 7]
+AppVersion := [0, 9, 71]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ForceConsole := false
@@ -107,15 +111,6 @@ JSONSave("Images", Images)
 
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
-
-/*
-	DllCall("LoadLibrary", str, A_WorkingDir "\USkin.dll")
-	DllCall("USkin.dll" . "\USkinInit", Int,0, Int,0, AStr, A_WorkingDir "\snas.msstyles")
-*/
-; milikymac
-; snas
-; pantherS
-; relapse
 
 ; create main gui
 CreateBigGUI()

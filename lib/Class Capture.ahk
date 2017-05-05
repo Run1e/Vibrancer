@@ -41,9 +41,7 @@
 		StartDrag() {
 			this.Dragging := true
 			
-			Loop
-				DllCall("ShowCursor", "int", false)
-			until !GetCursorInfo()
+			ShowCursor(false)
 			
 			MouseGetPos, x, y
 			this.sx := x, this.sy := y
@@ -57,8 +55,9 @@
 			new Hotkey("LButton Up", this.Close.Bind(this, true))
 		}
 		
+		; add a small offset so we never get a 0x0 size image
 		OnMouseMove(x, y) {
-			static Offset := 10
+			static Offset := 2
 			if this.Dragging { ; draggin
 				this.Vis.Pos(	  this.dx := (x>=this.sx?this.sx:x-Offset)
 							, this.dy := (y>=this.sy?this.sy:y-Offset)
@@ -85,13 +84,11 @@
 			this.Vis.Destroy()
 			this.Vis := ""
 			
+			ShowCursor(true)
+			
 			Cursor() ; reset cursor
 			
 			Keybinds(true)
-			
-			Loop
-				DllCall("ShowCursor", "int", true)
-			until GetCursorInfo()
 			
 			; capture
 			if Upload {
@@ -255,6 +252,24 @@
 		
 		return Name
 	}
+}
+
+; found base code somewhere, I cleaned up it *drastically*
+ShowCursor(Show) {
+	static Init := false, DefaultCurs := [], BlankCurs := []
+	static SysCurs := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649, 32650]
+	
+	if !Init {
+		VarSetCapacity(AndMask, 32*4, 0xFF)
+		VarSetCapacity(XorMask, 32*4, 0)
+		for Index, Curs in SysCurs {
+			DefaultCurs[A_Index] := DllCall("CopyImage", "Ptr", DllCall("LoadCursor", "Ptr", 0, "Ptr", Curs), "UInt", 2, "Int", 0, "Int", 0, "UInt", 0)
+			BlankCurs[A_Index] := DllCall("CreateCursor", "Ptr", 0, "Int", 0, "Int", 0, "Int", 32, "Int", 32, "Ptr", &AndMask, "Ptr", &XorMask)
+		}
+	}
+	
+	for Index, Curs in SysCurs
+		DllCall("SetSystemCursor", "Ptr", DllCall("CopyImage", "Ptr", (Show ? DefaultCurs : BlankCurs)[A_Index], "UInt", 2, "Int", 0, "Int", 0, "UInt", 0), "UInt", Curs)
 }
 
 ; https://autohotkey.com/boards/viewtopic.php?t=29793 ty jNizM

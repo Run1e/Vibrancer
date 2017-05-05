@@ -341,6 +341,7 @@
 		
 		if (this.QueueSucceed.MaxIndex() = 1) && (!this.QueueFail.MaxIndex()) { ; one succeeded item
 			Title := AppName " " AppVersionString
+			
 			if (this.QueueSucceed.1.Event = "Upload")
 				Msg := "Upload succeeded!" . RunClipboardKeybindText()
 			else
@@ -369,7 +370,7 @@
 			Msg := trim(Msg, "`n")
 		}
 		
-		TrayTip(Title, Msg)
+		this.GuiNotify(Title, Msg)
 		
 		; save images file
 		JSONSave("Images", Images)
@@ -483,8 +484,9 @@
 		this.GuiAllowFailedClear(!!this.QueueFail.MaxIndex())
 	}
 	
-	GuiNotify(ErrorTitle, ErrorDesc) {
-		TrayTip(ErrorTitle, ErrorDesc)
+	GuiNotify(Title, Msg) {
+		if !Big.IsVisible
+			TrayTip(Title, Msg)
 	}
 	
 	GuiSetStatus(Status) {

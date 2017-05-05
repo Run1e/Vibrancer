@@ -69,7 +69,7 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 		Prog.AppLV.Add("Icon" . IL.Add(StrLen(App.DisplayIcon)?App.DisplayIcon:App.InstallLocation), App.DisplayName, Index)
 	}
 	
-	Prog.Options("-MinimizeBox +Owner" Owner)
+	Prog.Options("+AlwaysOnTop -MinimizeBox +Owner" Owner)
 	Prog.Show()
 	return
 	

@@ -222,7 +222,7 @@
 		
 		MsgBox, 52, Image deletion, % Selected.MaxIndex() " image" (Selected.MaxIndex()>1?"s":"") " selected.`nProceed with deletion?"
 		ifMsgBox no
-			return
+		return
 		
 		for Index, ImageIndex in Selected
 			Uploader.Delete(ImageIndex)
@@ -234,7 +234,7 @@
 		if (ArraySize(Selected) > 7) { ; display a warning at 8+ images
 			MsgBox,262196,Warning!,% "Are you sure you want to open " ArraySize(Selected) " images?"
 			ifMsgBox no
-				return
+			return
 		}
 		
 		for Index, ImageIndex in this.ImgurGetSelected() {
@@ -294,12 +294,14 @@
 	; probably temporary (right?????)
 	AddGame() {
 		this.Disable()
+		this.Options("+AlwaysOnTop")
 		AppSelect(this.AddGameCallback.Bind(this), this.hwnd)
 	}
 	
 	AddGameCallback(Info) {
 		
 		this.Enable()
+		this.Options("-AlwaysOnTop")
 		this.Activate()
 		
 		if !IsObject(Info)
@@ -684,19 +686,30 @@
 	}
 	
 	Open(tab := "") {
-		if this.IsVisible
-			return this.Activate()
+		if this.IsVisible {
+			this.LVRedraw(false)
+			this.Activate()
+			this.LVRedraw(true)
+			return
+		}
 		
 		if SetGUI.IsVisible
 			return
 		
+		;this.Animate(0xa0000)
+		
+		this.LVRedraw(false)
+		this.Pos(A_ScreenWidth/2 - this.HALF_WIDTH, A_ScreenHeight/2 - 164, this.HALF_WIDTH*2)
 		this.SetTab(tab?tab:this.ActiveTab)
-		this.Show("x" A_ScreenWidth/2 - this.HALF_WIDTH " y" A_ScreenHeight/2 - 164 " w" this.HALF_WIDTH*2)
+		this.Show()
+		this.LVRedraw(true)
+		
+		if (this.ActiveTab = 1)
+			this.ColorScreens()
 		
 		this.SetTabColor(tab?tab:this.ActiveTab)
-		this.SetTabHotkeys(tab?tab:this.ActiveTab)
 		
-		; init CLV here because of coloring issues
+		; init CLV here
 		if !this.GameLV.CLV {
 			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)
 			this.GameLV.CLV.Critical := 500
@@ -708,12 +721,11 @@
 			this.BindLV.CLV.Critical := 500
 			this.BindLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
 		}
-		
-		; fix coloration in case LV_Colors failed
-		if (this.ActiveTab = 1)
-			this.GameListViewAction("", "C", "")
-		else if (this.ActiveTab = 3)
-			this.BindListViewAction("", "C", "")
+	}
+	
+	LVRedraw(Redraw) {
+		for Index, LV in [this.GameLV.hwnd, this.QueueLV.hwnd, this.BindLV.hwnd]
+			this.Control((Redraw ? "+" : "-") "Redraw", LV)
 	}
 	
 	Save() {
@@ -864,7 +876,7 @@ CreateBigGUI() {
 	Big.ImgurLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT + BUTTON_HEIGHT + 1 " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop +Background" Settings.Color.Dark, "empty|index", Big.ImgurListViewAction.Bind(Big))
 	Big.Font("s10")
 	
-	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH*2 " h24 +Left", " Click to view queue manager", Big.ImgurExpandToggle.Bind(Big))
+	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH*2 " h24 +Left", " Press space to view queue manager", Big.ImgurExpandToggle.Bind(Big))
 	
 	Big.Add("Button", "x" TAB_WIDTH*2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Copy link(s)", Big.ImgurCopyLinks.Bind(Big))
 	Big.Add("Button", "x" TAB_WIDTH*2 + TAB_WIDTH/2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Open link(s)", Big.ImgurOpenLinks.Bind(Big))
