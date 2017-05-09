@@ -45,8 +45,11 @@ if (A_PtrSize = 8) {
 */
 
 /*
-- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
-- Tab hotkeys change tab even though GUI is open
+	- Tab hotkeys change tab even though GUI is open
+	- Decent amounts of code cleanup
+	Reported by noname:
+	- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
+	- Testing: window capture cuts of if window off-screen
 */
 
 global AppName, AppVersion, AppVersionString ; app info
@@ -58,7 +61,7 @@ global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
 ForceConsole := false
 
 AppName := "Power Play"
-AppVersion := [0, 9, 71]
+AppVersion := [0, 9, 72]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -116,18 +119,6 @@ p("Startup time: " QPC(false) "s")
 
 Autoexec := true
 return
-
-p(text := "") {
-	static Handle, LastSpacer
-	if !ForceConsole && !Settings.Debug
-		return
-	if !Handle
-		Handle := DllCall("GetStdHandle", "UInt", (-11,DllCall("AllocConsole")), "UPtr")
-	Spacer := !!InStr(text, "`n")
-	FileOpen("CONOUT$", "w").Write((!LastSpacer&&Spacer?"`n":"") . text "`n" . (Spacer?"`n":""))
-	LastSpacer := Spacer
-	return
-}
 
 #Include lib\ApplySettings.ahk
 #Include lib\CheckForUpdates.ahk

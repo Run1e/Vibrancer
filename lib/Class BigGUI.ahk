@@ -468,6 +468,9 @@
 					this.Control("Disable", "msctls_trackbar321")
 					this.Control("Disable", "Button3")
 					this.Control("Disable", "Button4")
+					this.SetText("msctls_trackbar321", 50)
+					this.SetText("Button3", false)
+					this.SetText("Button4", false)
 					ControlsDisabled := true
 					return
 				} else if ControlsDisabled {

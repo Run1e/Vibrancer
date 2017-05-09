@@ -1,4 +1,17 @@
-﻿; removes grey border around buttons
+﻿p(text := "") {
+	static Handle, LastSpacer
+	if !ForceConsole && !Settings.Debug
+		return
+	if !Handle
+		Handle := DllCall("GetStdHandle", "UInt", (-11,DllCall("AllocConsole")), "UPtr")
+	Spacer := !!InStr(text, "`n")
+	FileOpen("CONOUT$", "w").Write((!LastSpacer&&Spacer?"`n":"") . text "`n" . (Spacer?"`n":""))
+	LastSpacer := Spacer
+	return
+}
+
+
+; removes grey border around buttons
 CtlColorBtns() {
 	static init := OnMessage(0x0135, "CtlColorBtns")
 	return DllCall("gdi32.dll\CreateSolidBrush", "uint", 0xFFFFFF, "uptr")

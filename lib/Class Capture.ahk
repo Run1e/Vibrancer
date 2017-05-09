@@ -110,10 +110,35 @@
 	}
 	
 	Window() {
-		if !(WinGetPosEx(WinActive("A"), x, y, w, h)) {
-			TrayTip("Failed getting active window position.")
-			return Error("WinGetPosEx failed", A_ThisFunc)
-		} this.Capture(x, y, w, h)
+		Mon := []
+		SysGet, MonitorCount, MonitorCount
+		Loop, %MonitorCount%
+		{
+			SysGet, Monitor, Monitor, %A_Index%
+			Mon[A_Index] := {Top:MonitorTop, Left: MonitorLeft, Bottom:MonitorBottom, Right:MonitorRight}
+		}
+		
+		Left := MonGetLow(Mon, "Left")
+		Right := MonGetHigh(Mon, "Right")
+		Top := MonGetLow(Mon, "Top")
+		Bottom := MonGetHigh(Mon, "Bottom")
+		
+		if !(WinGetPosEx(WinActive("A"), x, y, w, h))
+			return
+		
+		if (x < Left)
+			w -= Left-x, x := Left
+		if (y < Top)
+			h -= Top-y, y := Top
+		if ((x+w) > Right)
+			w -= x+w-Right
+		if ((y+h) > Bottom)
+			h -= y+h-Bottom
+		
+		if (w<0) || (h<0)
+			return
+		
+		this.Capture(x, y, w, h)
 	}
 	
 	Screen() {

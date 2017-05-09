@@ -2,8 +2,11 @@
 	File := A_WorkingDir "\data\" Name ".json"
 	
 	if !FileExist(File) {
-		Default := Default.Call()
-		FileAppend, % JSON.Dump(Default,, A_Tab), % File
+		if Default
+			DefaultObj := Default.Call()
+		else
+			DefaultObj := {}
+		FileAppend, % JSON.Dump(DefaultObj,, A_Tab), % File
 		Save := true
 	}
 	
@@ -12,8 +15,15 @@
 	catch error ; failed getting object from file, quit program
 		ErrorEx(error,, true)
 	
-	if Fill
-		FillArr(JSONobj, Default), Save := true
+	if Fill {
+		if !DefaultObj {
+			if Default
+				DefaultObj := Default.Call()
+			else
+				DefaultObj := {}
+		} FillArr(JSONobj, DefaultObj)
+		Save := true
+	}
 	
 	if Save
 		JSONSave(Name, JSONobj)
