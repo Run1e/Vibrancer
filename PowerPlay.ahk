@@ -61,7 +61,7 @@ global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
 ForceConsole := false
 
 AppName := "Power Play"
-AppVersion := [0, 9, 71]
+AppVersion := [0, 9, 72]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
