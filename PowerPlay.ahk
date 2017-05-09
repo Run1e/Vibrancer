@@ -23,13 +23,13 @@ if (A_PtrSize = 8) {
 }
 
 /*
-	[size=150]v0.9.3[/size]
-	
-	[list][/list]
-	
-	[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
-	[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
-	[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
+[size=150]v0.9.3[/size]
+
+[list][/list]
+
+[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
+[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
+[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
 */
 
 /*
@@ -45,11 +45,11 @@ if (A_PtrSize = 8) {
 */
 
 /*
-	- Tab hotkeys change tab even though GUI is open
-	- Decent amounts of code cleanup
-	Reported by noname:
-	- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
-	- Testing: window capture cuts of if window off-screen
+- Tab hotkeys change tab even though GUI is open
+- Decent amounts of code cleanup
+Reported by noname:
+- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
+- Testing: window capture cuts of if window off-screen
 */
 
 global AppName, AppVersion, AppVersionString ; app info
@@ -61,7 +61,7 @@ global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
 ForceConsole := false
 
 AppName := "Power Play"
-AppVersion := [0, 9, 72]
+AppVersion := [0, 9, 71]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -85,6 +85,9 @@ Images := JSONFile("Images")
 Uploader := new Uploader
 Plugin := new Plugin
 
+; init nvidia api wrapper
+InitNvAPI()
+
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
 
@@ -102,8 +105,6 @@ if FileExist(Icon("icon"))
 
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
-
-InitNvAPI()
 
 ; detect window activations
 DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)

@@ -860,7 +860,7 @@ CreateBigGUI() {
 	if Settings.NvAPI_InitFail { ; no nvidia card detected, grey out/disable some controls..
 		Big.Control("Disable", Big.BoostSliderHWND)
 		Big.Control("Disable", Big.DefaultSliderHWND)
-		Big.Font("c808080")
+		Big.Font("s11 c808080")
 		Big.Control("Font", "Static9")
 		Big.Font("cBlack")
 		Big.Control("Disable", "Static10")
