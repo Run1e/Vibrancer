@@ -1,18 +1,22 @@
 ﻿JSONFile(Name, Default := "", Fill := true) {
 	File := A_WorkingDir "\data\" Name ".json"
 	
-	if !FileExist(File)
+	if !FileExist(File) {
+		Default := Default.Call()
 		FileAppend, % JSON.Dump(Default,, A_Tab), % File
+		Save := true
+	}
 	
 	try
 		JSONobj := JSON.Load(FileRead(File))
 	catch error ; failed getting object from file, quit program
 		ErrorEx(error,, true)
 	
-	if Fill && IsObject(Default) {
-		FillArr(JSONobj, Default)
+	if Fill
+		FillArr(JSONobj, Default), Save := true
+	
+	if Save
 		JSONSave(Name, JSONobj)
-	}
 	
 	return JSONobj
 }
@@ -25,8 +29,8 @@ JSONSave(Name, Obj) {
 	try
 		JSONdump := JSON.Dump(Obj,, A_Tab)
 	catch error {
-		ErrorEx(error,, true)
 		FileAppend, % Contents, % File
+		ErrorEx(error,, true)
 		return
 	}
 	
@@ -34,7 +38,7 @@ JSONSave(Name, Obj) {
 }
 
 ; fill missing key/val pairs in ArrToFill, parsed over from ReferenceArr
-FillArr(ByRef FillArr, ReferenceArr, path:="") { ; RECURSIVE FUCKING GOODNESS FUCK YES
+FillArr(ByRef FillArr, ReferenceArr, path:="") {
 	if !IsObject(path)
 		path:=[]
 	for Key, Value in ReferenceArr {

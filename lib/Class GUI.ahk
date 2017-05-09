@@ -26,7 +26,7 @@
 	}
 	
 	Show(Options := "", Title := "") {
-		this.IsVisible := true
+		this.IsVisible := !InStr(Options, "Hide")
 		Gui % this.hwnd ":Show", % Options, % Title
 	}
 	
@@ -141,7 +141,7 @@
 					, ZOOM_OUT:			0x10010
 					, FADE_IN:			0xa0000
 					, FADE_OUT:			0x90000}
-					
+		
 		return DllCall("AnimateWindow", "UInt", this.hwnd, "Int", Duration, "UInt", Anims.HasKey(Type)?Anims[Type]:Type)
 	}
 	

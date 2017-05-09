@@ -1,0 +1,70 @@
+[
+	{
+		"Desc": "Data",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\data"
+		]
+	},
+	{
+		"Desc": "Images",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\images"
+		]
+	},
+	{
+		"Desc": "Logs",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\logs"
+		]
+	},
+	{
+		"Desc": "Menus",
+		"Func": "Run",
+		"Param": [
+			"D:\\Documents\\Scripts\\PowerPlay\\menus"
+		]
+	},
+	{
+		"Desc": "Reload",
+		"Func": "Reload"
+	},
+	{
+		"Desc": "Purge images",
+		"Func": "PurgeImages"
+	},
+	{
+		"Desc": "Print Keybinds",
+		"Func": "PrintKeybinds"
+	},
+	{
+		"Desc": "Print Settings",
+		"Func": "PrintSettings"
+	},
+	{
+		"Desc": "Print Headers",
+		"Func": "PrintHeaders"
+	},
+	{
+		"Desc": "Get Download Count",
+		"Func": "GetDownloadCount"
+	},
+	{
+		"Desc": "Copy Uploader SHA",
+		"Func": "CopyUploaderSHA"
+	},
+	{
+		"Desc": "Copy icon SHA",
+		"Func": "CopyIconSHA"
+	},
+	{
+		"Desc": "Open Console",
+		"Func": "OpenConsole"
+	},
+	{
+		"Desc": "ListVars",
+		"Func": "ListVars"
+	}
+]

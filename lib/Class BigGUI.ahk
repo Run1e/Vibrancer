@@ -688,6 +688,8 @@
 	Open(tab := "") {
 		if this.IsVisible {
 			this.LVRedraw(false)
+			if tab
+				this.SetTab(tab)
 			this.Activate()
 			this.LVRedraw(true)
 			return
@@ -695,8 +697,6 @@
 		
 		if SetGUI.IsVisible
 			return
-		
-		;this.Animate(0xa0000)
 		
 		this.LVRedraw(false)
 		this.Pos(A_ScreenWidth/2 - this.HALF_WIDTH, A_ScreenHeight/2 - 164, this.HALF_WIDTH*2)

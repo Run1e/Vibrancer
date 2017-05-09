@@ -15,7 +15,7 @@ CreateTrayMenu() {
 	Menus := ["Tray"]
 	
 	; menu object
-	Tray := new Menu("Tray", "TrayMenuHandler")
+	Tray := new Tray
 	
 	Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
 	Tray.Add("Settings", Actions.Settings.Bind(Actions), Icon("gear"))

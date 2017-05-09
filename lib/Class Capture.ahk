@@ -85,7 +85,6 @@
 			this.Vis := ""
 			
 			ShowCursor(true)
-			
 			Cursor() ; reset cursor
 			
 			Keybinds(true)
@@ -111,11 +110,10 @@
 	}
 	
 	Window() {
-		Pos := WinGetPos("A")
-		if !Pos {
+		if !(WinGetPosEx(WinActive("A"), x, y, w, h)) {
 			TrayTip("Failed getting active window position.")
-			return Error("Failed to get WinPos", A_ThisFunc, "ErrorLevel set by WinGetPos: " ErrorLevel)
-		} this.Capture(Pos.x, Pos.y, Pos.w, Pos.h)
+			return Error("WinGetPosEx failed", A_ThisFunc)
+		} this.Capture(x, y, w, h)
 	}
 	
 	Screen() {
@@ -124,8 +122,8 @@
 	
 	Class ScreenClass {
 		
-		static Width := A_ScreenWidth / 1.8
-		static Height := A_ScreenHeight / 1.8
+		static Width := A_ScreenWidth / 1.35
+		static Height := A_ScreenHeight / 1.35
 		static Margin := 10
 		static Outline := 2
 		static OutlineColor := 0xFFFFFFFF ; white with no transparency

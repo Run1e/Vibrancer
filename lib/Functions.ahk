@@ -127,8 +127,8 @@ RegRead(root, sub, value) {
 	return output
 }
 
+; https://autohotkey.com/board/topic/27849-solved-animated-gui-windows-causing-clipboard-set-error/
 Clipboard(clip) {
-	; https://autohotkey.com/board/topic/27849-solved-animated-gui-windows-causing-clipboard-set-error/
 	DllCall("OpenClipboard", uint, 0)
 	DllCall("EmptyClipboard")
 	DllCall("CloseClipboard")
@@ -143,21 +143,7 @@ WinGetPos(hwnd) {
 	return {x:x, y:y, w:w, h:h}
 }
 
-SetCueBanner(HWND, STRING) { ; thaaanks tidbit
-	static EM_SETCUEBANNER := 0x1501
-	if (A_IsUnicode) ; thanks just_me! http://www.autohotkey.com/community/viewtopic.php?t=81973
-		return DllCall("User32.dll\SendMessageW", "Ptr", HWND, "Uint", EM_SETCUEBANNER, "Ptr", false, "WStr", STRING)
-	else {
-		if !(HWND + 0) {
-			GuiControlGet, CHWND, HWND, %HWND%
-			HWND := CHWND
-		} VarSetCapacity(WSTRING, (StrLen(STRING) * 2) + 1)
-		DllCall("MultiByteToWideChar", UInt, 0, UInt, 0, UInt, &STRING, Int, -1, UInt, &WSTRING, Int, StrLen(STRING) + 1)
-		DllCall("SendMessageW", "UInt", HWND, "UInt", EM_SETCUEBANNER, "UInt", SHOWALWAYS, "UInt", &WSTRING)
-		return
-	}
-}
-
+; unsure who wrote the original funciton. however I cleaned it up drastically
 Cursor(Cursor := "") {
 	static Cursors := 	{ "IDC_ARROW":32512		, "IDC_IBEAM":32513	, "IDC_WAIT":32514		, "IDC_CROSS":32515
 					, "IDC_UPARROW":32516	, "IDC_SIZE":32640	, "IDC_ICON":32641		, "IDC_SIZENWSE":32642

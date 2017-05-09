@@ -34,7 +34,7 @@
 	}
 	
 	InputPastebinKey() {
-		InputBox, Key, Pastebin Developer API Key, Input your Developer API Key here:,, 280, 130
+		InputBox, Key, Pastebin Developer API Key, Input your Developer API Key here:,, 280, 130,,,,, % Settings.PastebinKey
 		if !ErrorLevel
 			Settings.PastebinKey := Key
 	}

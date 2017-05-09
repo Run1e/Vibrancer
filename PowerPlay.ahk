@@ -7,26 +7,36 @@
 DetectHiddenWindows On
 SetRegView 64
 SetWinDelay -1
+SetKeyDelay -1
 CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
+SetWorkingDir % A_ScriptDir
 OnExit("Exit")
 
+QPC(true)
+
+; only compiled and tested in 32-bit.
+if (A_PtrSize = 8) {
+	msgbox Please run this script as 32-bit.
+	ExitApp
+}
+
 /*
-[size=150]v0.9.3[/size]
-
-[list][/list]
-
-[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
-[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
-[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
+	[size=150]v0.9.3[/size]
+	
+	[list][/list]
+	
+	[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
+	[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
+	[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
 */
 
 /*
-To update:
-1. Exit PowerPlay
-2. Overwrite the old executable (PowerPlay)
-3. Launch PowerPlay
+	To update:
+	1. Exit PowerPlay
+	2. Overwrite the old executable (PowerPlay)
+	3. Launch PowerPlay
 */
 
 /*
@@ -35,79 +45,42 @@ To update:
 */
 
 /*
-- Space now toggles the queue manager visibility in the imgur tab
-- Added a regex to the website binding feature to check the URL
-- Fixed: Cursor is completely hidden now in the selection capture tool
-- Fixed: ListViews could be un-colored in specific situations (thanks 'just me' and jNizM)
-- Fixed: flickering when resetting GUI position
-- Fixed: Alt+Z hotkey wasn't disabled in the Imgur tab
+- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
+- Tab hotkeys change tab even though GUI is open
 */
 
-global NvAPI, Settings, Keybinds, AppName, AppVersion, AppVersionString, Big, Binder, GameRules, VERT_SCROLL, Actions, Images, Plugin, SetGUI, Prog, ForceConsole, Autoexec, Uploader
+global AppName, AppVersion, AppVersionString ; app info
+global Big, Binder, Settings, Prog, SetGUI ; GUI
+global Settings, Keybinds, GameRules, Images ; JSON
+global Actions, Plugin, Uploader, Tray ; objects
+global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
 
-QPC(true)
+ForceConsole := false
 
 AppName := "Power Play"
 AppVersion := [0, 9, 71]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
-ForceConsole := false
+; make necessary sub-folders
+MakeFolders()
 
-; only compiled and tested in 32-bit.
-if (A_PtrSize = 8) {
-	msgbox Please run this script as 32-bit.
-	ExitApp
-}
-
-SetWorkingDir % A_ScriptDir
-if !FileExist(A_WorkingDir "\data") {
-	FileCreateDir % A_WorkingDir "\data"
-	if ErrorLevel { ; failed creating subfolder
-		MsgBox, 48, % AppName, Unable to create necessary subfolders.`n`nPlease run PowerPlay as administrator or in a directory where it has the rights it needs (for example C:\PowerPlay\).
-		run % A_ScriptDir
-		ExitApp
-	}
-}
-
-if !FileExist(A_WorkingDir "\menus")
-	FileCreateDir % A_WorkingDir "\menus"
-
-; install necessary files, if we're uncompiled
+; if compiled, install necessary files
 if A_IsCompiled
 	InstallFiles()
 
 pToken := Gdip_Startup()
 
-Plugin := new Plugin
-Uploader := new Uploader
-
-Settings := JSONFile("Settings", DefaultSettings())
-
-if NvAPI.InitFail { ; NvAPI initialization failed, no nvidia card is installed
-	if !Settings.NvAPI_InitFail {
-		Error("NvAPI init failed, NvAPI features disabled.", A_ThisFunc, NvAPI.InitFail = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!")
-		a := Func("TrayTip").Bind(NvAPI.InitFail = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!", "Some features have been disabled.")
-		SetTimer, % a, -4000
-	} Settings.NvAPI_InitFail := NvAPI.InitFail ; NvAPI.InitFail
-}
-else if Settings.NvAPI_InitFail {
-	Settings.Remove("NvAPI_InitFail")
-	a := Func("TrayTip").Bind("NVIDIA graphics card found!", "Disabled features have been enabled.")
-	SetTimer, % a, -4000
-}
-
-JSONSave("Settings", Settings)
-
-Keybinds := JSONFile("Keybinds", DefaultKeybinds(), false)
-JSONSave("Keybinds", Keybinds)
-
+; contains user settings
+Settings := JSONFile("Settings", Func("DefaultSettings"))
+; contains keybind information
+Keybinds := JSONFile("Keybinds", Func("DefaultKeybinds"), false)
 ; contains game rules
-GameRules := JSONFile("GameRules", DefaultGameRules(), false)
-JSONSave("GameRules", GameRules)
-
+GameRules := JSONFile("GameRules", Func("DefaultGameRules"), false)
 ; contains list of uploaded imgur images
-Images := JSONFile("Images", {})
-JSONSave("Images", Images)
+Images := JSONFile("Images")
+
+Uploader := new Uploader
+Plugin := new Plugin
 
 ; get vertical scrollbar width, used in listviews
 VERT_SCROLL := SysGet(2)
@@ -127,12 +100,17 @@ if FileExist(Icon("icon"))
 Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
 
+InitNvAPI()
+
 ; detect window activations
 DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
 
 ; bind hotkeys
 Keybinds(true)
+
+if IsFunc("Custom")
+	Custom()
 
 p("Startup time: " QPC(false) "s")
 
@@ -167,6 +145,7 @@ p(text := "") {
 #Include lib\Class OnMouseMove.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class SettingsGUI.ahk
+#Include lib\Class Tray.ahk
 #Include lib\Class Uploader.ahk
 #Include lib\CreateTrayMenu.ahk
 #Include lib\DefaultGameRules.ahk
@@ -177,9 +156,11 @@ p(text := "") {
 #Include lib\Functions.ahk
 #Include lib\GetActionsList.ahk
 #Include lib\GetApplications.ahk
+#Include lib\InitNvAPI.ahk
 #Include lib\InstallFiles.ahk
 #Include lib\JSONfunctions.ahk
 #Include lib\Keybinds.ahk
+#Include lib\MakeFolders.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\WinActiveChange.ahk
@@ -198,3 +179,5 @@ p(text := "") {
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\FileSHA1.ahk
+#Include lib\third-party\SetCueBanner.ahk
+#Include lib\third-party\WinGetPosEx.ahk

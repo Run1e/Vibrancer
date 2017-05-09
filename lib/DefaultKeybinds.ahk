@@ -1,4 +1,4 @@
-﻿DefaultKeybinds(){
+﻿DefaultKeybinds() {
 	return 	{ "^Delete": 	Actions.List["Multimedia"][1]
 			, "^PgDn": 	Actions.List["Multimedia"][2]
 			, "^End": 	Actions.List["Multimedia"][3]

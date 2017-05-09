@@ -8,16 +8,9 @@
 		this.QueueSucceed := []
 		this.QueueFail := [] ; failed items go here
 		
-		this.UpdateGUI := true
-		
-		this.Folder := A_WorkingDir "\images"
-		this.ImgurFolder := this.Folder "\imgur"
-		this.DeletedFolder := this.Folder "\deleted"
-		this.LocalFolder := this.Folder "\local"
-		
-		for Index, Folder in [this.Folder, this.DeletedFolder, this.LocalFolder, this.ImgurFolder]
-			if !FileExist(Folder)
-				FileCreateDir % Folder
+		this.ImgurFolder :=  "images\imgur"
+		this.DeletedFolder := "images\deleted"
+		this.LocalFolder := "images\local"
 		
 		; setup com object
 		ObjRegisterActive(this, "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}")
@@ -82,9 +75,7 @@
 		if (this.Status = 0) {
 			p("starting queue")
 			this.SetStatus(1)
-			this.GuiAllowPause(true)
-			this.GuiAllowClear(false)
-			this.GuiAllowFailedClear(false)
+			this.GuiCheckButtons()
 			this.GuiUpdate()
 			this.StepQueue()
 		}
@@ -463,8 +454,6 @@
 	}
 	
 	GuiUpdate() {
-		if !this.UpdateGUI
-			return
 		Big.QueueLV.Delete()
 		
 		for Index, Arr in [this.Queue, this.QueueFail] {

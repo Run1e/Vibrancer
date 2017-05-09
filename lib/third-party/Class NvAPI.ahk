@@ -2,7 +2,6 @@
 {
 	static DllFile := (A_PtrSize = 8) ? "nvapi64.dll" : "nvapi.dll"
 	static hmod
-	static init := NvAPI.ClassInit()
 	static DELFunc := OnExit(ObjBindMethod(NvAPI, "_Delete"))
 	
 	static NVAPI_GENERIC_STRING_MAX   := 4096
@@ -18,7 +17,7 @@
 	{
 		if !(NvAPI.hmod := DllCall("LoadLibrary", "Str", NvAPI.DllFile, "UPtr"))
 		{
-			NvAPI.InitFail := true
+			NvAPI.InitFail := 1
 			return "Load Library Error: " A_LastError
 		}
 		if (NvStatus := DllCall(DllCall(NvAPI.DllFile "\nvapi_QueryInterface", "UInt", 0x0150E828, "CDECL UPtr"), "CDECL") != 0)

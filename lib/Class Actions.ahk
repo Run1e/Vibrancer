@@ -86,6 +86,18 @@
 		m(Hotkey.Keys)
 	}
 	
+	PurgeImages() {
+		for Index, Image in Images, Save := []
+			Save[Image.id "." Image.extension] := true
+		Loop, files, Images\imgur\*.*
+			if !Save.HasKey(A_LoopFileName)
+				FileDelete % A_LoopFileFullPath
+		FileRemoveDir, Images\local, 1
+		FileRemoveDir, Images\deleted, 1
+		FileCreateDir, Images\local
+		FileCreateDir, Images\deleted
+	}
+	
 	GetDownloadCount() {
 		static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases"
 		if !HTTP.Get(URL, Data)

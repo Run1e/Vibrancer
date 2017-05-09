@@ -4,12 +4,6 @@ InstallFiles() {
 	ico_sha := "52614380F058B92408A9125AA4EA7EE023364865"
 	exe_sha := "AA6D31F4531E7B3A91845C1ED40495C3F784E60B"
 	
-	if !FileExist("icons") 
-		FileCreateDir icons
-	
-	if !FileExist("icons\octicons")
-		FileCreateDir icons\octicons
-	
 	if (FileSHA1("icons\powerplay.ico") != ico_sha)
 		FileInstall, icons\powerplay.ico, icons\powerplay.ico
 	
@@ -33,6 +27,7 @@ InstallFiles() {
 		FileInstall, D:\Documents\Scripts\PowerPlay\PowerPlayUploader.exe, PowerPlayUploader.exe, 1
 		if ErrorLevel {
 			Error("Failed installing Uploader script", A_ThisFunc,, true, true)
+			ExitApp
 		}
 	}
 	
