@@ -12,6 +12,10 @@ Class JSONFile {
 		return this
 	}
 	
+	__Destroy() {
+		JSONFile.Instances.Remove(this)
+	}
+	
 	__Call(Func, Param*) {
 		if (JSONFile.Instances[this].HasKey(Func))
 			return JSONFile.Instances[this][Func]
@@ -23,19 +27,25 @@ Class JSONFile {
 			for Key, Val in Param.1 {
 				if (A_Index > 1)
 					Param.2.Pop()
-				HasKey := (Param.2.MaxIndex() ? this.Data()[(Param.2)*].HasKey(Key) : this.Data().HasKey(Key))
+				HasKey := (Param.2.MaxIndex() ? this.Data()[Param.2*].HasKey(Key) : this.Data().HasKey(Key))
 				Param.2.Push(Key)
 				if IsObject(Val) && HasKey
 					this.Fill(Val, Param.2), Param.2.Pop()
 				else if !HasKey
-					this.Data()[(Param.2)*] := Val
-			}
+					this.Data()[Param.2*] := Val
+			} return
 		}
 		
 		; save the json file
 		else if (Func = "Save") {
+			FileRead, Contents, % this.File()
 			FileDelete, % this.File()
-			FileAppend, % JSON.Dump(this.Data(),, A_Tab), % this.File()
+			try
+				FileAppend, % this.JSON(), % this.File()
+			catch e {
+				FileAppend, % Contents, % this.File()
+				throw e
+			} return
 		}
 		
 		; get the plain text json

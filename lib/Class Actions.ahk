@@ -75,11 +75,11 @@
 	}
 	
 	PrintSettings() {
-		m(Settings)
+		m(Settings.Data())
 	}
 	
 	PrintKeybinds() {
-		m(Keybinds)
+		m(Keybinds.Data())
 	}
 	
 	PrintHotkeys() {

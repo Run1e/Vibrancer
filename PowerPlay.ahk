@@ -22,34 +22,6 @@ if (A_PtrSize = 8) {
 	ExitApp
 }
 
-/*
-[size=150]v0.9.3[/size]
-
-[list][/list]
-
-[size=150][url=https://github.com/Run1e/PowerPlay/releases/latest]Download[/url][/size]
-[url=https://github.com/Run1e/PowerPlay]GitHub repo[/url]
-[url=https://github.com/Run1e/PowerPlay/wiki]GitHub wiki[/url]
-*/
-
-/*
-To update:
-1. Exit PowerPlay
-2. Overwrite the old executable (PowerPlay)
-3. Launch PowerPlay
-*/
-
-/*
-	bugs:
-	- after adding bind/game the lv isn't focused
-*/
-
-/*
-- Lowered gifperiod to 3fps
-Reported by noname:
-- Fixed case where JSON arrays didn't start off as objects
-*/
-
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules, Images ; JSON
@@ -73,7 +45,7 @@ pToken := Gdip_Startup()
 
 ; contains user settings
 Settings := new JSONFile("data\Settings.json")
-Settings.Fill(DefaultSettings()) ; fill missing keys
+Settings.Fill(DefaultSettings())
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
@@ -83,7 +55,7 @@ if !Keybinds.FileExist()
 ; contains game rules
 GameRules := new JSONFile("data\GameRules.json")
 if !GameRules.FileExist()
-	Keybinds.Fill(DefaultGameRules())
+	GameRules.Fill(DefaultGameRules())
 
 ; contains list of uploaded imgur images
 Images := new JSONFile("data\Images.json")
@@ -115,6 +87,8 @@ Menu, Tray, Icon ; show trayicon
 ; detect window activations
 DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
+
+WinActiveChange(32772, WinActive("A"))
 
 ; bind hotkeys
 Keybinds(true)
