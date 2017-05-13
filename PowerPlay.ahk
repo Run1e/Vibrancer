@@ -33,10 +33,10 @@ if (A_PtrSize = 8) {
 */
 
 /*
-	To update:
-	1. Exit PowerPlay
-	2. Overwrite the old executable (PowerPlay)
-	3. Launch PowerPlay
+To update:
+1. Exit PowerPlay
+2. Overwrite the old executable (PowerPlay)
+3. Launch PowerPlay
 */
 
 /*
@@ -45,11 +45,9 @@ if (A_PtrSize = 8) {
 */
 
 /*
-- Tab hotkeys change tab even though GUI is open
-- Decent amounts of code cleanup
+- Lowered gifperiod to 3fps
 Reported by noname:
-- Implemented WinGetPosEx to fix window capture getting wrong window pos/size
-- Testing: window capture cuts of if window off-screen
+- Fixed case where JSON arrays didn't start off as objects
 */
 
 global AppName, AppVersion, AppVersionString ; app info
@@ -61,7 +59,7 @@ global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
 ForceConsole := false
 
 AppName := "Power Play"
-AppVersion := [0, 9, 72]
+AppVersion := [0, 9, 73]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -74,13 +72,21 @@ if A_IsCompiled
 pToken := Gdip_Startup()
 
 ; contains user settings
-Settings := JSONFile("Settings", Func("DefaultSettings"))
+Settings := new JSONFile("data\Settings.json")
+Settings.Fill(DefaultSettings()) ; fill missing keys
+
 ; contains keybind information
-Keybinds := JSONFile("Keybinds", Func("DefaultKeybinds"), false)
+Keybinds := new JSONFile("data\Keybinds.json")
+if !Keybinds.FileExist()
+	Keybinds.Fill(DefaultKeybinds())
+
 ; contains game rules
-GameRules := JSONFile("GameRules", Func("DefaultGameRules"), false)
+GameRules := new JSONFile("data\GameRules.json")
+if !GameRules.FileExist()
+	Keybinds.Fill(DefaultGameRules())
+
 ; contains list of uploaded imgur images
-Images := JSONFile("Images")
+Images := new JSONFile("data\Images.json")
 
 Uploader := new Uploader
 Plugin := new Plugin
@@ -132,6 +138,7 @@ return
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
+#Include lib\Class JSONFile.ahk
 #Include lib\Class Menu.ahk
 #Include lib\Class MouseTip.ahk
 #Include lib\Class OnMouseMove.ahk
@@ -150,7 +157,6 @@ return
 #Include lib\GetApplications.ahk
 #Include lib\InitNvAPI.ahk
 #Include lib\InstallFiles.ahk
-#Include lib\JSONfunctions.ahk
 #Include lib\Keybinds.ahk
 #Include lib\MakeFolders.ahk
 #Include lib\MonitorSetup.ahk

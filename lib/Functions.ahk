@@ -10,6 +10,32 @@
 	return
 }
 
+; found base code somewhere, I cleaned up it *drastically*
+ShowCursor(Show) {
+	static Init := false, DefaultCurs := [], BlankCurs := []
+	static SysCurs := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649, 32650]
+	
+	if !Init {
+		VarSetCapacity(AndMask, 32*4, 0xFF)
+		VarSetCapacity(XorMask, 32*4, 0)
+		for Index, Curs in SysCurs {
+			DefaultCurs[A_Index] := DllCall("CopyImage", "Ptr", DllCall("LoadCursor", "Ptr", 0, "Ptr", Curs), "UInt", 2, "Int", 0, "Int", 0, "UInt", 0)
+			BlankCurs[A_Index] := DllCall("CreateCursor", "Ptr", 0, "Int", 0, "Int", 0, "Int", 32, "Int", 32, "Ptr", &AndMask, "Ptr", &XorMask)
+		}
+	}
+	
+	for Index, Curs in SysCurs
+		DllCall("SetSystemCursor", "Ptr", DllCall("CopyImage", "Ptr", (Show ? DefaultCurs : BlankCurs)[A_Index], "UInt", 2, "Int", 0, "Int", 0, "UInt", 0), "UInt", Curs)
+}
+
+; https://autohotkey.com/boards/viewtopic.php?t=29793 ty jNizM
+GetCursorInfo() ; https://msdn.microsoft.com/en-us/library/ms648381(v=vs.85).aspx
+{
+	NumPut(VarSetCapacity(CURSORINFO, 16 + A_PtrSize, 0), CURSORINFO, "uint")
+	if !(DllCall("user32\GetCursorInfo", "ptr", &CURSORINFO))
+		return A_LastError
+	return NumGet(CURSORINFO, 8, "ptr") ; hCursor
+}
 
 ; removes grey border around buttons
 CtlColorBtns() {
@@ -66,8 +92,18 @@ m(x*) {
 	MsgBox, 0, msgbox, % text
 }
 
-pas(array, separator:=", ", depth=5, indentLevel:="") {
-	return StrReplace(pa(array, depth, indentLevel), "`n", separator)
+pas(array, depth=5) { ; tidbit, this has saved my life
+	try {
+		lst := "{"
+		for k,v in Array {
+			lst.= k ": "oh
+			if (IsObject(v) && depth>1)
+				lst.= A_ThisFunc.(v, depth-1, indentLevel . "    ")
+			else
+				lst.=v
+			lst.=", "
+		} return rtrim(lst, ", ") "}"	
+	} return
 }
 
 as(arr) {
@@ -177,7 +213,7 @@ Cursor(Cursor := "") {
 }
 
 RunClipboardKeybindText() {
-	for Key, Bind in Keybinds
+	for Key, Bind in Keybinds.Data()
 		if (Bind.Func = "RunClipboard")
 			return "`nClipboard Keybind: " HotkeyToString(Key)
 }

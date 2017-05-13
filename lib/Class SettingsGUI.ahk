@@ -28,7 +28,7 @@
 		Settings.Imgur.CloseOnOpen := CloseOnOpen
 		Settings.Imgur.UseGifv := UseGifv
 		
-		JSONSave("Settings", Settings)
+		Settings.Save()
 		ApplySettings()
 		this.Close()
 	}

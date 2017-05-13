@@ -36,7 +36,6 @@
 	; https://autohotkey.com/boards/viewtopic.php?t=14275
 	; returns a list of imagelist icon numbers in order associated with the gif
 	AddGif(File) {
-		
 		IconList := []
 		
 		; gif bitmap

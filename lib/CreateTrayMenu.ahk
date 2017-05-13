@@ -4,7 +4,7 @@ CreateTrayMenu() {
 	
 	; contains the order of the tray menu item/submenus
 	try
-		TrayMenu := JSONFile("TrayMenu")
+		TrayMenu := new JSONFile("data\TrayMenu.json")
 	catch e
 		ErrorEx((e, e.extra := "Failed loading data\TrayMenu.json"), true)
 	
@@ -23,7 +23,7 @@ CreateTrayMenu() {
 	
 	Tray.SetDefault("Open")
 	
-	for Index, TrayObj in TrayMenu {
+	for Index, TrayObj in TrayMenu.Data() {
 		if TrayObj.HasKey("File") { ; points to another file, it's a submenu
 			
 			; load the json

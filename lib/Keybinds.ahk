@@ -8,8 +8,8 @@ Keybinds(Enable) {
 	
 	Hotkey.DeleteAll()
 	
-	if Enable
-		for Key, Bind in Keybinds ; rebind hotkeys
+	if Enable && Settings.Keybinds
+		for Key, Bind in Keybinds.Data() ; rebind hotkeys
 			new Hotkey(Key, Actions[Bind.Func].Bind(Actions, Bind.Param*))
 	
 	; enable hotkeys for active tab if main gui is open

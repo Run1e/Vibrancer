@@ -81,23 +81,19 @@
 		this.ImgurImageWidth:=124
 		this.ImgurImageHeight:=70
 		
+		if IsObject(this.ImgurLV.IL)
+			this.ImgurLV.IL.Destroy(), this.ImgurLV.IL := ""
+		
 		this.ImgurLV.IL := new CustomImageList(this.ImgurImageWidth, this.ImgurImageHeight, 0x20, 50, 5) ; custom res imagelist
 		
-		this.ImgurLV.IL.GifPeriod := 200 ; 5fps
+		this.ImgurLV.IL.GifPeriod := 333 ; 3fps
 		
 		this.ImgurLV.SetImageList(this.ImgurLV.IL.ID, true)
 		this.ImgurLV.Delete()
 		
-		New := [], Rem := []
-		for Date, Image in Images {
-			if (FileExist(Uploader.ImgurFolder "\" Image.id  "." Image.extension) != "A")
-				Rem.Push(Date)
-			else
+		for Date, Image in Images.Data(), New := []
+			if (FileExist(Uploader.ImgurFolder "\" Image.id  "." Image.extension) = "A")
 				New.Push(Date)
-		}
-		
-		for Index, Date in Rem
-			Images.Remove(Date)
 		
 		Loop % Settings.Imgur.ListViewMax
 			this.ImgurListAdd(New[New.MaxIndex() - A_Index + 1], false, false)
@@ -316,7 +312,8 @@
 			Game.Icon := Info.DisplayIcon
 		
 		GameRules[Info.InstallLocation] := Game
-		JSONSave("GameRules", GameRules)
+		
+		GameRules.Save()
 		this.UpdateGameList(Info.InstallLocation)
 		
 		Loop % this.GameLV.GetCount() {
@@ -438,7 +435,7 @@
 		this.GameLV.SetImageList(IL.ID)
 		this.GameLV.Delete()
 		
-		for Process, Info in GameRules {
+		for Process, Info in GameRules.Data() {
 			if StrLen(Info.Title)
 				Title := Info.Title
 			else
@@ -588,7 +585,7 @@
 		this.BindLV.Redraw(false)
 		this.BindLV.Delete()
 		
-		for Key, Bind in Keybinds {
+		for Key, Bind in Keybinds.Data() {
 			Pos := this.BindLV.Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
 			
 			if (Key = FocusKey)
@@ -734,9 +731,9 @@
 	Save() {
 		Settings.GuiState.ActiveTab := this.ActiveTab
 		Settings.GuiState.ExpandState := this.ExpandState
-		JSONSave("Settings", Settings)
-		JSONSave("Keybinds", Keybinds)
-		JSONSave("GameRules", GameRules)
+		Settings.Save()
+		Keybinds.Save()
+		GameRules.Save()
 	}
 	
 	Escape() {
@@ -800,7 +797,7 @@ CreateBigGUI() {
 	Big.KeybindsHWND := Big.Add("Text", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1 " 0x200 Center", "Keybinds", Big.TabAction.Bind(Big))
 	
 	; separators
-	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 0x08 w" HALF_WIDTH*2+5) ; big-ass sep
+	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 w" HALF_WIDTH*2+5 " 0x08") ; big-ass sep
 	Big.Add("Text", "x" TAB_WIDTH - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; first sep
 	Big.Add("Text", "x" TAB_WIDTH*2 - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; second sep
 	
@@ -846,9 +843,9 @@ CreateBigGUI() {
 		Big.Add("Text", "x" HALF_WIDTH+1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center", "Primary screen selected!")
 		Settings.VibrancyScreens := [SysGet("MonitorPrimary")] ; reset it so it doesn't get messed up and the user is stuck and can't change
 	} else {
-		for MonID, Mon in MonitorSetup(HALF_WIDTH - 12, 100, 4) {
+		for MonID, Mon in MonitorSetup(HALF_WIDTH - 20, 100, 4) {
 			HWND := Big.Add("Text"
-					, "x" HALF_WIDTH + 6 + Mon.X
+					, "x" HALF_WIDTH + 14 + Mon.X
 					. " y" 186 + Mon.Y
 					. " w" Mon.W
 					. " h" Mon.H
@@ -907,7 +904,7 @@ CreateBigGUI() {
 	
 	Big.Font("s10")
 	
-	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Delete Keybind", Big.BindDelete.Bind(Big))
+	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1, "Delete Keybind", Big.BindDelete.Bind(Big))
 	ImageButtonApply(Button)
 	
 	Button := Big.Add("Button", "x" HALF_WIDTH + 1 " yp w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Add a Keybind", Big.AddBind.Bind(Big))

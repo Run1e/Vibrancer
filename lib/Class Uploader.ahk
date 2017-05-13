@@ -172,6 +172,11 @@
 		
 		Images[Index] := {link:res.data.link, deletehash:res.data.deletehash, id:res.data.id, extension:extension}
 		
+		if !IsObject(Images[Index]) { ; something wrong with images arr
+			Error("Saving image object failed", A_ThisFunc, "ID: " ID "`nres:`n" pa(res), true)
+			return
+		}
+		
 		if (InStr(ID, this.LocalFolder) = 1)
 			FileMove % ID, % this.ImgurFolder "\" res.data.id "." extension
 		else
@@ -214,6 +219,11 @@
 	DeleteSuccess(ID) {
 		
 		Image := Images.Delete(ID)
+		
+		if !IsObject(Image) { ; something wrong with images arr
+			Error("Getting image object failed", A_ThisFunc, ID, true)
+			return
+		}
 		
 		; move the image regardless of whether saveimages is enabled or not
 		if FileExist(this.ImgurFolder "\" Image.id "." Image.extension)
@@ -364,7 +374,7 @@
 		this.GuiNotify(Title, Msg)
 		
 		; save images file
-		JSONSave("Images", Images)
+		Images.Save()
 		
 		; reset infos
 		this.QueueSucceed := []

@@ -7,7 +7,7 @@ WinActiveChange(wParam, hwnd) {
 	
 	WinGet, ProcessPath, ProcessPath, ahk_id %hwnd%
 	
-	for Process, Info in GameRules {
+	for Process, Info in GameRules.Data() {
 		if (SubStr(ProcessPath, 1, StrLen(Process)) = Process) { ; apply rules to any exe in the dir if only a dir is specified
 			
 			if RulesEnabled
@@ -17,7 +17,7 @@ WinActiveChange(wParam, hwnd) {
 				WinGetTitle, Title, ahk_id %hwnd%
 				GameRules[Process].Title := Title
 				Info.Title := Title
-				JSONSave("GameRules", GameRules)
+				GameRules.Save()
 				Big.UpdateGameList()
 			}
 			

@@ -87,7 +87,7 @@
 	}
 	
 	PurgeImages() {
-		for Index, Image in Images, Save := []
+		for Index, Image in Images.Data(), Save := []
 			Save[Image.id "." Image.extension] := true
 		Loop, files, Images\imgur\*.*
 			if !Save.HasKey(A_LoopFileName)
@@ -96,6 +96,13 @@
 		FileRemoveDir, Images\deleted, 1
 		FileCreateDir, Images\local
 		FileCreateDir, Images\deleted
+		Rem := []
+		for Date, Image in Images.Data() {
+			if (FileExist(Uploader.ImgurFolder "\" Image.id  "." Image.extension) != "A")
+				Rem.Push(Date)
+		} for Index, Date in Rem
+			Images.Remove(Date)
+		Images.Save()
 	}
 	
 	GetDownloadCount() {
