@@ -46,6 +46,8 @@ pToken := Gdip_Startup()
 ; contains user settings
 Settings := new JSONFile("data\Settings.json")
 Settings.Fill(DefaultSettings())
+if !Settings.FileExist()
+	Settings.Save()
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
