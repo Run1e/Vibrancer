@@ -50,15 +50,17 @@ Settings.Fill(DefaultSettings())
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
 if !Keybinds.FileExist()
-	Keybinds.Fill(DefaultKeybinds())
+	Keybinds.Fill(DefaultKeybinds()), Keybinds.Save()
 
 ; contains game rules
 GameRules := new JSONFile("data\GameRules.json")
 if !GameRules.FileExist()
-	GameRules.Fill(DefaultGameRules())
+	GameRules.Fill(DefaultGameRules()), GameRules.Save()
 
 ; contains list of uploaded imgur images
 Images := new JSONFile("data\Images.json")
+if !Images.FileExist()
+	Images.Save()
 
 Uploader := new Uploader
 Plugin := new Plugin

@@ -7,7 +7,12 @@ Class JSONFile {
 		Contents := "{}"
 		if FileExist(File)
 			FileRead, Contents, % File
-		JSONFile.Instances[this].Data := JSON.Load(Contents)
+		try
+			JSONFile.Instances[this].Data := JSON.Load(Contents)
+		catch e
+			JSONFile.Instances[this].Data := {}
+		if !IsObject(JSONFile.Instances[this].Data)
+			JSONFile.Instances[this].Data := {}
 		JSONFile.Instances[this].File := File
 		return this
 	}
