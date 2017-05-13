@@ -199,6 +199,12 @@
 							, Mon.h - this.Outline*2 + 1
 							, 0, 0, bWidth, bHeight)
 				
+				Gdip_TextToGraphics(G, MonitorID
+								, "x" Mon.x " y" Mon.y + Mon.h/2 - 56 " w" Mon.w " h" Mon.h " Centre s96 cFFFFFFFF"
+								, Settings.Font
+								, this.Width
+								, this.Height)
+				
 				Bitmaps.Push(pBitmap)
 				
 				HWND := this.Vis.Add("Text"
@@ -207,6 +213,8 @@
 								. " w" Mon.w
 								. " h" Mon.h
 								. " +Border 0x200 Center", MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
+				
+				new Hotkey(MonitorID, this.CaptureMonitor.Bind(this, MonitorID, true))
 			}
 			
 			UpdateLayeredWindow(this.Vis.hwnd, hdc

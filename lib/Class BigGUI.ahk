@@ -843,9 +843,9 @@ CreateBigGUI() {
 		Big.Add("Text", "x" HALF_WIDTH+1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center", "Primary screen selected!")
 		Settings.VibrancyScreens := [SysGet("MonitorPrimary")] ; reset it so it doesn't get messed up and the user is stuck and can't change
 	} else {
-		for MonID, Mon in MonitorSetup(HALF_WIDTH - 20, 100, 4) {
+		for MonID, Mon in MonitorSetup(HALF_WIDTH - 16, 100, 4) {
 			HWND := Big.Add("Text"
-					, "x" HALF_WIDTH + 14 + Mon.X
+					, "x" HALF_WIDTH + 8 + Mon.X
 					. " y" 186 + Mon.Y
 					. " w" Mon.W
 					. " h" Mon.H
