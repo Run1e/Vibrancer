@@ -900,7 +900,7 @@ CreateBigGUI() {
 	Big.Margin(0, 0)
 	Big.Font("s11")
 	
-	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop","desc|key|realkey", Big.BindListViewAction.Bind(Big))
+	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop", "desc|key|realkey", Big.BindListViewAction.Bind(Big))
 	
 	Big.Font("s10")
 	

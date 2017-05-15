@@ -5,8 +5,6 @@
 		this.Name := Name
 		this.Map := {}
 		Menu.Instances[Name] := this
-		if (Name = "Tray")
-			this.Clear()
 	}
 	
 	__Destroy() {
@@ -27,6 +25,16 @@
 			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
 	}
 	
+	Insert(Pos, Item := "", Target := "", Icon := "") {
+		if IsObject(Item) { ; add menu
+			Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
+		} else { ; add item
+			Menu % this.Name, Insert, % Pos, % Item, MenuHandler
+			this.Map[Item] := Target
+		} if StrLen(Icon)
+			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
+	}
+	
 	Delete(ItemName := "") {
 		Menu % this.Name, Delete, % ItemName
 	}
@@ -42,6 +50,10 @@
 	
 	Color(Color) {
 		Menu % this.Name, Color, % Color
+	}
+	
+	GetCount() {
+		return DllCall("GetMenuItemCount", "ptr", MenuGetHandle(this.Name))
 	}
 	
 	Destroy() {
@@ -73,4 +85,14 @@
 
 MenuHandler(ItemName, ItemPos, MenuName) {
 	Menu.Instances[MenuName].Map[ItemName].Call()
+}
+
+Class Tray extends Menu {
+	__New() {
+		Name := "Tray"
+		this.Name := Name
+		this.Map := {}
+		Menu.Instances[Name] := this
+		this.Clear()
+	}
 }

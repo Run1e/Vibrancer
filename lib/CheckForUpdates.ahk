@@ -1,8 +1,6 @@
 ﻿CheckForUpdates() {
 	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases/latest"
 	
-	p("Checking for updates..")
-	
 	; get github api info on the powerplay repo
 	if !HTTP.Get(URL, Data)
 		return TrayTip("Failed fetching update info")
@@ -25,7 +23,6 @@
 	
 	; keep it simple fam. for now at least
 	if NewUpdate {
-		p("Update avaliable: " GitJSON.tab_name)
 		MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to visit the download page?"
 		ifMsgBox yes
 		Run(GitJSON.html_url)

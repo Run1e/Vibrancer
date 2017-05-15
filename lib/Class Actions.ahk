@@ -18,10 +18,6 @@
 		PostMessage, 0x319,, % CMD,, ahk_class SpotifyMainWindow ; 0x319 = WM_APPCOMMAND
 	}
 	
-	SpotifySend(Key) {
-		ControlSend, ahk_parent, % Key, ahk_class SpotifyMainWindow
-	}
-	
 	SpotifyItem(Top, Sub) {
 		WinMenuSelectItem, ahk_class SpotifyMainWindow, Chrome Legacy Window, % Top, % Sub
 	}

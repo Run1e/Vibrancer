@@ -23,14 +23,12 @@
 	}
 	
 	Upload(File) {
-		p("UPLOAD: " file)
 		Info := {Event: "Upload", ID: File}
 		if FileExist(File)
 			this.AddQueue(Info)
 	}
 	
 	Delete(Index) {
-		p("DELETE: " index)
 		Info := {Event: "Delete", ID: Index, DeleteHash: Images[Index].deletehash}
 		if Images[Index]
 			this.AddQueue(Info)
@@ -39,7 +37,6 @@
 	; adds an item to the queue
 	; also starts the queue if it's idling
 	AddQueue(Info) {
-		p("adding to queue: " Info.ID)
 		this.Queue.Push(Info)
 		
 		; start queue if we're idling
@@ -73,7 +70,6 @@
 	; set to running if we're idling
 	StartQueue() {
 		if (this.Status = 0) {
-			p("starting queue")
 			this.SetStatus(1)
 			this.GuiCheckButtons()
 			this.GuiUpdate()
@@ -83,10 +79,8 @@
 	
 	; set to pause if we're running
 	StopQueue() {
-		if (this.Status = 1) {
-			p("stopping queue")
+		if (this.Status = 1)
 			this.SetStatus(2)
-		}
 	}
 	
 	StepQueue() {
@@ -118,12 +112,10 @@
 		; pass them to the worker
 		if (Info.Event = "Upload") {
 			this.Worker.Upload(Info.ID)
-			p("Uploading " Info.ID)
 		}
 		
 		else if (Info.Event = "Delete") {
 			this.Worker.Delete(Info.ID, Info.DeleteHash)
-			p("Deleting " Info.ID " (" Info.DeleteHash ")")
 		}
 	}
 	
@@ -166,7 +158,6 @@
 	
 	; successful upload
 	UploadSuccess(ID, res) {
-		
 		Index := A_Now "_" A_MSec
 		SplitPath, ID,,, extension
 		
@@ -184,12 +175,8 @@
 		
 		; add to the queuesucceed queue
 		this.AddSucceed({Event:"Upload", Index: Index, ID: ID}) ; ID is filename
-		
 		Clipboard(res.data.link . ((SubStr(res.data.link, -2) = "gif")&&Settings.Imgur.UseGifv?"v":""))
-		
 		this.GuiAddImage(Index)
-		
-		p("Uploaded successfully")
 		
 		this.AdvanceQueue()
 		this.StepQueue() ; advance in queue and continue
@@ -199,7 +186,6 @@
 	UploadFailure(ID, Error) {
 		this.AdvanceQueue()
 		this.AddFail({Event:"Upload", ID:ID}, Error)
-		p("Upload failed")
 		Error("Failed uploading image", A_ThisFunc, Error)
 	}
 	
@@ -229,11 +215,8 @@
 		if FileExist(this.ImgurFolder "\" Image.id "." Image.extension)
 			FileMove, % this.ImgurFolder "\" Image.id "." Image.extension, % this.DeletedFolder "\" Image.id "." Image.extension
 		
-		p("del " id)
 		this.GuiRemoveImage(ID)
 		this.AddSucceed({Event: "Delete", ID: ID}) ; ID is index
-		p("Deleted successfully")
-		
 		this.AdvanceQueue()
 		this.StepQueue() ; advance in queue and continue
 	}
@@ -242,9 +225,7 @@
 	DeleteFailure(ID, Error, UploadError := true) {
 		
 		this.Queue.RemoveAt(1)
-		
 		this.AddFail({Event:"Delete", ID: ID}, UploadError?"Failed connecting to imgur":Error)
-		p("Deletion failed")
 		
 		if !UploadError
 			Error("Failed deleting image", A_ThisFunc, Error)
@@ -259,8 +240,6 @@
 		
 		status := res.status
 		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
-		
-		p("IMGUR ERROR " status " " error)
 		
 		Error("Imgur threw an error", A_ThisFunc, "Error: " error "`nFile: " file "`n`nRes:`n" pa(res) "`n`nHeaders:`n" pa(this.LastHeaders))
 		
@@ -335,9 +314,7 @@
 	
 	; run when queue is paused/finished
 	FinishQueue() {
-		
-		p("finish queue")
-		
+	
 		this.SetStatus(0)
 		
 		if (this.QueueSucceed.MaxIndex() = 1) && (!this.QueueFail.MaxIndex()) { ; one succeeded item
@@ -392,7 +369,6 @@
 	*/
 	SetStatus(Status) {
 		this.Status := Status
-		p("status: " status)
 	}
 	
 	LaunchWorker() {

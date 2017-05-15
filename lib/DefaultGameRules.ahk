@@ -8,9 +8,3 @@
 	Games[SteamDir "\steamapps\common\H1Z1 King of the Kill"].Vibrancy := 75
 	return Games
 }
-
-GetSteamDir() {
-	SteamUninstall := RegRead("HKLM", "SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam", "DisplayIcon")
-	SplitPath, SteamUninstall,, SteamDir
-	return SteamDir
-}

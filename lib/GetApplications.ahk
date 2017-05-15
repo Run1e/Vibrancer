@@ -52,6 +52,12 @@ GetSteamGames() {
 	return ret
 }
 
+GetSteamDir() {
+	SteamUninstall := RegRead("HKLM", "SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam", "DisplayIcon")
+	SplitPath, SteamUninstall,, SteamDir
+	return SteamDir
+}
+
 ObjSortOverKey(obj, key) {
 	ret := []
 	for a, b in obj

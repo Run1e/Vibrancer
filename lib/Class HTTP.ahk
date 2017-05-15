@@ -20,12 +20,12 @@
 			if this.HTTP.WaitForResponse(this.Timeout) {
 				Post := this.GetData()
 				Headers := this.GetHeaders()
-				p("POST request SUCCESS`nURL: " URL "`nStatus: " Post.Status " (" Post.StatusText ")")
+				this.Log("POST request SUCCESS`nURL: " URL "`nStatus: " Post.Status " (" Post.StatusText ")")
 				return true
 			}
 		}
 		
-		p("POST request FAILED (" URL ")")
+		this.Log("POST request FAILED (" URL ")")
 		return false
 	}
 	
@@ -43,12 +43,12 @@
 			if this.HTTP.WaitForResponse(this.Timeout) {
 				OutData := this.GetData()
 				Headers := this.GetHeaders()
-				p("GET request SUCCESS`nURL: " URL "`nStatus: " OutData.Status " (" OutData.StatusText ")")
+				this.Log("GET request SUCCESS`nURL: " URL "`nStatus: " OutData.Status " (" OutData.StatusText ")")
 				return true
 			}
 		}
 		
-		p("GET request FAILED (" URL ")")
+		this.Log("GET request FAILED (" URL ")")
 		return false
 	}
 	
@@ -63,6 +63,10 @@
 	/*
 		*** INTERNAL METHODS ***
 	*/
+	
+	Log(Text) {
+		
+	}
 	
 	GetData() {
 		return 	{ ResponseText:this.HTTP.ResponseText

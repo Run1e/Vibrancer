@@ -1,12 +1,10 @@
-notes.txt
 *.exe
 backup/*
 data/*
 images/*
-menus/SteamMenu.json
 logs/*
+ignore/*
+plugins/Steam Account Switcher.ahk
+plugins/Debugger.ahk
+plugins/backup/*
 lib/client_id.ahk
-SteamLogin.ahk
-GetSHA1.ahk
-Custom.ahk
-NVIDIA Classic.ahk

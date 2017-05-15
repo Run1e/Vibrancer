@@ -1,53 +1,81 @@
-﻿
-/*
-	through this class you can interact with the program and write plugins.
-	
-	to connect to the class do:
-	pp := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
-	
-	now you can call Get, Call and the rest of the methods via the pp object
-	
-	for example to disable keybinds you can use Call to call the Keybinds function
-	pp.Call("Keybinds", false)
-	and to enable keybinds again:
-	pp.Call("Keybinds", true)
-	
-	you can also get global variables/objects with Get
-	gui := pp.Get("Big") ; this is the object for the main window
-	
-	to hide/show the main gui you can do:
-	gui.open()
-	gui.close()
-	or any other method in the BigGUI class
-	
-	should be worth noting:
-	YOU MIGHT CRASH/MESS UP THE PROGRAM BY CALLING STUFF.
-	don't fear contacting me if you want to write something, I'll help you with it.
-	
-	Email: runar-borge@hotmail.com
-	AHK Discord where I'm active: https://discord.gg/0eAZhRs7dgWmObae
-*/
-
-Class Plugin {
+﻿Class Plugin {
 	__New() {
+		this.CloseOnExit := []
 		this.CLSID := "{40677552-fdbd-444d-a9dd-6dce43b0cd56}"
 		ObjRegisterActive(this, this.CLSID)
 	}
 	
-	; get a global variable/object
-	; use listvars or the global declaration in powerplay.ahk
-	Get(ref) {
-		return _:=%ref%
+	; call if you want power play to close your plugin when it exits
+	AutoClose(hwnd) {
+		this.CloseOnExit.Push(hwnd)
+	}
+	
+	; call this when your plugin autoexec is finished. it tells powerplay to launch the next plugin
+	Finished() {
+		if !IsObject(this.NextFunc)
+			return
+		NextFunc := this.NextFunc
+		SetTimer, % NextFunc, Off
+		NextFunc.Call()
+	}
+	
+	; get a global variable
+	Get(Name) {
+		return _:=%Name%
 	}
 	
 	; call a function
-	Call(func, param*) {
-		return %func%(param*)
+	Call(Func, Param*) {
+		return %Func%(Param*)
 	}
 	
-	; print to debug console
-	p(text := "") {
-		ForceConsole := true
-		p(text)
+	; return function reference
+	Func(Name) {
+		return Func(Name)
+	}
+	
+	CreateListener(Events) {
+		return new Listener(Events)
+	}
+	
+	CreateMenu(Name) {
+		return new Menu(Name)
+	}
+	
+	TrayAdd(Name, Call := "", Icon := "") {
+		static Added, DefItemCount := 3
+		Added++
+		Tray.Insert(DefItemCount + Added "&", Name, Call, Icon)
+		if (Added = 1)
+			Tray.Insert("Exit", "")
+	}
+	
+	; === PRIVATE METHODS ===
+	
+	Event(Event, Param*) {
+		for Index, Lstn in Listener.Sessions {
+			if Lstn.List.HasKey(Event) {
+				try {
+					(Lstn.Events)[Event](Param*)
+					if Lstn.List[Event]
+						Return := true
+				}
+			}
+		} return Return
+	}
+	
+	Launch(Index) {
+		static MaxWait := 800 ; max amount of time a plugin has to declare it's finished it's autoexec
+		if (Plg := Settings.Data().Plugins[Index]) {
+			Run(A_WorkingDir "\plugins\" Plg)
+			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
+			SetTimer, % NextFunc, % "-" MaxWait
+		} else
+			this.NextFunc := ""
+	}
+	
+	Exit() {
+		for Index, hwnd in this.CloseOnExit
+			PostMessage, 0x10,,,, % "ahk_id" hwnd ; WM_CLOSE=0x10
 	}
 }

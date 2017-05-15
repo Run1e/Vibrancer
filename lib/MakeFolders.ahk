@@ -1,5 +1,5 @@
 ﻿MakeFolders() {
-	for Index, Folder in ["data", "menus", "logs", "images", "images\imgur", "images\local", "images\deleted", "icons", "icons\octicons"] {
+	for Index, Folder in ["data", "logs", "plugins", "images", "images\imgur", "images\local", "images\deleted", "icons", "icons\octicons"] {
 		if !FileExist(Folder) {
 			FileCreateDir % Folder
 			if ErrorLevel {

@@ -6,7 +6,7 @@
 		this.hwnd := hwnd
 		this.ahkid := "ahk_id" hwnd
 		this.IsVisible := false
-		Gui % this.hwnd ": -E0x10" ; disable drag-drop by default
+		this.DropFilesToggle(false) ; disable drag-drop by default
 		Gui.Instances[hwnd] := this
 		this.Controls := []
 		return this
@@ -189,7 +189,7 @@
 			return LV_GetNext(Start, Option)
 		}
 		
-		GetText(Row, Column := "") {
+		GetText(Row, Column := 1) {
 			this.SetDefault()
 			LV_GetText(Text, Row, Column)
 			return Text
@@ -242,29 +242,31 @@
 }
 
 GuiClose(GuiHwnd) {
-	(Instance := Gui.Instances[GuiHwnd]).Close.Call(Instance)
+	Gui.Instances[GuiHwnd].Close.Call(Gui.Instances[GuiHwnd])
 }
 
 GuiEscape(GuiHwnd) {
-	(Instance := Gui.Instances[GuiHwnd]).Escape.Call(Instance)
+	Gui.Instances[GuiHwnd].Escape.Call(Gui.Instances[GuiHwnd])
 }
 
 GuiSize(GuiHwnd, EventInfo, Width, Height) {
-	(Instance := Gui.Instances[GuiHwnd]).Size.Call(	  Instance
-					, EventInfo
-					, Width
-					, Height)
+	Gui.Instances[GuiHwnd].Size.Call(	  Gui.Instances[GuiHwnd]
+								, EventInfo
+								, Width
+								, Height)
 }
 
 GuiDropFiles(GuiHwnd, FileArray, CtrlHwnd, X, Y) {
-	(Instance := Gui.Instances[GuiHwnd]).DropFiles.Call(Instance, FileArray, CtrlHwnd, X, Y)
+	Gui.Instances[GuiHwnd].DropFiles.Call(	  Gui.Instances[GuiHwnd]
+									, FileArray
+									, CtrlHwnd
+									, X, Y)
 }
 
 GuiContextMenu(GuiHwnd, CtrlHwnd, EventInfo, IsRightClick, X, Y) {
-	(Instance := Gui.Instances[GuiHwnd]).ContextMenu.Call( Instance
-						, CtrlHwnd
-						, EventInfo
-						, IsRightClick
-						, X
-						, Y)
+	Gui.Instances[GuiHwnd].ContextMenu.Call(  Gui.Instances[GuiHwnd]
+									, CtrlHwnd
+									, EventInfo
+									, IsRightClick
+									, X, Y)
 }

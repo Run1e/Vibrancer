@@ -40,12 +40,12 @@
 	}
 	
 	; close gui
-	Close() {
+	Close(OpenMain := true) {
 		this.Destroy()
 		
 		SetGUI := "" ; remove global ref
 		
-		if this.OpenMainOnClose
+		if this.OpenMainOnClose && OpenMain
 			Big.Open()
 	}
 }
@@ -71,7 +71,8 @@ Settings() {
 	SetGUI.Add("Groupbox", "xm y+6 h136 w180", "Imgur")
 	
 	; bottom buttons
-	SetGUI.Add("Button",, "Check for updates", Func("CheckForUpdates"))
+	SetGUI.Add("Button", "x6 w181", "Manage Plugins", Func("OpenPluginGUI"))
+	SetGUI.Add("Button", "x6", "Check for updates", Func("CheckForUpdates"))
 	SetGUI.Add("Button", "x137 yp w50", "Save", SetGUI.Save.Bind(SetGUI))
 	
 	; power play controls

@@ -21,7 +21,7 @@ WinActiveChange(wParam, hwnd) {
 				Big.UpdateGameList()
 			}
 			
-			ApplyRules(Info), RulesEnabled := true
+			ApplyRules(Process), RulesEnabled := true
 			return
 		}
 	}
@@ -30,8 +30,11 @@ WinActiveChange(wParam, hwnd) {
 		DisableRules(), RulesEnabled := false
 }
 
-ApplyRules(Info) {
-	p("Applying game rules for " Info.Title)
+ApplyRules(Process) {
+	Info := GameRules[Process]
+	
+	if Plugin.Event("RulesEnable", Process, Info)
+		return
 	
 	if !Settings.NvAPI_InitFail
 		for Index, Screen in Settings.VibrancyScreens
@@ -48,12 +51,10 @@ scaryvoid:
 return
 
 DisableRules() {
-	p("Disabling game rules")
-	
 	if !Settings.NvAPI_InitFail
 		Loop % SysGet("MonitorCount")
 			NvAPI.SetDVCLevelEx(Settings.VibrancyDefault, A_Index - 1)
-	
+		
 	Hotkey.GetKey("LWin").Delete()
 	Hotkey.GetKey("!Tab").Delete()
 }

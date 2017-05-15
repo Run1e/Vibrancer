@@ -14,8 +14,6 @@ SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 OnExit("Exit")
 
-QPC(true)
-
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
 	msgbox Please run this script as 32-bit.
@@ -26,12 +24,10 @@ global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules, Images ; JSON
 global Actions, Plugin, Uploader, Tray ; objects
-global VERT_SCROLL, ForceConsole, AutoExec, pToken ; other
-
-ForceConsole := false
+global VERT_SCROLL, pToken ; other
 
 AppName := "Power Play"
-AppVersion := [0, 9, 73]
+AppVersion := [0, 9, 80]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -77,7 +73,12 @@ VERT_SCROLL := SysGet(2)
 CreateBigGUI()
 
 ; init menu from json file
-CreateTrayMenu()
+Tray := new Tray
+Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
+Tray.Add("Settings", Actions.Settings.Bind(Actions), Icon("gear"))
+Tray.Add()
+Tray.SetDefault("Open")
+Tray.Add("Exit", Actions.Exit.Bind(Actions), Icon("x"))
 
 ; apply/reenforce settings that do something external
 ApplySettings()
@@ -97,15 +98,9 @@ WinActiveChange(32772, WinActive("A"))
 ; bind hotkeys
 Keybinds(true)
 
-if IsFunc("Custom")
-	Custom()
-
-p("Startup time: " QPC(false) "s")
-
-Autoexec := true
+Plugin.Launch(1)
 return
 
-#Include lib\ApplySettings.ahk
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
 #Include lib\Class AppSelectGUI.ahk
@@ -121,10 +116,10 @@ return
 #Include lib\Class MouseTip.ahk
 #Include lib\Class OnMouseMove.ahk
 #Include lib\Class Plugin.ahk
+#Include lib\Class PluginGUI.ahk
 #Include lib\Class SettingsGUI.ahk
-#Include lib\Class Tray.ahk
 #Include lib\Class Uploader.ahk
-#Include lib\CreateTrayMenu.ahk
+#Include lib\Debug.ahk
 #Include lib\DefaultGameRules.ahk
 #Include lib\DefaultKeybinds.ahk
 #Include lib\DefaultSettings.ahk
@@ -142,7 +137,6 @@ return
 #Include lib\WinActiveChange.ahk
 
 #Include *i lib\client_id.ahk
-#Include *i Custom.ahk
 
 ; thanks fams
 #Include lib\third-party\Class CtlColors.ahk
@@ -157,3 +151,4 @@ return
 #Include lib\third-party\FileSHA1.ahk
 #Include lib\third-party\SetCueBanner.ahk
 #Include lib\third-party\WinGetPosEx.ahk
+#Include lib\Class Listener.ahk

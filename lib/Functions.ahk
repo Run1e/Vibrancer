@@ -1,16 +1,4 @@
-﻿p(text := "") {
-	static Handle, LastSpacer
-	if !ForceConsole && !Settings.Debug
-		return
-	if !Handle
-		Handle := DllCall("GetStdHandle", "UInt", (-11,DllCall("AllocConsole")), "UPtr")
-	Spacer := !!InStr(text, "`n")
-	FileOpen("CONOUT$", "w").Write((!LastSpacer&&Spacer?"`n":"") . text "`n" . (Spacer?"`n":""))
-	LastSpacer := Spacer
-	return
-}
-
-; found base code somewhere, I cleaned up it *drastically*
+﻿; found base code somewhere, I cleaned up it *drastically*
 ShowCursor(Show) {
 	static Init := false, DefaultCurs := [], BlankCurs := []
 	static SysCurs := [32512, 32513, 32514, 32515, 32516, 32642, 32643, 32644, 32645, 32646, 32648, 32649, 32650]
@@ -54,56 +42,22 @@ ImageButtonApply(hwnd) {
 		MsgBox, 0, ImageButton Error Btn2, % ImageButton.LastError
 }
 
-Run(file) {
-	if FileExist(file)
-		SplitPath, file,, dir
-	try
-		run, % file, % dir
-	catch e
+Run(File) {
+	if FileExist(File)
+		SplitPath, File,, Dir
+	try {
+		Run, % File, % Dir
+		return true
+	} catch e
 		return false
-	return true
 }
 
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
 		Msg := Title, Title := AppName " " AppVersionString
 	TrayTip, % Title, % Msg
-	p(title "`n" msg)
 	if Settings.ToolMsg
 		MouseTip.Create(Msg)
-}
-
-pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
-	try {
-		for k,v in Array {
-			lst.= indentLevel "[" k "]"
-			if (IsObject(v) && depth>1)
-				lst.="`n" pa(v, depth-1, indentLevel . "    ")
-			else
-				lst.=" => " v
-			lst.="`n"
-		} return rtrim(lst, "`r`n `t")	
-	} return
-}
-
-m(x*) {
-	for a, b in x
-		text .= (IsObject(b)?pa(b):b) "`n"
-	MsgBox, 0, msgbox, % text
-}
-
-pas(array, depth=5) { ; tidbit, this has saved my life
-	try {
-		lst := "{"
-		for k,v in Array {
-			lst.= k ": "oh
-			if (IsObject(v) && depth>1)
-				lst.= A_ThisFunc.(v, depth-1, indentLevel . "    ")
-			else
-				lst.=v
-			lst.=", "
-		} return rtrim(lst, ", ") "}"	
-	} return
 }
 
 as(arr) {
