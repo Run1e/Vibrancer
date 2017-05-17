@@ -21,6 +21,7 @@ InstallFiles() {
 	FileInstall, D:\Documents\Scripts\octicons\trashcan.ico, icons\octicons\trashcan.ico
 	FileInstall, D:\Documents\Scripts\octicons\book.ico, icons\octicons\book.ico
 	FileInstall, D:\Documents\Scripts\octicons\file.ico, icons\octicons\file.ico
+	FileInstall, D:\Documents\Scripts\octicons\plug.ico, icons\octicons\plug.ico
 	
 	; install uploader exe if compiled and file has changed
 	if (FileSHA1("PowerPlayUploader.exe") != exe_sha) {

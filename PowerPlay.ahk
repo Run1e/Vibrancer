@@ -23,7 +23,7 @@ if (A_PtrSize = 8) {
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules, Images ; JSON
-global Actions, Plugin, Uploader, Tray ; objects
+global Actions, Plug, Uploader, Tray ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Power Play"
@@ -75,6 +75,7 @@ CreateBigGUI()
 ; init menu from json file
 Tray := new Tray
 Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
+Tray.Add("Plugins", Actions.Plugins.Bind(Actions), Icon("plug"))
 Tray.Add("Settings", Actions.Settings.Bind(Actions), Icon("gear"))
 Tray.Add()
 Tray.SetDefault("Open")
@@ -100,6 +101,10 @@ Keybinds(true)
 
 Plugin.Launch(1)
 return
+
+Print(text, func := "") {
+	Event("Print", (func = "" ? "" : func ": ") text)
+}
 
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
@@ -151,4 +156,3 @@ return
 #Include lib\third-party\FileSHA1.ahk
 #Include lib\third-party\SetCueBanner.ahk
 #Include lib\third-party\WinGetPosEx.ahk
-#Include lib\Class Listener.ahk

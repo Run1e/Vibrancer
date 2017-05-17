@@ -85,7 +85,6 @@
 			this.ImgurLV.IL.Destroy(), this.ImgurLV.IL := ""
 		
 		this.ImgurLV.IL := new CustomImageList(this.ImgurImageWidth, this.ImgurImageHeight, 0x20, 50, 5) ; custom res imagelist
-		
 		this.ImgurLV.IL.GifPeriod := 333 ; 3fps
 		
 		this.ImgurLV.SetImageList(this.ImgurLV.IL.ID, true)
@@ -621,12 +620,12 @@
 	*/
 	
 	TabAction(Control, GuiEvent, EventInfo) {
-		this.SetDefault()
+		this.Default()
 		this.SetTab(Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3))
 	}
 	
 	SetTab(tab) {
-		this.SetDefault()
+		this.Default()
 		
 		this.ActiveTab := tab
 		this.Control("Choose", "SysTabControl321", tab)

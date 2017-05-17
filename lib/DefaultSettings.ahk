@@ -1,6 +1,5 @@
 ﻿DefaultSettings() {
-	return 	{ ToolMsg: false
-			, StartUp: true
+	return 	{ StartUp: true
 			, Keybinds: true
 			, Font: "Segoe UI Light"
 			, Color: {Selection: "44C6F6", Tab: "FE9A2E", Dark: "353535"} ; FE9A2E

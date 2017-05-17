@@ -53,6 +53,11 @@ Class JSONFile {
 			} return
 		}
 		
+		else if (Func = "Refresh") {
+			FileRead, Contents, % this.File()
+			JSONFile.Instances[this].Data := JSON.Load(Contents)
+		}
+		
 		; get the plain text json
 		else if (Func = "JSON")
 			return JSON.Dump(this.Data(),, A_Tab)

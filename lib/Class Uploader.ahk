@@ -24,14 +24,20 @@
 	
 	Upload(File) {
 		Info := {Event: "Upload", ID: File}
-		if FileExist(File)
+		if FileExist(File) {
+			if Event("UploaderUpload", File)
+				return
 			this.AddQueue(Info)
+		}
 	}
 	
 	Delete(Index) {
 		Info := {Event: "Delete", ID: Index, DeleteHash: Images[Index].deletehash}
-		if Images[Index]
+		if Images[Index] {
+			if Event("UploaderDelete", Index)
+				return
 			this.AddQueue(Info)
+		}
 	}
 	
 	; adds an item to the queue
@@ -60,11 +66,16 @@
 	
 	StartStop() {
 		if (this.Status = 1) {
+			if Event("UploaderStopQueue")
+				return
 			Uploader.StopQueue()
 			Big.Control("Disable", Big.PauseButtonHWND)
 			Big.SetText(Big.PauseButtonHWND, "Pausing..")
-		} else if (this.Status = 0) && (this.Queue.MaxIndex())
+		} else if (this.Status = 0) && (this.Queue.MaxIndex()) {
+			if Event("UploaderStartQueue")
+				return
 			this.StartQueue()
+		}
 	}
 	
 	; set to running if we're idling
@@ -79,12 +90,13 @@
 	
 	; set to pause if we're running
 	StopQueue() {
-		if (this.Status = 1)
+		if (this.Status = 1) {
 			this.SetStatus(2)
+		}
 	}
 	
 	StepQueue() {
-		p("stepping queue")
+		Print("UPLOADER: stepping queue")
 		
 		; stop if we said to stop, or if the queue is empty
 		if (this.Status = 2)
@@ -153,11 +165,13 @@
 			else ; other status code
 				this.ImgurError({Event:"Upload", ID:ID}, res)
 		} else
-			this.UploadFailure(ID, Data, true)
+			this.UploadFailure(ID, Data)
 	}
 	
 	; successful upload
 	UploadSuccess(ID, res) {
+		Event("UploaderUploadSuccess", ID, res)
+		
 		Index := A_Now "_" A_MSec
 		SplitPath, ID,,, extension
 		
@@ -175,7 +189,7 @@
 		
 		; add to the queuesucceed queue
 		this.AddSucceed({Event:"Upload", Index: Index, ID: ID}) ; ID is filename
-		Clipboard(res.data.link . ((SubStr(res.data.link, -2) = "gif")&&Settings.Imgur.UseGifv?"v":""))
+		Clipboard(res.data.link . ((SubStr(res.data.link, -2) = "gif") && Settings.Imgur.UseGifv ? "v" : ""))
 		this.GuiAddImage(Index)
 		
 		this.AdvanceQueue()
@@ -184,9 +198,11 @@
 	
 	; upload failed
 	UploadFailure(ID, Error) {
-		this.AdvanceQueue()
+		Event("UploaderUploadFailure", ID, Error)
 		this.AddFail({Event:"Upload", ID:ID}, Error)
 		Error("Failed uploading image", A_ThisFunc, Error)
+		this.AdvanceQueue()
+		this.StepQueue()
 	}
 	
 	DeleteResponse(ID, Data) {
@@ -199,10 +215,11 @@
 			else ; other status code
 				this.ImgurError({Event:"Delete", ID:ID}, res)
 		} else
-			this.DeleteFailure(ID, Data, true)
+			this.DeleteFailure(ID, Data)
 	}
 	
 	DeleteSuccess(ID) {
+		Event("UploaderDeleteSuccess", ID, res)
 		
 		Image := Images.Delete(ID)
 		
@@ -222,21 +239,17 @@
 	}
 	
 	; deletion failed
-	DeleteFailure(ID, Error, UploadError := true) {
-		
-		this.Queue.RemoveAt(1)
-		this.AddFail({Event:"Delete", ID: ID}, UploadError?"Failed connecting to imgur":Error)
-		
-		if !UploadError
-			Error("Failed deleting image", A_ThisFunc, Error)
-		else
-			this.ImgurError(Error)
-		
+	DeleteFailure(ID, Error) {
+		Event("UploaderDeleteFailure", ID, Error)
+		this.AddFail({Event:"Delete", ID: ID}, Error)
+		Error("Failed deleting image", A_ThisFunc, Error)
+		this.AdvanceQueue()
 		this.StepQueue()
 	}
 	
 	; takes an imgur error status and decides what to do
 	ImgurError(Info, res) {
+		Event("UploaderImgurError", Info, res)
 		
 		status := res.status
 		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
@@ -314,7 +327,8 @@
 	
 	; run when queue is paused/finished
 	FinishQueue() {
-	
+		Event("UploaderQueueFinished")
+		
 		this.SetStatus(0)
 		
 		if (this.QueueSucceed.MaxIndex() = 1) && (!this.QueueFail.MaxIndex()) { ; one succeeded item
@@ -348,16 +362,11 @@
 			Msg := trim(Msg, "`n")
 		}
 		
-		this.GuiNotify(Title, Msg)
-		
-		; save images file
 		Images.Save()
-		
-		; reset infos
 		this.QueueSucceed := []
-		
 		this.GuiCheckButtons()
 		this.GuiSetStatus("Queue finished!")
+		this.GuiNotify(Title, Msg)
 		this.GuiUpdate()
 	}
 	
@@ -368,13 +377,16 @@
 		3 = restarting launcher, then restart queue
 	*/
 	SetStatus(Status) {
+		Event("UploaderStatus", Status)
 		this.Status := Status
 	}
 	
 	LaunchWorker() {
+		Print("Launching upload worker")
 		Run % this.WorkerScript,, UseErrorLevel
 		if (ErrorLevel = "ERROR")
 			Error("Failed to run Uploader Helper", A_ThisFunc, this.WorkerScript " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
+		Print("Upload worker launched")
 	}
 	
 	CheckAlive() {
@@ -435,8 +447,6 @@
 	
 	UploadUpdate(per) {
 		this.GuiSetStatus(Per > 99 ? "Working.." : "Progress: " (Per) "%")
-		if Settings.ToolMsg && !Big.IsVisible
-			MouseTip.Create(Per > 99 ? "Working.." : Per "%")
 	}
 	
 	GuiUpdate() {
@@ -466,6 +476,7 @@
 	
 	GuiSetStatus(Status) {
 		Big.SetText(Big.QueueTextHWND, " " Status)
+		Event("UploaderStatusText", Status)
 	}
 	
 	GuiAllowPause(Allow) {

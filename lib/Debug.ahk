@@ -30,7 +30,3 @@ pas(array, depth=5) { ; tidbit, this has saved my life
 		} return rtrim(lst, ", ") "}"	
 	} return
 }
-
-p(x:="") {
-	
-}

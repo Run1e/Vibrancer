@@ -55,9 +55,9 @@ Run(File) {
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
 		Msg := Title, Title := AppName " " AppVersionString
+	if Func("Event").Call("TrayTip", Title, Msg)
+		return
 	TrayTip, % Title, % Msg
-	if Settings.ToolMsg
-		MouseTip.Create(Msg)
 }
 
 as(arr) {
@@ -70,7 +70,7 @@ ArraySize(arr) {
 
 QPC(R := 0) { ; By SKAN, http://goo.gl/nf7O4G, CD:01/Sep/2014 | MD:01/Sep/2014
 	static P := 0, F := 0, Q := DllCall("QueryPerformanceFrequency", "Int64P", F)
-	return !DllCall("QueryPerformanceCounter", "Int64P" , Q) + (R ? (P:=Q)/F : (Q-P)/F) 
+	return !DllCall("QueryPerformanceCounter", "Int64P" , Q) + (R ? (P:=Q)/F : (Q-P)/F)
 }
 
 SysGet(sub, param3 := "") {
@@ -170,4 +170,8 @@ RunClipboardKeybindText() {
 	for Key, Bind in Keybinds.Data()
 		if (Bind.Func = "RunClipboard")
 			return "`nClipboard Keybind: " HotkeyToString(Key)
+}
+
+reload() {
+	reload
 }

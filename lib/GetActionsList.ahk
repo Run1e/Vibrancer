@@ -5,7 +5,8 @@
 					, 4: {Desc:"Open Games Tab", Func:"Open", Param:[1]}
 					, 5: {Desc:"Open Imgur Tab", Func:"Open", Param:[2]}
 					, 6: {Desc:"Open Keybinds Tab", Func:"Open", Param:[3]}
-					, 7: {Desc:"Open Settings", Func:"Settings"}}
+					, 7: {Desc:"Open Settings", Func:"Settings"}
+					, 8: {Desc:"Open Plugins", Func:"Plugins"}}
 	
 	Imgur :=			{ 1: {Desc:"Capture/Upload Screen", Func:"Screenshot", Param:["Full"]}
 					, 2: {Desc:"Capture/Upload Window", Func:"Screenshot", Param:["Window"]}

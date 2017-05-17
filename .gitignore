@@ -4,7 +4,9 @@ data/*
 images/*
 logs/*
 ignore/*
+lib/AutoHotkey.exe
 plugins/Steam Account Switcher.ahk
 plugins/Debugger.ahk
 plugins/backup/*
+plugins/pluginlib/backup/*
 lib/client_id.ahk

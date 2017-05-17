@@ -17,22 +17,36 @@
 	
 	Add(Item := "", Target := "", Icon := "") {
 		if IsObject(Item) { ; add menu
-			Menu % this.Name, Add, % Item.Name, % ":" Item.Name
+			try
+				Menu % this.Name, Add, % Item.Name, % ":" Item.Name
+			catch e
+				return false
 		} else { ; add item
-			Menu % this.Name, Add, % Item, MenuHandler
+			try
+				Menu % this.Name, Add, % Item, MenuHandler
+			catch e
+				return false
 			this.Map[Item] := Target
 		} if StrLen(Icon)
 			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
+		return true
 	}
 	
 	Insert(Pos, Item := "", Target := "", Icon := "") {
 		if IsObject(Item) { ; add menu
-			Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
+			try
+				Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
+			catch e
+				return false
 		} else { ; add item
-			Menu % this.Name, Insert, % Pos, % Item, MenuHandler
+			try
+				Menu % this.Name, Insert, % Pos, % Item, MenuHandler
+			catch e
+				return false
 			this.Map[Item] := Target
 		} if StrLen(Icon)
 			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
+		return true
 	}
 	
 	Delete(ItemName := "") {

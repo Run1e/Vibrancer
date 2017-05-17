@@ -2,7 +2,7 @@
 	DropFiles(FileArray, CtrlHwnd, X, Y) {
 		for Index, File in FileArray {
 			SplitPath, File, FileName,, Ext
-			if !(Ext ~= "^(exe|ahk)$")
+			if (Ext != "ahk")
 				continue
 			FileMove, % File, % "plugins\" FileName
 			Update := true
@@ -21,7 +21,7 @@
 			MsgBox,68,Run plugin?,Do you want to run %Plg%?
 			ifMsgBox no
 			return
-			Run(A_WorkingDir "\plugins\" this.LV.GetText(this.LV.GetNext()))
+			Run(A_WorkingDir "\plugins\" this.LV.GetText(this.LV.GetNext()) ".ahk")
 		}
 	}
 	
@@ -38,39 +38,41 @@
 	
 	SetList() {
 		i:=0, Checked := {}
+		
 		while i:=this.LV.GetNext(i, "Checked")
 			Checked.Push(this.LV.GetText(i))
+		
+		
 		if !Checked.MaxIndex() {
 			if !Settings.Plugins.MaxIndex()
 				return
 			Settings.Plugins := {}
 			this.UpdatePluginList()
 			return
-		} for Index, Plg in Checked
+		}
+		
+		for Index, Plg in Checked {
 			if (Settings.Data().Plugins[index] != Plg) || (Settings.Plugins.MaxIndex() > Checked.MaxIndex()) {
 				Settings.Plugins := Checked
 				this.UpdatePluginList(this.LV.GetNext())
 				return
 			}
+		}
 	}
 	
 	UpdatePluginList(Select := 1) {
 		this.LV.Delete()
 		
 		for Index, Plg in Settings.Plugins, Added := [] {
-			if !FileExist("plugins\" Plg) {
+			if !FileExist("plugins\" Plg ".ahk") {
 				Settings.Plugins.RemoveAt(Index)
 				continue
 			} this.LV.Add("Check1", Plg), Added[Plg] := ""
 		}
 		
 		Loop, Files, plugins\*.ahk
-			if !Added.HasKey(A_LoopFileName)
-				this.LV.Add("Check0", A_LoopFileName)
-		
-		Loop, Files, plugins\*.exe
-			if !Added.HasKey(A_LoopFileName)
-				this.LV.Add("Check0", A_LoopFileName)
+			if !Added.HasKey(File := rtrim(A_LoopFileName, ".ahk"))
+				this.LV.Add("Check0", File)
 		
 		if Select
 			this.LV.Modify(Select, "Select Vis")
@@ -93,7 +95,7 @@
 }
 
 ; game: how many variations of "plugin" can I come up with?
-OpenPluginGUI() {
+Plugins() {
 	
 	if IsObject(Plug)
 		return
@@ -125,7 +127,7 @@ OpenPluginGUI() {
 	Plug.Add("Button", "x145 yp w72 h" BUTTON_HEIGHT, "Move down", Plug.Move.Bind(Plug, 1))
 	
 	Plug.Add("Button", "x6 yp+30 w" WIDTH/2 - 6 " h" BUTTON_HEIGHT, "Open plugin folder", Plug.OpenFolder.Bind(Plug))
-	Plug.Add("Button", "x" WIDTH/2 + 3 " yp w" WIDTH/2 - 6 " h" BUTTON_HEIGHT, "Apply changes", Plug.Restart.Bind(Plug))
+	Plug.Add("Button", "x" WIDTH/2 + 3 " yp w" WIDTH/2 - 6 " h" BUTTON_HEIGHT, "Apply (reload)", Plug.Restart.Bind(Plug))
 	
 	Plug.Show("w" WIDTH " h" HEIGHT)
 }

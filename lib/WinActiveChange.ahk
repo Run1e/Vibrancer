@@ -26,14 +26,16 @@ WinActiveChange(wParam, hwnd) {
 		}
 	}
 	
-	if RulesEnabled ; no windows matched, disable rules
-		DisableRules(), RulesEnabled := false
+	if RulesEnabled {
+		if !Event("RulesDisable")
+			DisableRules(), RulesEnabled := false
+	}
 }
 
 ApplyRules(Process) {
 	Info := GameRules[Process]
 	
-	if Plugin.Event("RulesEnable", Process, Info)
+	if Event("RulesEnable", Process, Info)
 		return
 	
 	if !Settings.NvAPI_InitFail
@@ -41,14 +43,11 @@ ApplyRules(Process) {
 			NvAPI.SetDVCLevelEx(Info.Vibrancy, Screen - 1)
 	
 	if Info.BlockWinKey
-		new Hotkey("LWin", "scaryvoid")
+		new Hotkey("LWin", "")
 	
 	if Info.BlockAltTab
-		new Hotkey("!Tab", "scaryvoid")
+		new Hotkey("!Tab", "")
 }
-
-scaryvoid:
-return
 
 DisableRules() {
 	if !Settings.NvAPI_InitFail

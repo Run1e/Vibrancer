@@ -14,7 +14,7 @@
 		this.Destroy()
 		
 		if IsObject(Info)
-			p("Prog callback:`n" pa(Info))
+			Print(Info)
 		
 		this.Callback.Call(Info)
 		
@@ -37,7 +37,7 @@
 AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog := new AppSelectGUI("Select an application")
 	
-	Prog.SetDefault()
+	Prog.Default()
 	
 	Prog.Font("s10", Settings.Font)
 	Prog.Color("FFFFFF", "FFFFFF")

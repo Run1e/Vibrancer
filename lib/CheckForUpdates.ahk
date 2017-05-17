@@ -27,7 +27,7 @@
 		ifMsgBox yes
 		Run(GitJSON.html_url)
 	} else
-		TrayTip("You're up to date!"), p("Program up to date.")
+		TrayTip("You're up to date!")
 	
 	return
 }

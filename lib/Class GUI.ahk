@@ -35,8 +35,14 @@
 		Gui % this.hwnd ":Hide", % Options
 	}
 	
-	SetDefault() {
-		Gui % this.hwnd ":Default"
+	Default() {
+		if (A_DefaultGui != this.hwnd)
+			Gui % this.hwnd ":Default"
+	}
+	
+	DefaultListView(hwnd) {
+		if (A_DefaultListView != hwnd)
+			Gui % this.hwnd ":ListView", % hwnd
 	}
 	
 	Activate() {
@@ -216,8 +222,8 @@
 		}
 		
 		SetDefault() {
-			this.Parent.SetDefault()
-			this.Parent.Options("ListView", this.hwnd)
+			this.Parent.Default()
+			this.Parent.DefaultListView(this.hwnd)
 		}
 	}
 	

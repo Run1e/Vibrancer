@@ -1,7 +1,14 @@
 ﻿Class Plugin {
 	__New() {
+		this.Listeners := []
 		this.CloseOnExit := []
 		this.CLSID := "{40677552-fdbd-444d-a9dd-6dce43b0cd56}"
+		
+		this.AppName := AppName
+		this.Version := AppVersion
+		this.VersionString := AppVersionString
+		this.Directory := A_WorkingDir
+		
 		ObjRegisterActive(this, this.CLSID)
 	}
 	
@@ -34,8 +41,8 @@
 		return Func(Name)
 	}
 	
-	CreateListener(Events) {
-		return new Listener(Events)
+	AddListener(hwnd) {
+		return (this.Listeners[hwnd] := {})
 	}
 	
 	CreateMenu(Name) {
@@ -43,31 +50,36 @@
 	}
 	
 	TrayAdd(Name, Call := "", Icon := "") {
-		static Added, DefItemCount := 3
+		static Added := 1, DefItemCount := 4
+		if !Tray.Insert(DefItemCount + Added "&", Name, Call, Icon)
+			return
 		Added++
-		Tray.Insert(DefItemCount + Added "&", Name, Call, Icon)
-		if (Added = 1)
+		if (Added = 2)
 			Tray.Insert("Exit", "")
 	}
 	
 	; === PRIVATE METHODS ===
 	
 	Event(Event, Param*) {
-		for Index, Lstn in Listener.Sessions {
-			if Lstn.List.HasKey(Event) {
+		for Listener, Events in this.Listeners {
+			if Events.HasKey(Event) {
 				try {
-					(Lstn.Events)[Event](Param*)
-					if Lstn.List[Event]
+					Listener.OnEvent(Event, Param*) ; fails here if plugin has exited
+					if Events[Event]
 						Return := true
-				}
+				} catch e
+					this.Listeners.Delete(Listener)
 			}
 		} return Return
 	}
 	
 	Launch(Index) {
-		static MaxWait := 800 ; max amount of time a plugin has to declare it's finished it's autoexec
+		static MaxWait := 800 ; max amount of time a plugin has to declare it has finished its autoexec
 		if (Plg := Settings.Data().Plugins[Index]) {
-			Run(A_WorkingDir "\plugins\" Plg)
+			if A_IsCompiled {
+				;Run()
+			} else
+				Run(A_WorkingDir "\plugins\" Plg ".ahk")
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
 			SetTimer, % NextFunc, % "-" MaxWait
 		} else
@@ -78,4 +90,8 @@
 		for Index, hwnd in this.CloseOnExit
 			PostMessage, 0x10,,,, % "ahk_id" hwnd ; WM_CLOSE=0x10
 	}
+}
+
+Event(Event, Param*) {
+	return Plugin.Event(Event, Param*)
 }

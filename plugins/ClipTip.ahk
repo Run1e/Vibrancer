@@ -4,14 +4,17 @@
 #NoTrayIcon
 SetBatchLines -1
 
+#Include pluginlib\PowerPlay.ahk
+
 #Include ..\lib\Class OnMouseMove.ahk
 #Include ..\lib\Class MouseTip.ahk
 
 global MaxLen := 30
 global MaxLines := 4
 
-Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
-Power.AutoClose(A_ScriptHwnd)
+if !Power := PowerPlay()
+	ExitApp
+
 OnClipboardChange("ClipTip")
 Power.Finished()
 return
