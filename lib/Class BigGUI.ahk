@@ -629,10 +629,13 @@
 	SetTab(tab) {
 		this.Default()
 		
+		if Event("GuiSetTab", tab)
+			return
+		
 		this.Control("Choose", "SysTabControl321", tab)
 		
-		this.SetTabColor(tab)
 		this.SetTabHotkeys(tab)
+		this.SetTabColor(tab)
 		
 		this.ActiveTab := tab
 		
@@ -674,34 +677,11 @@
 	}
 	
 	SetTabColor(tab) {
-		static NORMAL, SELECTED
-		
-		if !NORMAL {
-			;bordermix := hexblend(0xFFFFFF, int2hex(Settings.Color.Tab))
-			bordermix := 0xFFEEEEEE ;CK
-			NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0x80FFFFFF, 1] ; normal
-					,  [0, bordermix, , 0xD3000000, 0, , bordermix, 1] ; hover
-					,  [0, bordermix , , 0xD3000000, 0, , bordermix, 1] ; pressed
-					,  [0, 0x80F0F0F0, , 0x00DFDFDF, 0, , 0x80A7A7A7, 1] ; disabled
-					,  [0, 0xFFFFFFFF, , 0xFF000000, 0, , 0xFFFFFFFF, 1]] ; default
-		}
-		
-		if !SELECTED
-			SELECTED := [[0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; normal
-					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; hover
-					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; pressed
-					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; disabled
-					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1]] ; default
-		
-		this.SetText(this.GamesHWND, "Games")
-		this.SetText(this.ImgurHWND, "Imgur")
-		this.SetText(this.KeybindsHWND, "Keybinds")
-		
 		for Index, TabCtrl in {1:this.GamesHWND, 2:this.ImgurHWND, 3:this.KeybindsHWND} {
 			if (A_Index = tab)
-				ImageButton.Create(TabCtrl, SELECTED*)
+				this.Control("Disable", TabCtrl)
 			else
-				ImageButton.Create(TabCtrl, NORMAL*)
+				this.Control("Enable", TabCtrl)
 		}
 	}
 	
@@ -813,7 +793,7 @@
 
 CreateBigGUI() {
 	
-	Big := new BigGUI(AppName " " AppVersionString)
+	Big := new BigGUI(AppName " " AppVersionString, "-MinimizeBox")
 	
 	Big.Font("s14", Settings.Font)
 	Big.Color("FFFFFF")
@@ -829,9 +809,19 @@ CreateBigGUI() {
 	; ==========================================
 	
 	; tab text controls
-	Big.GamesHWND := Big.Add("Button", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " AltSubmit", "Games")
-	Big.ImgurHWND := Big.Add("Button", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " AltSubmit", "Imgur")
-	Big.KeybindsHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1 " AltSubmit", "Keybinds")
+	Big.GamesHWND := Big.Add("Button", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1, "Games")
+	Big.ImgurHWND := Big.Add("Button", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1, "Imgur")
+	Big.KeybindsHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1, "Keybinds")
+	
+	bordermix := 0xFFEEEEEE ;CK
+	NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0xFFFFFFFF, 1] ; normal
+			,  [0, bordermix, , 0xD3000000, 0, , bordermix, 1] ; hover
+			,  [0, bordermix , , 0xD3000000, 0, , bordermix, 1] ; pressed
+			,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; disabled
+			,  [0, 0xFFFFFFFF, , 0xFF000000, 0, , 0xFFFFFFFF, 1]] ; default
+	
+	for Index, Tabber in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
+		ImageButton.Create(Tabber, NORMAL*)
 	
 	; separators
 	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 w" HALF_WIDTH*2+5 " 0x08") ; big-ass sep
@@ -947,7 +937,6 @@ CreateBigGUI() {
 	Big.ActiveTab := Settings.GuiState.ActiveTab
 	Big.ExpandState := Settings.GuiState.ExpandState
 	
-	Big.Options("-MinimizeBox")
 	Big.SetIcon(Icon("icon"))
 	
 	if (Settings.GuiState.GameListPos > ArraySize(GameRules))

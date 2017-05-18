@@ -453,7 +453,7 @@
 		Big.QueueLV.Delete()
 		
 		for Index, Arr in [this.Queue, this.QueueFail] {
-			Color := [Settings.Color.Selection, "FF2525", "25AA25"][Index]
+			Color := [Settings.Color.Selection, 0xFF2525, 0x25AA25][Index]
 			for Index2, Info in Arr {
 				SplitPath, % Info.ID, FileName
 				Pos := Big.QueueLV.Add(, Info.Event, (Info.Error?Info.Error:(FileName?FileName:Info.ID)), Info.ID)

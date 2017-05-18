@@ -8,7 +8,7 @@ Keybinds(Enable) {
 	
 	Hotkey.DeleteAll()
 	
-	if Enable && Settings.Keybinds
+	if Enable
 		for Key, Bind in Keybinds.Data() ; rebind hotkeys
 			new Hotkey(Key, Actions[Bind.Func].Bind(Actions, Bind.Param*))
 	

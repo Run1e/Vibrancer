@@ -1,7 +1,7 @@
 ﻿Class Plugin {
 	__New() {
 		this.Listeners := []
-		this.CloseOnExit := []
+		this.OnExits := []
 		this.CLSID := "{40677552-fdbd-444d-a9dd-6dce43b0cd56}"
 		
 		this.AppName := AppName
@@ -13,8 +13,8 @@
 	}
 	
 	; call if you want power play to close your plugin when it exits
-	AutoClose(hwnd) {
-		this.CloseOnExit.Push(hwnd)
+	OnExit(Func) {
+		this.OnExits.Push(Func)
 	}
 	
 	; call this when your plugin autoexec is finished. it tells powerplay to launch the next plugin
@@ -87,8 +87,9 @@
 	}
 	
 	Exit() {
-		for Index, hwnd in this.CloseOnExit
-			PostMessage, 0x10,,,, % "ahk_id" hwnd ; WM_CLOSE=0x10
+		for Index, Func in this.OnExits
+			try
+				Func.Call()
 	}
 }
 

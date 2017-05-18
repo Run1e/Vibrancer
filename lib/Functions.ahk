@@ -16,6 +16,13 @@ ShowCursor(Show) {
 		DllCall("SetSystemCursor", "Ptr", DllCall("CopyImage", "Ptr", (Show ? DefaultCurs : BlankCurs)[A_Index], "UInt", 2, "Int", 0, "Int", 0, "UInt", 0), "UInt", Curs)
 }
 
+
+/*
+	showcursor(x) {
+		
+	}
+*/
+
 ; https://autohotkey.com/boards/viewtopic.php?t=29793 ty jNizM
 GetCursorInfo() ; https://msdn.microsoft.com/en-us/library/ms648381(v=vs.85).aspx
 {

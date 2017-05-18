@@ -3,8 +3,8 @@
 #Persistent
 #NoTrayIcon
 SetBatchLines -1
-OnExit, Exit
-#Include pluginlib\PowerPlay.ahk
+
+#Include pluginlib\EventListener.ahk
 
 #Include ..\lib\Class OnMouseMove.ahk
 #Include ..\lib\Class MouseTip.ahk
@@ -16,10 +16,10 @@ DisableTrayTips := false
 
 global Power, Listener, Duration
 
-if !Power := PowerPlay()
-	ExitApp
+Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+Power.OnExit(Func("Exit"))
 
-Listener := new Power.EventListener(Power)
+Listener := new EventListener(Power)
 
 if TrayTipMsg
 	Listener.Listen("TrayTip", Func("OnTrayTip"), DisableTrayTips)
@@ -30,40 +30,9 @@ if UploaderTipMsg
 Power.Finished()
 return
 
-Exit:
-ExitApp
-
-/*
-	---------------------------
-	ClipMessages.ahk
-	---------------------------
-	Error:  0x80010108 - The object invoked has disconnected from its clients.
-	
-	Specifically: __Delete
-	
-	Line#
-	020: ExitApp
-	022: Listener := new Power.EventListener(Power)
-	024: if TrayTipMsg  
-	025: Listener.Listen("TrayTip", Func("OnTrayTip"), DisableTrayTips)  
-	027: if UploaderTipMsg  
-	028: Listener.Listen("UploaderStatusText", Func("OnUploaderStatusText"))  
-	030: Power.Finished()  
-	--->	031: Return
-	033: {
-		034: MouseTip.Create(Msg, Duration)  
-		035: }
-		037: {
-			038: MouseTip.Create(Status, Duration)  
-			039: }
-			040: Exit
-			
-			Continue running the script?
-			---------------------------
-			Yes   No   
-			---------------------------
-			
-*/
+Exit() {
+	ExitApp
+}
 
 OnTrayTip(Title, Msg) {
 	MouseTip.Create(Msg, Duration)

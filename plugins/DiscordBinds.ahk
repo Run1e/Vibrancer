@@ -8,7 +8,7 @@ SetBatchLines -1
 #Include ..\lib\Debug.ahk
 
 Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
-Power.AutoClose(A_ScriptHwnd)
+Power.OnExit(Func("Exit"))
 
 new Hotkey("~F2", Func("DiscordCode"))
 new Hotkey("~*XButton1", Func("DiscordMove").Bind("Down"))
@@ -32,4 +32,8 @@ DiscordMove(Direction, Channel := false) {
 DiscordCode() {
 	if WinActive("ahk_exe Discord.exe")
 		SendInput % "`````` " "AutoHotkey`n^v`n`````` "
+}
+
+Exit() {
+	ExitApp
 }
