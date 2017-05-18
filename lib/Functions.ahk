@@ -175,3 +175,31 @@ RunClipboardKeybindText() {
 reload() {
 	reload
 }
+
+hexblend(c1, c2) {
+	if (InStr(c1, "0x") = 1)
+		c1:=SubStr(c1, 3)
+	if (InStr(c2, "0x") = 1)
+		c2:=SubStr(c2, 3)
+	Loop 3 {
+		a := hex2int("0x" SubStr(c1, (1 + (A_Index-1)*2), 2))
+		b := hex2int("0x" SubStr(c2, (1 + (A_Index-1)*2), 2))
+		x := int2hex(Round((a+b)/2))
+		out .= SubStr(x, 3)
+	} return "0x" out
+}
+
+Int2Hex(i) {
+	def:=A_FormatInteger
+	if (i = 0) || (i = "")
+		return 00
+	add := i < 16
+	SetFormat, Integer, H
+	x:=i
+	SetFormat, Integer, % def
+	return "0x" (add?0:"") SubStr(x, 3)
+}
+
+Hex2Int(h) {
+	return h+0
+}

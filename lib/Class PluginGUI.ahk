@@ -115,7 +115,7 @@ Plugins() {
 	
 	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" HEIGHT - 66 " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin", Plug.ListViewAction.Bind(Plug))
 	Plug.CLV := new LV_Colors(Plug.LV.hwnd)
-	Plug.CLV.SelectionColors("0x" Settings.Color.Selection, 0xFFFFFF)
+	Plug.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
 	Plug.UpdatePluginList()
 	

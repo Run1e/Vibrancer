@@ -21,7 +21,9 @@
 		}
 		
 		; create nugget
-		if (this.Assignment ~= this.DDLAssignments) { ; assignment used a dll control, get the data from it
+		
+		; assignment used a dll control, get the data from it
+		if (this.Assignment ~= this.DDLAssignments) {
 			
 			for Index, Action in Actions.List[this.Assignment] {
 				if (Action.Desc = this.Function) {
@@ -34,7 +36,8 @@
 				
 			}
 			
-		} else if (this.Assignment ~= this.EditAssignments) { ; assignment used an edit control
+		; assignment used an edit control
+		} else if (this.Assignment ~= this.EditAssignments) {
 			
 			if !StrLen(EditText) {
 				SoundPlay, *-64
@@ -61,7 +64,8 @@
 			}
 		}
 		
-		if !IsObject(Bind) || !StrLen(Bind.Desc) { ; throw an error if we don't have a bind object
+		; throw an error if we don't have a bind object
+		if !IsObject(Bind) || !StrLen(Bind.Desc) {
 			Error("Unable to create bind", A_ThisFunc, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText "`nRebind: " Rebind)
 			TrayTip("Unable to create create bind.`nAn error log has been saved.")
 			this.Close()
@@ -172,7 +176,6 @@
 		
 		; check if in use
 		this.HotkeyChange()
-		
 	}
 	
 	; check for dupe hotkey

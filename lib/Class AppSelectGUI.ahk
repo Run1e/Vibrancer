@@ -51,7 +51,7 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog.AppLV := new Prog.ListView(Prog, "w250 h265 -HDR -Multi", "prog|id", Prog.AppListViewAction.Bind(Prog))
 	
 	Prog.AppLV.CLV := new LV_Colors(Prog.AppLV.hwnd)
-	Prog.AppLV.CLV.SelectionColors("0x" Settings.Color.Selection, 0xFFFFFF)
+	Prog.AppLV.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
 	Prog.Add("Text", "y+10", "Not in the list? Select manually: ")
 	Prog.Add("Button", "x193 yp-5", "Select exe", Prog.SelectFile.Bind(Prog))

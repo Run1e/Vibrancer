@@ -389,7 +389,7 @@
 		for ColorScreen, HWND in this.MonitorHWND {
 			for Index, SavedScreen in Settings.VibrancyScreens {
 				if (ColorScreen = SavedScreen) {
-					CtlColors.Change(HWND, Settings.Color.Tab, "FFFFFF")
+					CtlColors.Change(HWND, SubStr(int2hex(Settings.Color.Tab), 3), "FFFFFF")
 					continue 2
 				} 
 			} CtlColors.Change(HWND, "FFFFFF", "000000")
@@ -398,12 +398,12 @@
 	
 	GamesWinBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockWinKey := Big.GuiControlGet(, "Button3")
+			GameRules[Key].BlockWinKey := Big.GuiControlGet(, "Button6")
 	}
 	
 	GamesAltTabBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockAltTab := Big.GuiControlGet(, "Button4")
+			GameRules[Key].BlockAltTab := Big.GuiControlGet(, "Button7")
 	}
 	
 	GamesSlider() {
@@ -462,23 +462,23 @@
 				Key := this.GameLV.GetText(Pos, 2)
 				if (Key = "path") || !StrLen(Key) {
 					this.Control("Disable", "msctls_trackbar321")
-					this.Control("Disable", "Button3")
-					this.Control("Disable", "Button4")
+					this.Control("Disable", "Button6")
+					this.Control("Disable", "Button7")
 					this.SetText("msctls_trackbar321", 50)
-					this.SetText("Button3", false)
-					this.SetText("Button4", false)
+					this.SetText("Button6", false)
+					this.SetText("Button7", false)
 					ControlsDisabled := true
 					return
 				} else if ControlsDisabled {
 					if !Settings.NvAPI_InitFail
 						this.Control("Enabled", "msctls_trackbar321")
-					this.Control("Enabled", "Button3")
-					this.Control("Enabled", "Button4")
+					this.Control("Enabled", "Button6")
+					this.Control("Enabled", "Button7")
 					ControlsDisabled := false
 				}
 				this.SetText("msctls_trackbar321", GameRules[Key].Vibrancy)
-				this.SetText("Button3", GameRules[Key].BlockWinKey)
-				this.SetText("Button4", GameRules[Key].BlockAltTab)
+				this.SetText("Button6", GameRules[Key].BlockWinKey)
+				this.SetText("Button7", GameRules[Key].BlockAltTab)
 				Settings.GuiState.GameListPos := Pos
 			}
 			
@@ -621,17 +621,20 @@
 	
 	TabAction(Control, GuiEvent, EventInfo) {
 		this.Default()
-		this.SetTab(Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3))
+		Tab := Control=this.GamesHWND?1:(Control=this.ImgurHWND?2:3)
+		this.SetTabColor(Tab)
+		this.SetTab(Tab)
 	}
 	
 	SetTab(tab) {
 		this.Default()
 		
-		this.ActiveTab := tab
 		this.Control("Choose", "SysTabControl321", tab)
 		
 		this.SetTabColor(tab)
 		this.SetTabHotkeys(tab)
+		
+		this.ActiveTab := tab
 		
 		if (tab = 1) {
 			this.ColorScreens()
@@ -671,8 +674,35 @@
 	}
 	
 	SetTabColor(tab) {
-		for Index, HWND in [Big.GamesHWND, Big.ImgurHWND, Big.KeybindsHWND]
-			CtlColors.Change(HWND, ((tab = A_Index) ? Settings.Color.Tab : "FFFFFF"), ((tab = A_Index) ? "FFFFFF" : "000000"))
+		static NORMAL, SELECTED
+		
+		if !NORMAL {
+			;bordermix := hexblend(0xFFFFFF, int2hex(Settings.Color.Tab))
+			bordermix := 0xFFEEEEEE ;CK
+			NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0x80FFFFFF, 1] ; normal
+					,  [0, bordermix, , 0xD3000000, 0, , bordermix, 1] ; hover
+					,  [0, bordermix , , 0xD3000000, 0, , bordermix, 1] ; pressed
+					,  [0, 0x80F0F0F0, , 0x00DFDFDF, 0, , 0x80A7A7A7, 1] ; disabled
+					,  [0, 0xFFFFFFFF, , 0xFF000000, 0, , 0xFFFFFFFF, 1]] ; default
+		}
+		
+		if !SELECTED
+			SELECTED := [[0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; normal
+					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; hover
+					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; pressed
+					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; disabled
+					,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1]] ; default
+		
+		this.SetText(this.GamesHWND, "Games")
+		this.SetText(this.ImgurHWND, "Imgur")
+		this.SetText(this.KeybindsHWND, "Keybinds")
+		
+		for Index, TabCtrl in {1:this.GamesHWND, 2:this.ImgurHWND, 3:this.KeybindsHWND} {
+			if (A_Index = tab)
+				ImageButton.Create(TabCtrl, SELECTED*)
+			else
+				ImageButton.Create(TabCtrl, NORMAL*)
+		}
 	}
 	
 	ImgurExpandToggle() {
@@ -685,7 +715,7 @@
 	}
 	
 	Open(tab := "") {
-		if this.IsVisible {
+		if this.IsVisible { ; why redraw? lv_colors fix
 			this.LVRedraw(false)
 			if tab
 				this.SetTab(tab)
@@ -706,19 +736,20 @@
 		if (this.ActiveTab = 1)
 			this.ColorScreens()
 		
-		this.SetTabColor(tab?tab:this.ActiveTab)
+		new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid)
+		;this.SetTabColor(tab?tab:this.ActiveTab)
 		
 		; init CLV here
 		if !this.GameLV.CLV {
 			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)
 			this.GameLV.CLV.Critical := 500
-			this.GameLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
+			this.GameLV.CLV.SelectionColors(Settings.Color.Selection, "0xFFFFFF")
 		}
 		
 		if !this.BindLV.CLV {
 			this.BindLV.CLV := new LV_Colors(this.BindLV.hwnd)
 			this.BindLV.CLV.Critical := 500
-			this.BindLV.CLV.SelectionColors("0x" . Settings.Color.Selection, "0xFFFFFF")
+			this.BindLV.CLV.SelectionColors(Settings.Color.Selection, "0xFFFFFF")
 		}
 	}
 	
@@ -771,6 +802,13 @@
 			}
 		}
 	}
+	
+	; change the stupid tab IMMEDIATELY NICE HACK RUNE
+	MouseClick() {
+		MouseGetPos,,,, Ctrl
+		if (Ctrl ~= "^(Button(1|2|3))$")
+			this.SetTab(SubStr(Ctrl, 7, 1))
+	}
 }
 
 CreateBigGUI() {
@@ -791,19 +829,14 @@ CreateBigGUI() {
 	; ==========================================
 	
 	; tab text controls
-	Big.GamesHWND := Big.Add("Text", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " 0x200 Center", "Games", Big.TabAction.Bind(Big))
-	Big.ImgurHWND := Big.Add("Text", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " 0x200 Center", "Imgur", Big.TabAction.Bind(Big))
-	Big.KeybindsHWND := Big.Add("Text", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1 " 0x200 Center", "Keybinds", Big.TabAction.Bind(Big))
+	Big.GamesHWND := Big.Add("Button", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " AltSubmit", "Games")
+	Big.ImgurHWND := Big.Add("Button", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1 " AltSubmit", "Imgur")
+	Big.KeybindsHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1 " AltSubmit", "Keybinds")
 	
 	; separators
 	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 w" HALF_WIDTH*2+5 " 0x08") ; big-ass sep
 	Big.Add("Text", "x" TAB_WIDTH - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; first sep
 	Big.Add("Text", "x" TAB_WIDTH*2 - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; second sep
-	
-	; attach to ctlcolors
-	CtlColors.Attach(Big.GamesHWND,, "000000")
-	CtlColors.Attach(Big.ImgurHWND,, "000000")
-	CtlColors.Attach(Big.KeybindsHWND,, "000000")
 	
 	Big.Add("Tab2", "x0 y0 w0 h0 -Wrap Choose2 AltSubmit", "Games|Imgur|Keybinds", Big.TabAction.Bind(Big))
 	
@@ -872,7 +905,7 @@ CreateBigGUI() {
 	
 	Big.Tab(2)
 	Big.Font("s1")
-	Big.ImgurLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT + BUTTON_HEIGHT + 1 " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop +Background" Settings.Color.Dark, "empty|index", Big.ImgurListViewAction.Bind(Big))
+	Big.ImgurLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 " h" LV_HEIGHT + BUTTON_HEIGHT + 1 " -HDR +Multi +Icon AltSubmit cWhite -E0x200 -TabStop +Background" SubStr(int2hex(Settings.Color.Dark), 3), "empty|index", Big.ImgurListViewAction.Bind(Big))
 	Big.Font("s10")
 	
 	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH*2 " h24 +Left", " Press space to view queue manager", Big.ImgurExpandToggle.Bind(Big))
@@ -882,7 +915,7 @@ CreateBigGUI() {
 	
 	Big.Font("s11")
 	
-	Big.QueueLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 25 " w" HALF_WIDTH*2 " h" EXPAND_SIZE - BUTTON_HEIGHT - 24 " AltSubmit NoSort -Hdr -Multi +LV0x4000 -E0x200 -LV0x10 -TabStop cWhite +Background" Settings.Color.Dark, "updown|filename|id", Big.QueueListViewAction.Bind(Big))
+	Big.QueueLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 25 " w" HALF_WIDTH*2 " h" EXPAND_SIZE - BUTTON_HEIGHT - 24 " AltSubmit NoSort -Hdr -Multi +LV0x4000 -E0x200 -LV0x10 -TabStop cWhite +Background" SubStr(int2hex(Settings.Color.Dark), 3), "updown|filename|id", Big.QueueListViewAction.Bind(Big))
 	Big.QueueLV.CLV := new LV_Colors(Big.QueueLV.hwnd)
 	
 	Big.Font("s10")
