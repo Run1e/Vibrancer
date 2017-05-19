@@ -11,18 +11,22 @@
 	}
 	
 	ListViewAction(Control, GuiEvent, EventInfo) {
+		
+		/*
+			static LastC
+			
+			if (GuiEvent = "DoubleClick") && !LastC { ; launch plugin
+				if !(Pos := this.LV.GetNext())
+					return
+				Plg := this.LV.GetText(Pos)
+				MsgBox,68,Run plugin?,Do you want to run %Plg%?
+				ifMsgBox no
+				return
+				Run(A_WorkingDir "\plugins\" this.LV.GetText(this.LV.GetNext()) ".ahk")
+		*/
+		
 		if (GuiEvent = "C")
 			this.SetList()
-		
-		else if (GuiEvent = "DoubleClick") { ; launch plugin
-			if !(Pos := this.LV.GetNext())
-				return
-			Plg := this.LV.GetText(Pos)
-			MsgBox,68,Run plugin?,Do you want to run %Plg%?
-			ifMsgBox no
-			return
-			Run(A_WorkingDir "\plugins\" this.LV.GetText(this.LV.GetNext()) ".ahk")
-		}
 	}
 	
 	Move(Dir) {
@@ -52,7 +56,7 @@
 		}
 		
 		for Index, Plg in Checked {
-			if (Settings.Data().Plugins[index] != Plg) || (Settings.Plugins.MaxIndex() > Checked.MaxIndex()) {
+			if (Settings.Data().Plugins[Index] != Plg) || (Settings.Plugins.MaxIndex() > Checked.MaxIndex()) {
 				Settings.Plugins := Checked
 				this.UpdatePluginList(this.LV.GetNext())
 				return

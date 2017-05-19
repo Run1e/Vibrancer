@@ -386,7 +386,7 @@
 		Run % this.WorkerScript,, UseErrorLevel
 		if (ErrorLevel = "ERROR")
 			Error("Failed to run Uploader Helper", A_ThisFunc, this.WorkerScript " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
-		Print("Upload worker launched")
+		Print("Upload worker launching..")
 	}
 	
 	CheckAlive() {
@@ -400,6 +400,8 @@
 	}
 	
 	Handshake(Worker) {
+		Print("Upload worker launched")
+		
 		this.Worker := Worker
 		
 		; start queue if the queue is waiting
@@ -453,12 +455,11 @@
 		Big.QueueLV.Delete()
 		
 		for Index, Arr in [this.Queue, this.QueueFail] {
-			Color := [Settings.Color.Selection, 0xFF2525, 0x25AA25][Index]
+			Color := [Settings.Color.Selection,  0xFF2525, 0x25AA25][Index]
 			for Index2, Info in Arr {
 				SplitPath, % Info.ID, FileName
 				Pos := Big.QueueLV.Add(, Info.Event, (Info.Error?Info.Error:(FileName?FileName:Info.ID)), Info.ID)
-				FileName:=""
-				Big.QueueLV.CLV.Row(Pos, "0x" (Index=1?(this.Status = 1 && Index2 = 1?Color:"505050"):Color[2]), 0xFFFFFF)
+				Big.QueueLV.CLV.Row(Pos, (Index=1?(this.Status = 1 && Index2 = 1?Color:"0x505050"):Color[2]), 0xFFFFFF)
 			}
 		}
 		

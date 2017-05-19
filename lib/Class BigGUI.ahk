@@ -661,6 +661,7 @@
 	}
 	
 	SetTabHotkeys(tab) {
+		new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist") ; always bound
 		if (tab = 1) {
 			new Hotkey("Delete", this.GameDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
@@ -677,7 +678,7 @@
 	}
 	
 	SetTabColor(tab) {
-		for Index, TabCtrl in {1:this.GamesHWND, 2:this.ImgurHWND, 3:this.KeybindsHWND} {
+		for Index, TabCtrl in [this.GamesHWND, this.ImgurHWND, this.KeybindsHWND] {
 			if (A_Index = tab)
 				this.Control("Disable", TabCtrl)
 			else
@@ -716,7 +717,6 @@
 		if (this.ActiveTab = 1)
 			this.ColorScreens()
 		
-		new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid)
 		;this.SetTabColor(tab?tab:this.ActiveTab)
 		
 		; init CLV here
@@ -785,8 +785,8 @@
 	
 	; change the stupid tab IMMEDIATELY NICE HACK RUNE
 	MouseClick() {
-		MouseGetPos,,,, Ctrl
-		if (Ctrl ~= "^(Button(1|2|3))$")
+		MouseGetPos,,, hwnd, Ctrl
+		if (Ctrl ~= "^(Button(1|2|3))$") && (hwnd = this.hwnd)
 			this.SetTab(SubStr(Ctrl, 7, 1))
 	}
 }

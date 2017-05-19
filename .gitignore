@@ -1,12 +1,14 @@
 *.exe
+PowerPlaySetup.iss
 backup/*
 data/*
 images/*
 logs/*
 ignore/*
-lib/AutoHotkey.exe
+compiled/*
 plugins/Steam Account Switcher.ahk
 plugins/Debugger.ahk
 plugins/backup/*
+plugins/pluginlib/AutoHotkey.ahk
 plugins/pluginlib/backup/*
 lib/client_id.ahk

@@ -49,11 +49,11 @@ ImageButtonApply(hwnd) {
 		MsgBox, 0, ImageButton Error Btn2, % ImageButton.LastError
 }
 
-Run(File) {
-	if FileExist(File)
-		SplitPath, File,, Dir
+Run(File, WorkingDir := "") {
+	if FileExist(File) && (WorkingDir = "")
+		SplitPath, File,, WorkingDir
 	try {
-		Run, % File, % Dir
+		Run, % File, % WorkingDir
 		return true
 	} catch e
 		return false
@@ -96,6 +96,12 @@ ObjFullyClone(obj) {
 FileRead(file) {
 	FileRead, out, % file
 	return out
+}
+
+Icon(name := "") {
+	if (name = "icon")
+		return "icons\powerplay.ico"
+	return "icons\octicons\" name ".ico"
 }
 
 WinActivate(win) {
@@ -153,6 +159,22 @@ WinGetPos(hwnd) {
 	return {x:x, y:y, w:w, h:h}
 }
 
+; https://autohotkey.com/board/topic/60706-native-zip-and-unzip-xpvista7-ahk-l/
+Unz(sZip, sUnz) {
+	fso := ComObjCreate("Scripting.FileSystemObject")
+	If Not fso.FolderExists(sUnz)  ; http://www.autohotkey.com/forum/viewtopic.php?p=402574
+		fso.CreateFolder(sUnz)
+	psh  := ComObjCreate("Shell.Application")
+	zippedItems := psh.Namespace( sZip ).items().count
+	psh.Namespace( sUnz ).CopyHere( psh.Namespace( sZip ).items, 4|16 )
+	Loop {
+		sleep 50
+		unzippedItems := psh.Namespace( sUnz ).items().count
+		IfEqual,zippedItems,%unzippedItems%
+		break
+	}
+}
+
 ; unsure who wrote the original funciton. however I cleaned it up drastically
 Cursor(Cursor := "") {
 	static Cursors := 	{ "IDC_ARROW":32512		, "IDC_IBEAM":32513	, "IDC_WAIT":32514		, "IDC_CROSS":32515
@@ -199,7 +221,7 @@ hexblend(c1, c2) {
 Int2Hex(i) {
 	def:=A_FormatInteger
 	if (i = 0) || (i = "")
-		return 00
+		return 0x00
 	add := i < 16
 	SetFormat, Integer, H
 	x:=i

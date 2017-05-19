@@ -4,6 +4,8 @@
 	
 	Plugin.Exit()
 	
+	ShowCursor(true)
+	
 	Gdip_Shutdown(pToken) ; shut down gdip
 	
 	; revoke COM objects

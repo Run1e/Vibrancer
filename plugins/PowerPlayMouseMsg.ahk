@@ -4,8 +4,8 @@
 #NoTrayIcon
 SetBatchLines -1
 
+#Include %A_ScriptDir%
 #Include pluginlib\EventListener.ahk
-
 #Include ..\lib\Class OnMouseMove.ahk
 #Include ..\lib\Class MouseTip.ahk
 

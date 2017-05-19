@@ -76,10 +76,10 @@
 	Launch(Index) {
 		static MaxWait := 800 ; max amount of time a plugin has to declare it has finished its autoexec
 		if (Plg := Settings.Data().Plugins[Index]) {
-			if A_IsCompiled {
-				;Run()
-			} else
+			if A_AhkPath
 				Run(A_WorkingDir "\plugins\" Plg ".ahk")
+			else ; ahk is not installed. use ahk.exe packed with the installer
+				Run(A_WorkingDir "\plugins\pluginlib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
 			SetTimer, % NextFunc, % "-" MaxWait
 		} else

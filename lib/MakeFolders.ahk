@@ -1,10 +1,9 @@
 ﻿MakeFolders() {
-	for Index, Folder in ["data", "logs", "plugins", "images", "images\imgur", "images\local", "images\deleted", "icons", "icons\octicons"] {
+	for Index, Folder in ["data", "logs", "plugins", "plugins\pluginlib", "images", "images\imgur", "images\local", "images\deleted", "icons", "icons\octicons"] {
 		if !FileExist(Folder) {
 			FileCreateDir % Folder
-			if ErrorLevel {
-				MsgBox,48,Permissions error,Unable to create necessary subfolders.`n`nMake sure Power Play is installed a place where it has the permissions it needs (for example: C:\PowerPlay\), 10000
-				run % A_ScriptDir
+			if ErrorLevel { ; program will fail here first if the program doesn't have permissions to write to disk
+				MsgBox,16,Permission error,Unable to create necessary sub-folders`nTry uninstalling and installing to a different folder. (ex: C:\PowerPlay\)
 				ExitApp
 			}
 		}

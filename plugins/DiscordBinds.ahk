@@ -4,6 +4,7 @@
 #NoTrayIcon
 SetBatchLines -1
 
+#Include %A_ScriptDir%
 #Include ..\lib\Class Hotkey.ahk
 #Include ..\lib\Debug.ahk
 

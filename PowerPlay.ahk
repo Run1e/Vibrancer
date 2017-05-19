@@ -14,6 +14,12 @@ SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 OnExit("Exit")
 
+; has to elevate itself to admin so it can create folders/files when installed in program files
+if !A_IsAdmin && A_IsCompiled {
+	Run *RunAs "%A_ScriptFullPath%"
+	ExitApp
+}
+
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
 	msgbox Please run this script as 32-bit.
@@ -32,10 +38,6 @@ AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
 MakeFolders()
-
-; if compiled, install necessary files
-if A_IsCompiled
-	InstallFiles()
 
 pToken := Gdip_Startup()
 
@@ -100,6 +102,15 @@ WinActiveChange(32772, WinActive("A"))
 Keybinds(true)
 
 Plugin.Launch(1)
+
+; remove files and prompt user after successful update
+if FileExist("PowerPlay-installer") && (Settings.UpdateVersion < (AppVersion.1 AppVersion.2 AppVersion.3)) {
+	FileRemoveDir PowerPlay-installer, 1
+	FileDelete PowerPlay-installer.zip
+	Settings.Delete("UpdateVersion")
+	TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+}
+
 return
 
 Print(text, func := "") {
@@ -134,11 +145,11 @@ Print(text, func := "") {
 #Include lib\GetActionsList.ahk
 #Include lib\GetApplications.ahk
 #Include lib\InitNvAPI.ahk
-#Include lib\InstallFiles.ahk
 #Include lib\Keybinds.ahk
 #Include lib\MakeFolders.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
+#Include lib\Update.ahk
 #Include lib\WinActiveChange.ahk
 
 #Include *i lib\client_id.ahk
@@ -149,10 +160,10 @@ Print(text, func := "") {
 #Include lib\third-party\Class JSON.ahk
 #Include lib\third-party\Class LV_Colors.ahk
 #Include lib\third-party\Class NvAPI.ahk
+#Include lib\third-party\FileSHA1.ahk
 #Include lib\third-party\FrameShadow.ahk
 #Include lib\third-party\Gdip_All.ahk
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
-#Include lib\third-party\FileSHA1.ahk
 #Include lib\third-party\SetCueBanner.ahk
 #Include lib\third-party\WinGetPosEx.ahk
