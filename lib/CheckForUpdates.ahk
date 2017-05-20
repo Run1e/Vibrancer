@@ -24,7 +24,7 @@
 		} else {
 			MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to visit download page?"
 			ifMsgBox yes
-			Run(URL)
+			Run("https://github.com/Run1e/PowerPlay/releases/latest")
 		}
 	} else
 		TrayTip("You're up to date!")

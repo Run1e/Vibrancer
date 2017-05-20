@@ -93,7 +93,7 @@ Menu, Tray, Tip, % AppName
 Menu, Tray, Icon ; show trayicon
 
 ; detect window activations
-DllCall("RegisterShellHookWindow", "ptr", A_ScriptHwnd)
+DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
 
 WinActiveChange(32772, WinActive("A"))
@@ -111,6 +111,11 @@ if FileExist("PowerPlay-installer") && (Settings.UpdateVersion < (AppVersion.1 A
 	TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
 }
 
+;m(%0%, %1%, %2%)
+
+; installer gui open
+if (%1%)
+	Big.Open()
 return
 
 Print(text, func := "") {

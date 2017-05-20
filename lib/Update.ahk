@@ -1,5 +1,7 @@
 ﻿Update(URL) {
 	
+	SetGUI.Close(false)
+	
 	; download the newest installer
 	try
 		URLDownloadToFile, % URL, PowerPlay-installer.zip
