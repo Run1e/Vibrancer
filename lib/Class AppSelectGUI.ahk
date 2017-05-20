@@ -17,7 +17,6 @@
 			Print(Info)
 		
 		this.Callback.Call(Info)
-		
 		Prog := ""
 	}
 	

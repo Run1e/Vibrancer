@@ -7,7 +7,7 @@
 	if !StrLen(Settings.PastebinKey)
 		return TrayTip("No Pastebin key!", "Please enter your Pastebin API key in the settings.")
 	
-	Print("Uploading clipboard to pastebin", A_ThisFunc)
+	Print("Uploading clipboard to pastebin")
 	
 	POST := {api_dev_key:Settings.PastebinKey, api_option:"paste", api_paste_code:clipboard}
 	
@@ -31,7 +31,7 @@
 		Print("Paste success, uploaded in " UploadTime "s")
 		
 	} else
-		Title := "Paste failed!", Msg := (Response?"Error: " Response:"Request timed out."), Print("Paste failed: " Response, A_ThisFunc)
+		Title := "Paste failed!", Msg := (Response?"Error: " Response:"Request timed out."), Print("Paste failed: " Response)
 	
 	TrayTip(Title, Msg)
 }

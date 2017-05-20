@@ -16,7 +16,9 @@ OnExit("Exit")
 
 ; has to elevate itself to admin so it can create folders/files when installed in program files
 if !A_IsAdmin && A_IsCompiled {
-	Run *RunAs "%A_ScriptFullPath%"
+	Loop %0%
+		pToken .= (InStr(%A_Index%, " ")?"""":"") . %A_Index% . (InStr(%A_Index%, " ")?"""":"")
+	Run *RunAs "%A_ScriptFullPath% " %pToken%
 	ExitApp
 }
 
@@ -33,7 +35,7 @@ global Actions, Plug, Uploader, Tray ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Power Play"
-AppVersion := [0, 9, 80]
+AppVersion := [0, 9, 81]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -103,23 +105,23 @@ Keybinds(true)
 
 Plugin.Launch(1)
 
-; remove files and prompt user after successful update
-if FileExist("PowerPlay-installer") && (Settings.UpdateVersion < (AppVersion.1 AppVersion.2 AppVersion.3)) {
-	FileRemoveDir PowerPlay-installer, 1
-	FileDelete PowerPlay-installer.zip
-	Settings.Delete("UpdateVersion")
-	TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+Loop %0%
+{
+	if (%A_Index% = "/UPDATED") {
+		Settings.Delete("UpdateVersion")
+		FileRemoveDir PowerPlay-installer, 1
+		FileDelete PowerPlay-installer.zip
+		TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+	}
+	
+	else if (%A_Index% = "/OPEN")
+		Big.Open()
 }
 
-;m(%0%, %1%, %2%)
-
-; installer gui open
-if (%1%)
-	Big.Open()
 return
 
-Print(text, func := "") {
-	Event("Print", (func = "" ? "" : func ": ") text)
+Print(text := "") {
+	Event("Print", IsObject(text)?pa(text):text)
 }
 
 #Include lib\CheckForUpdates.ahk

@@ -12,25 +12,19 @@
 	}
 	
 	; check that zip is downloaded
-	if !FileExist("PowerPlay-installer.zip") {
-		TrayTip("Failed downloading update")
-		return
-	}
+	if !FileExist("PowerPlay-installer.zip")
+		return TrayTip("Failed downloading update")
 	
 	; unzip
 	Unz(A_WorkingDir "\PowerPlay-installer.zip", A_WorkingDir "\PowerPlay-installer\")
 	
 	; check it unzipped properly
-	if !FileExist("PowerPlay-installer\PowerPlay-installer.exe") {
-		TrayTip("Failed extracting updater")
-		return
-	}
-	
-	; save current version comparison after updating
-	Settings.UpdateVersion := SubStr(AppVersionString, 2)
-	Settings.Save()
+	if !FileExist("PowerPlay-installer\PowerPlay-installer.exe")
+		return TrayTip("Failed extracting updater")
 	
 	; run the installer in silent mode, installing to the current dir
-	if !Run("PowerPlay-Installer\PowerPlay-installer.exe /VERYSILENT /DIR=""" A_WorkingDir """")
-		TrayTip("Failed running updater")
+	if !Run("PowerPlay-Installer\PowerPlay-installer.exe /verysilent /noicons ""/dir=" A_WorkingDir "")
+		return TrayTip("Failed running updater")
+	
+	ExitApp
 }

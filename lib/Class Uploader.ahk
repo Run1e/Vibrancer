@@ -1,6 +1,6 @@
 ﻿Class Uploader {
 	__New() {
-		this.AllowedExt := "i)(png|jpg|jpeg|gif|bmp)$"
+		this.AllowedExt := "i)^(png|jpg|jpeg|gif|bmp)$"
 		this.client_id := IsFunc("client_id")?Func("client_id").Call():""
 		this.WorkerScript := A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk")
 		
@@ -96,7 +96,7 @@
 	}
 	
 	StepQueue() {
-		Print("UPLOADER: stepping queue")
+		Plugin.Event("UploaderStepQueue")
 		
 		; stop if we said to stop, or if the queue is empty
 		if (this.Status = 2)
