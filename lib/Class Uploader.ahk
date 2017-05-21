@@ -1,6 +1,6 @@
 ﻿Class Uploader {
 	__New() {
-		this.AllowedExt := "i)^(png|jpg|jpeg|gif|bmp)$"
+		this.AllowedExt := "i)(png|jpg|jpeg|gif|bmp)$"
 		this.client_id := IsFunc("client_id")?Func("client_id").Call():""
 		this.WorkerScript := A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk")
 		
@@ -24,20 +24,29 @@
 	
 	Upload(File) {
 		Info := {Event: "Upload", ID: File}
-		if FileExist(File) {
-			if Event("UploaderUpload", File)
-				return
-			this.AddQueue(Info)
-		}
+		
+		if !FileExist(File)
+			return
+		
+		FileGetSize, Size, % File
+		if (Size > 10480000)
+			return TrayTip("Files larger than 10MB can not be uploaded to imgur.")
+		
+		if Event("UploaderUpload", File)
+			return
+		
+		this.AddQueue(Info)
 	}
 	
 	Delete(Index) {
 		Info := {Event: "Delete", ID: Index, DeleteHash: Images[Index].deletehash}
-		if Images[Index] {
-			if Event("UploaderDelete", Index)
-				return
-			this.AddQueue(Info)
-		}
+		
+		if !Images[Index]
+			return
+		
+		if Event("UploaderDelete", Index)
+			return
+		this.AddQueue(Info)
 	}
 	
 	; adds an item to the queue

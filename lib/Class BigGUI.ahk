@@ -21,7 +21,9 @@
 						GameRules[Target].Icon := Icon
 					AddFile := Target
 				}
-			} if StrLen(AddFile) {
+			}
+			
+			if StrLen(AddFile) {
 				this.Activate()
 				this.UpdateGameList(AddFile)
 			} else
@@ -32,9 +34,9 @@
 			for Index, File in FileArray {
 				if (File ~= Uploader.AllowedExt)
 					Uploader.Upload(File)
-				else 
-					Uploader.QueueErrors.Push(ext " files are not allowed on imgur!")
-			} if !Uploader.RunQueue
+			}
+			
+			if !Uploader.RunQueue && Uploader.Queue.MaxIndex()
 				Uploader.StartQueue()
 		}
 	}
