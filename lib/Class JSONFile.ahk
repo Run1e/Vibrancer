@@ -53,6 +53,7 @@ Class JSONFile {
 			} return
 		}
 		
+		; reset the object from file
 		else if (Func = "Refresh") {
 			FileRead, Contents, % this.File()
 			JSONFile.Instances[this].Data := JSON.Load(Contents)

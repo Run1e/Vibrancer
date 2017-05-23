@@ -17,7 +17,7 @@ OnExit("Exit")
 ; has to elevate itself to admin so it can create folders/files when installed in program files
 if !A_IsAdmin && A_IsCompiled {
 	Loop %0%
-		pToken .= (InStr(%A_Index%, " ")?"""":"") . %A_Index% . (InStr(%A_Index%, " ")?"""":"")
+		pToken .= (InStr(%A_Index%, " ") ? """" : "") . %A_Index% . (InStr(%A_Index%, " ") ? """" : "")
 	Run *RunAs "%A_ScriptFullPath% " %pToken%
 	ExitApp
 }
@@ -35,7 +35,7 @@ global Actions, Plug, Uploader, Tray ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Power Play"
-AppVersion := [0, 9, 81]
+AppVersion := [0, 9, 82]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -82,8 +82,9 @@ Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
 Tray.Add("Plugins", Actions.Plugins.Bind(Actions), Icon("plug"))
 Tray.Add("Settings", Actions.Settings.Bind(Actions), Icon("gear"))
 Tray.Add()
-Tray.SetDefault("Open")
+Tray.Add("Donate", Actions.Donate.Bind(Actions), Icon("link"))
 Tray.Add("Exit", Actions.Exit.Bind(Actions), Icon("x"))
+Tray.SetDefault("Open")
 
 ; apply/reenforce settings that do something external
 ApplySettings()

@@ -1,7 +1,7 @@
 ﻿Class BigGUI extends GUI {
-	static BindHistory := [], GamesHistory := [], MonitorHWND := []
-	static HALF_WIDTH := 270, TAB_HEIGHT := 32, LV_HEIGHT := 240, BUTTON_HEIGHT := 26, TAB_WIDTH := 180
-	static EXPAND_SIZE := 206
+	static BindHistory := []
+	static GamesHistory := []
+	static MonitorHWND := []
 	static AnimatedImages := {}
 	static AnimatedPositions := {}
 	static AnimatedEnabled := false
@@ -459,7 +459,7 @@
 	GameListViewAction(Control, GuiEvent, EventInfo) {
 		static ControlsDisabled
 		if (GuiEvent = "C") || (GuiEvent = "I") {
-			Pos := (EventInfo?EventInfo:this.GameLV.GetNext())
+			Pos := (EventInfo ? EventInfo : this.GameLV.GetNext())
 			if Pos {
 				Key := this.GameLV.GetText(Pos, 2)
 				if (Key = "path") || !StrLen(Key) {
@@ -710,6 +710,9 @@
 		if SetGUI.IsVisible
 			return
 		
+		if Event("GuiOpen")
+			return
+		
 		this.LVRedraw(false)
 		this.Pos(A_ScreenWidth/2 - this.HALF_WIDTH, A_ScreenHeight/2 - 164, this.HALF_WIDTH*2)
 		this.SetTab(tab?tab:this.ActiveTab)
@@ -720,6 +723,8 @@
 			this.ColorScreens()
 		
 		;this.SetTabColor(tab?tab:this.ActiveTab)
+		
+		this.Control(, this.ProgressHWND, 50)
 		
 		; init CLV here
 		if !this.GameLV.CLV {
@@ -753,6 +758,8 @@
 	}
 	
 	Close() {
+		if Event("GuiClose")
+			return
 		this.Hide()
 		this.ImgurAnimate(false)
 		Keybinds(true)
@@ -801,19 +808,19 @@ CreateBigGUI() {
 	Big.Color("FFFFFF")
 	Big.Margin(0, 0)
 	
-	HALF_WIDTH := Big.HALF_WIDTH
-	TAB_WIDTH := Big.TAB_WIDTH
-	TAB_HEIGHT := Big.TAB_HEIGHT
-	LV_HEIGHT := Big.LV_HEIGHT
-	BUTTON_HEIGHT := Big.BUTTON_HEIGHT
-	EXPAND_SIZE := Big.EXPAND_SIZE
+	Big.HALF_WIDTH := HALF_WIDTH := 270
+	Big.TAB_WIDTH := TAB_WIDTH := 180
+	Big.TAB_HEIGHT := TAB_HEIGHT := 32
+	Big.LV_HEIGHT := LV_HEIGHT := 240
+	Big.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
+	Big.EXPAND_SIZE := EXPAND_SIZE := 180
 	
 	; ==========================================
 	
 	; tab text controls
-	Big.GamesHWND := Big.Add("Button", "x0 y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1, "Games")
-	Big.ImgurHWND := Big.Add("Button", "x" TAB_WIDTH " y0 w" TAB_WIDTH-1 " h" TAB_HEIGHT-1, "Imgur")
-	Big.KeybindsHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT-1, "Keybinds")
+	Big.GamesHWND := Big.Add("Button", "x0 y0 w" TAB_WIDTH - 1 " h" TAB_HEIGHT - 1, "Games")
+	Big.ImgurHWND := Big.Add("Button", "x" TAB_WIDTH " y0 w" TAB_WIDTH - 1 " h" TAB_HEIGHT - 1, "Imgur")
+	Big.KeybindsHWND := Big.Add("Button", "x" TAB_WIDTH*2 " y0 w" TAB_WIDTH " h" TAB_HEIGHT - 1, "Keybinds")
 	
 	bordermix := 0xFFEEEEEE ;CK
 	NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0xFFFFFFFF, 1] ; normal
@@ -826,9 +833,9 @@ CreateBigGUI() {
 		ImageButton.Create(Tabber, NORMAL*)
 	
 	; separators
-	Big.Add("Text", "x0 y" TAB_HEIGHT-1 " h1 w" HALF_WIDTH*2+5 " 0x08") ; big-ass sep
-	Big.Add("Text", "x" TAB_WIDTH - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; first sep
-	Big.Add("Text", "x" TAB_WIDTH*2 - 1 " y0 w1 h" TAB_HEIGHT-1 " 0x08") ; second sep
+	Big.Add("Text", "x0 y" TAB_HEIGHT - 1 " h1 w" HALF_WIDTH*2 + 5 " 0x08") ; big-ass sep
+	Big.Add("Text", "x" TAB_WIDTH - 1 " y0 w1 h" TAB_HEIGHT - 1 " 0x08") ; first sep
+	Big.Add("Text", "x" TAB_WIDTH*2 - 1 " y0 w1 h" TAB_HEIGHT - 1 " 0x08") ; second sep
 	
 	Big.Add("Tab2", "x0 y0 w0 h0 -Wrap Choose2 AltSubmit", "Games|Imgur|Keybinds", Big.TabAction.Bind(Big))
 	
@@ -840,13 +847,13 @@ CreateBigGUI() {
 	
 	Big.Font("s10")
 	
-	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1, "Remove", Big.GameDelete.Bind(Big))
+	Button := Big.Add("Button", "x1 y" TAB_HEIGHT+LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1, "Remove", Big.GameDelete.Bind(Big))
 	ImageButtonApply(Button)
 	
-	Button := Big.Add("Button", "x" Round(HALF_WIDTH/5*2) + 1 " yp w" HALF_WIDTH - Round(HALF_WIDTH/5*2) - 1 " h" BUTTON_HEIGHT - 1, "Add Program", Big.AddGame.Bind(Big))
+	Button := Big.Add("Button", "x" Round(HALF_WIDTH/5*2) + 1 " yp w" HALF_WIDTH-Round(HALF_WIDTH/5*2) - 1 " h" BUTTON_HEIGHT - 1, "Add Program", Big.AddGame.Bind(Big))
 	ImageButtonApply(Button)
 	
-	Big.Add("Text", "x" HALF_WIDTH-1 " y" TAB_HEIGHT " w1 h" LV_HEIGHT " 0x08") ; skille
+	Big.Add("Text", "x" HALF_WIDTH - 1 " y" TAB_HEIGHT " w1 h" LV_HEIGHT " 0x08") ; skille
 	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT/2 " w" HALF_WIDTH " h1 0x08") ; skille
 	
 	Big.Font("s11")
@@ -864,7 +871,7 @@ CreateBigGUI() {
 	Big.Font(MonitorCount>1?"s16":"s13")
 	
 	if (MonitorCount = 1) {
-		Big.Add("Text", "x" HALF_WIDTH+1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center", "Primary screen selected!")
+		Big.Add("Text", "x" HALF_WIDTH + 1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center", "Primary screen selected!")
 		Settings.VibrancyScreens := [SysGet("MonitorPrimary")] ; reset it so it doesn't get messed up and the user is stuck and can't change
 	} else {
 		for MonID, Mon in MonitorSetup(HALF_WIDTH - 16, 100, 4) {
@@ -902,6 +909,8 @@ CreateBigGUI() {
 	
 	Big.QueueTextHWND := Big.Add("Button", "x0 y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH*2 " h24 +Left", " Press space to view queue manager", Big.ImgurExpandToggle.Bind(Big))
 	
+	Big.Control(, Big.ProgressHWND, 50)
+	
 	Big.Add("Button", "x" TAB_WIDTH*2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Copy link(s)", Big.ImgurCopyLinks.Bind(Big))
 	Big.Add("Button", "x" TAB_WIDTH*2 + TAB_WIDTH/2 " y" TAB_HEIGHT + LV_HEIGHT + BUTTON_HEIGHT + 1 " w" TAB_WIDTH/2 " h24", "Open link(s)", Big.ImgurOpenLinks.Bind(Big))
 	
@@ -924,7 +933,7 @@ CreateBigGUI() {
 	Big.Margin(0, 0)
 	Big.Font("s11")
 	
-	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2+1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop", "desc|key|realkey", Big.BindListViewAction.Bind(Big))
+	Big.BindLV := new Big.ListView(Big, "x0 y" TAB_HEIGHT " w" HALF_WIDTH*2 + 1 " h" LV_HEIGHT " -HDR -Multi AltSubmit -E0x200 -TabStop", "desc|key|realkey", Big.BindListViewAction.Bind(Big))
 	
 	Big.Font("s10")
 	

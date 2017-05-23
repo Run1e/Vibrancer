@@ -457,6 +457,7 @@
 	}
 	
 	UploadUpdate(per) {
+		Event("UploadUpdate", per)
 		this.GuiSetStatus(Per > 99 ? "Working.." : "Progress: " (Per) "%")
 	}
 	

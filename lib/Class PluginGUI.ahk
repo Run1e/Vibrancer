@@ -78,6 +78,8 @@
 			if !Added.HasKey(File := rtrim(A_LoopFileName, ".ahk"))
 				this.LV.Add("Check0", File)
 		
+		this.LV.ModifyCol(1, this.WIDTH - (LV_EX_GetRowHeight(this.LV.hwnd) * this.LV.GetCount() > this.LV_HEIGHT ? VERT_SCROLL : 0))
+		
 		if Select
 			this.LV.Modify(Select, "Select Vis")
 	}
@@ -107,17 +109,18 @@ Plugins() {
 	if IsObject(SetGUI)
 		SetGUI.Close(false)
 	
-	WIDTH := 220
-	HEIGHT := 230
-	BUTTON_HEIGHT := 26
-	
 	Plug := new PluginGUI("Plugins", "-MinimizeBox")
+	
+	Plug.WIDTH := WIDTH := 220
+	Plug.HEIGHT := HEIGHT := 250
+	Plug.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
+	Plug.LV_HEIGHT := LV_HEIGHT := HEIGHT - 66
 	
 	Plug.Color("FFFFFF")
 	Plug.Font("s10")
 	Plug.DropFilesToggle(true)
 	
-	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" HEIGHT - 66 " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin", Plug.ListViewAction.Bind(Plug))
+	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" LV_HEIGHT " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin", Plug.ListViewAction.Bind(Plug))
 	Plug.CLV := new LV_Colors(Plug.LV.hwnd)
 	Plug.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	

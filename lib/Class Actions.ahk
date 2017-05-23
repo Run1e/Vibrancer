@@ -82,6 +82,10 @@
 		m(Keybinds.Data())
 	}
 	
+	Donate() {
+		Run("https://www.paypal.me/RUNIE")
+	}
+	
 	Exit() {
 		ExitApp
 	}

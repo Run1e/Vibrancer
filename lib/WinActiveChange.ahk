@@ -2,7 +2,7 @@
 WinActiveChange(wParam, hwnd) {
 	static RulesEnabled
 	
-	if !(wParam ~= "^(4|32772)$") ; only listen for HSHELL_RUDEAPPACTIVATED
+	if !(wParam ~= "^(4|32772)$") ; HSHELL_WINDOWACTIVATED and HSHELL_RUDEAPPACTIVATED
 		return
 	
 	WinGet, ProcessPath, ProcessPath, ahk_id %hwnd%

@@ -204,7 +204,7 @@
 		this.Destroy()
 		
 		if IsObject(Bind)
-			Print("Binder callback for ID " ID " :`n" pa(Bind))
+			Print("Binder callback for ID " HotkeyToString(ID) "`n" pa(Bind))
 		
 		this.Callback.Call(Bind, ID)
 	}

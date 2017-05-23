@@ -27,7 +27,7 @@
 	AppListViewAction(Control, GuiEvent, EventInfo) {
 		if (GuiEvent = "DoubleClick") {
 			id := this.AppLV.GetText(this.AppLV.GetNext(), 2)
-			if (id) && StrLen(id)
+			if id && StrLen(id)
 				this.Close(Prog.AppList[id])
 		}
 	}
@@ -70,9 +70,5 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	
 	Prog.Options("+AlwaysOnTop -MinimizeBox +Owner" Owner)
 	Prog.Show()
-	return
-	
-	ProgListView:
-	Prog.ListView(A_GuiEvent)
 	return
 }

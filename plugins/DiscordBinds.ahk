@@ -7,14 +7,15 @@ SetKeyDelay -1
 
 #Include %A_ScriptDir%
 #Include ..\lib\Class Hotkey.ahk
+#Include ..\lib\Class HTTP.ahk
+#Include ..\lib\third-party\Class JSON.ahk
 #Include ..\lib\Debug.ahk
 
-global NICK
+global NICK := "your discord id here"
+global LANG := "AutoHotkey"
 
 if (A_ComputerName = "DESKTOP-AAVK743")
 	NICK := "<@265644569784221696>"
-else
-	NICK := "your username here"
 
 Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 Power.OnExit(Func("Exit"))
@@ -29,10 +30,18 @@ Power.Finished()
 return
 
 DiscordNP() {
-	WinGetTitle, Song, ahk_exe Spotify.exe
-	if !WinActive("ahk_exe Discord.exe") || !StrLen(Song)
+	static EndPoint := "https://api.spotify.com/v1/search?q="
+	WinGetTitle, Title, ahk_exe Spotify.exe
+	if !WinActive("ahk_exe Discord.exe") || !StrLen(Title)
 		return
-	SendInput % NICK " is playing **" Song "**{Enter}"
+	
+	if HTTP.Get(EndPoint
+			. "track:" . HTTP.UriEncode(SubStr(Title, InStr(Title, " - ") + 3)) 
+			. "+artist:" . HTTP.UriEncode(SubStr(Title, 1, InStr(Title, " - ") - 1))
+			. "&type=track", Data)
+		URL := JSON.Load(Data.ResponseText).tracks.items.1.external_urls.spotify
+		
+	SendInput % NICK " is listening to **" Title "** " URL "{Enter}"
 }
 
 DiscordChannelMove(Direction) {
@@ -49,7 +58,7 @@ DiscordChannelMove(Direction) {
 
 DiscordCode(Paste := true) {
 	if hwnd := WinActive("ahk_exe Discord.exe") {
-		SendInput % "`````` " "AutoHotkey`n" (Paste ? "^v" : "") "`n`````` "
+		SendInput % "`````` " LANG "`n" (Paste ? "^v" : "") "`n`````` "
 		sleep 20
 		ControlSend, ahk_parent, % "{" (Paste ? "Enter" : "Up") "}", % "ahk_id" hwnd
 	}
