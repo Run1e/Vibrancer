@@ -1,7 +1,7 @@
 ﻿m(x*) {
 	for a, b in x
 		text .= (IsObject(b)?pa(b):b) "`n"
-	MsgBox, 0, Power Play, % text
+	MsgBox, 0, msgbox, % text
 }
 
 pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life

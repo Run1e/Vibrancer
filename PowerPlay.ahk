@@ -97,9 +97,7 @@ Menu, Tray, Icon ; show trayicon
 
 ; detect window activations
 DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
-OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), "WinActiveChange")
-
-WinActiveChange(32772, WinActive("A"))
+OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
 
 ; bind hotkeys
 Keybinds(true)
@@ -119,10 +117,11 @@ Loop %0%
 		Big.Open()
 }
 
+Rules.WinChange(32772, WinActive("A"))
 return
 
 Print(text := "") {
-	Event("Print", IsObject(text)?pa(text):text)
+	Event("Print", IsObject(text) ? pa(text) : text)
 }
 
 #Include lib\CheckForUpdates.ahk
@@ -158,7 +157,6 @@ Print(text := "") {
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\Update.ahk
-#Include lib\WinActiveChange.ahk
 
 #Include *i lib\client_id.ahk
 
@@ -175,3 +173,4 @@ Print(text := "") {
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\SetCueBanner.ahk
 #Include lib\third-party\WinGetPosEx.ahk
+#Include lib\Class Rules.ahk

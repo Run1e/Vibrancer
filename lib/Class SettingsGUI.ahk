@@ -22,7 +22,8 @@
 		
 		Settings.StartUp := StartUp
 		Settings.VibrancyDefault := VibrancyDefault
-		DisableRules() ; set new vibrancy
+		
+		Rules.VibAll(VibrancyDefault)
 		
 		Settings.Imgur.CloseOnCopy := CloseOnCopy
 		Settings.Imgur.CloseOnOpen := CloseOnOpen

@@ -32,15 +32,19 @@ return
 DiscordNP() {
 	static EndPoint := "https://api.spotify.com/v1/search?q="
 	WinGetTitle, Title, ahk_exe Spotify.exe
-	if !WinActive("ahk_exe Discord.exe") || !StrLen(Title)
+	if !WinActive("ahk_exe Discord.exe") || !StrLen(Title) || (Title = "Spotify")
 		return
 	
+	trackpre := RegExReplace(SubStr(Title, InStr(Title, " - ") + 3), "[^(a-zA-Z|\s)]", "")
+	artistpre := RegExReplace(SubStr(Title, 1, InStr(Title, " - ") - 1), "[^(a-zA-Z|\s)]", "")
+	
 	if HTTP.Get(EndPoint
-			. "track:" . HTTP.UriEncode(SubStr(Title, InStr(Title, " - ") + 3)) 
-			. "+artist:" . HTTP.UriEncode(SubStr(Title, 1, InStr(Title, " - ") - 1))
+			. "track:" . HTTP.UriEncode(trackpre)
+			. "+artist:" . HTTP.UriEncode(artistpre)
 			. "&type=track", Data)
-		URL := JSON.Load(Data.ResponseText).tracks.items.1.external_urls.spotify
-		
+
+	URL := JSON.Load(Data.ResponseText).tracks.items.1.external_urls.spotify
+	
 	SendInput % NICK " is listening to **" Title "** " URL "{Enter}"
 }
 
