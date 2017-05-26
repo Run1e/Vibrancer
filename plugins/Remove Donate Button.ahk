@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; Remove 'Donate' button from tray menu
+#SingleInstance force
 #NoEnv
 #NoTrayIcon
 

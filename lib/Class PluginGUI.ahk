@@ -71,14 +71,26 @@
 			if !FileExist("plugins\" Plg ".ahk") {
 				Settings.Plugins.RemoveAt(Index)
 				continue
-			} this.LV.Add("Check1", Plg), Added[Plg] := ""
+			}
+			
+			FileReadLine, Line, % "plugins\" Plg ".ahk", 1
+			Desc := (InStr(Line, "; ") = 1 ? SubStr(Line, 3) : "No description")
+			this.LV.Add("Check1", Plg, Desc), Added[Plg] := ""
 		}
 		
 		Loop, Files, plugins\*.ahk
-			if !Added.HasKey(File := rtrim(A_LoopFileName, ".ahk"))
-				this.LV.Add("Check0", File)
+		{
+			if !Added.HasKey(File := rtrim(A_LoopFileName, ".ahk")) {
+				FileReadLine, Line, % A_LoopFileFullPath, 1
+				Desc := (InStr(Line, "; ") = 1 ? SubStr(Line, 3) : "No description")
+				this.LV.Add("Check0", File, Desc)
+			}
+		}
 		
-		this.LV.ModifyCol(1, this.WIDTH - (LV_EX_GetRowHeight(this.LV.hwnd) * this.LV.GetCount() > this.LV_HEIGHT ? VERT_SCROLL : 0))
+		this.LV.ModifyCol(1, "AutoHDR")
+		this.LV.ModifyCol(2, "AutoHDR")
+		
+		; this.LV.ModifyCol(1, this.WIDTH - (LV_EX_GetRowHeight(this.LV.hwnd) * this.LV.GetCount() > this.LV_HEIGHT ? VERT_SCROLL : 0))
 		
 		if Select
 			this.LV.Modify(Select, "Select Vis")
@@ -111,30 +123,30 @@ Plugins() {
 	
 	Plug := new PluginGUI("Plugins", "-MinimizeBox")
 	
-	Plug.WIDTH := WIDTH := 220
+	Plug.WIDTH := WIDTH := 460
 	Plug.HEIGHT := HEIGHT := 250
 	Plug.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
-	Plug.LV_HEIGHT := LV_HEIGHT := HEIGHT - 66
+	Plug.LV_HEIGHT := LV_HEIGHT := HEIGHT - 33
 	
 	Plug.Color("FFFFFF")
 	Plug.Font("s10")
 	Plug.DropFilesToggle(true)
 	
-	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" LV_HEIGHT " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin", Plug.ListViewAction.Bind(Plug))
+	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" LV_HEIGHT " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin|Description", Plug.ListViewAction.Bind(Plug))
 	Plug.CLV := new LV_Colors(Plug.LV.hwnd)
 	Plug.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
 	Plug.UpdatePluginList()
 	
-	Plug.Add("Text", "x0 y" HEIGHT - 66 " h1 w" WIDTH " 0x08")
+	Plug.Add("Text", "x0 y" HEIGHT - 35 " h1 w" WIDTH " 0x08")
 	Plug.Add("Text", "x8 yp+9", "Load order:")
 	
 	Plug.Font("s8")
 	Plug.Add("Button", "x80 yp-4 w63 h" BUTTON_HEIGHT, "Move up", Plug.Move.Bind(Plug, -1))
 	Plug.Add("Button", "x145 yp w72 h" BUTTON_HEIGHT, "Move down", Plug.Move.Bind(Plug, 1))
 	
-	Plug.Add("Button", "x6 yp+30 w" WIDTH/2 - 6 " h" BUTTON_HEIGHT, "Open plugin folder", Plug.OpenFolder.Bind(Plug))
-	Plug.Add("Button", "x" WIDTH/2 + 3 " yp w" WIDTH/2 - 6 " h" BUTTON_HEIGHT, "Apply (reload)", Plug.Restart.Bind(Plug))
+	Plug.Add("Button", "x" WIDTH - 180 " yp h" BUTTON_HEIGHT, "Open plugin folder", Plug.OpenFolder.Bind(Plug))
+	Plug.Add("Button", "xp+100 yp h" BUTTON_HEIGHT, "Apply (reload)", Plug.Restart.Bind(Plug))
 	
 	Plug.Show("w" WIDTH " h" HEIGHT)
 }

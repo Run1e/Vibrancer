@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; Show a MouseTip on clipboard change
+#SingleInstance force
 #NoEnv
 #Persistent
 #NoTrayIcon

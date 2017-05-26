@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; Add a CS:GO shortcut to tray menu
+#SingleInstance force
 #NoEnv
 #Persistent
 #NoTrayIcon

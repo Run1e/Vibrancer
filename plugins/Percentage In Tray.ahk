@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; WIP UNFINISHED
+#SingleInstance force
 #NoEnv
 #Persistent
 SetBatchLines -1
@@ -23,7 +24,7 @@ SetBatchLines, -1
 pToken := Gdip_Startup()
 
 ; Set the width and height we want as our drawing area, to draw everything in. This will be the dimensions of our bitmap
-Width := 32, Height := 32
+Width := 128, Height := 128
 
 ; Create a layered window (+E0x80000 : must be used for UpdateLayeredWindow to work!) that is always on top (+AlwaysOnTop), has no taskbar entry or caption
 Gui, 1: -Caption +E0x80000 +LastFound +AlwaysOnTop +ToolWindow +OwnDialogs
@@ -39,7 +40,7 @@ hbm := CreateDIBSection(Width, Height)
 
 ; Get a device context compatible with the screen
 hdc := CreateCompatibleDC()
-Gdip_Bitmap
+
 ; Select the bitmap into the device context
 obm := SelectObject(hdc, hbm)
 
@@ -105,7 +106,7 @@ If !Gdip_FontFamilyCreate(Font)
 ; As mentioned previously, you don not need to specify the last 2 parameters, the width and height, unless
 ; you are planning on using the p option with the x,y,w,h to use the percentage
 Options = x10p y30p w80p Centre cbbffffff r4 s20 Underline Italic
-Gdip_TextToGraphics(G, "Tutorial 8`n`nThank you for trying this example", Options, Font, Width, Height)
+Gdip_TextToGraphics(G, "15", Options, Font, Width, Height)
 
 
 ; Update the specified window we have created (hwnd1) with a handle to our bitmap (hdc), specifying the x,y,w,h we want it positioned on our screen

@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; F2/F3: paste code, F4: Spotify NP command
+#SingleInstance force
 #NoEnv
 #Persistent
 #NoTrayIcon
@@ -31,6 +32,7 @@ return
 
 DiscordNP() {
 	static EndPoint := "https://api.spotify.com/v1/search?q="
+	
 	WinGetTitle, Title, ahk_exe Spotify.exe
 	if !WinActive("ahk_exe Discord.exe") || !StrLen(Title) || (Title = "Spotify")
 		return

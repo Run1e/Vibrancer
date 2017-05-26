@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; Shows a MouseTip showing upload progress
+#SingleInstance force
 #NoEnv
 #Persistent
 #NoTrayIcon

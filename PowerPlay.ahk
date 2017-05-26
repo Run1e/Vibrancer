@@ -124,6 +124,7 @@ Print(text := "") {
 	Event("Print", IsObject(text) ? pa(text) : text)
 }
 
+#Include lib\ApplySettings.ahk
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
 #Include lib\Class AppSelectGUI.ahk

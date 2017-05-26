@@ -1,4 +1,5 @@
-﻿#SingleInstance force
+﻿; Launch Steam games through the tray menu
+#SingleInstance force
 #NoEnv
 #NoTrayIcon
 SetRegView 64
