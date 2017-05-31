@@ -1,4 +1,5 @@
 *.exe
+CreateRelease.ahk
 PowerPlaySetup.iss
 backup/*
 data/*

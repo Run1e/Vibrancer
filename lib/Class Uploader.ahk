@@ -1,8 +1,7 @@
 ﻿Class Uploader {
 	__New() {
 		this.AllowedExt := "i)(png|jpg|jpeg|gif|bmp)$"
-		this.client_id := IsFunc("client_id")?Func("client_id").Call():""
-		this.WorkerScript := A_WorkingDir "\PowerPlayUploader." (A_IsCompiled?"exe":"ahk")
+		this.client_id := Settings.Imgur.client_id ? Settings.Imgur.client_id : "45a0e7fa6727f61"
 		
 		this.Queue := [] ; contains items waiting to be ran
 		this.QueueSucceed := []
@@ -11,9 +10,6 @@
 		this.ImgurFolder :=  "images\imgur"
 		this.DeletedFolder := "images\deleted"
 		this.LocalFolder := "images\local"
-		
-		; setup com object
-		ObjRegisterActive(this, "{9cd4083e-4f48-42e9-9b89-f1fc463b43b8}")
 		
 		; launch the uploader
 		this.LaunchWorker()
@@ -46,6 +42,7 @@
 		
 		if Event("UploaderDelete", Index)
 			return
+		
 		this.AddQueue(Info)
 	}
 	
@@ -111,9 +108,6 @@
 		if (this.Status = 2)
 			this.SetStatus(0), this.GuiSetStatus("Paused..")
 		
-		if !this.CheckAlive()
-			return
-		
 		this.GuiCheckButtons()
 		this.GuiUpdate()
 		
@@ -130,14 +124,12 @@
 		
 		this.GuiSetStatus(Info.Event="Upload"?"Starting..":"Deleting..")
 		
-		; pass them to the worker
-		if (Info.Event = "Upload") {
-			this.Worker.Upload(Info.ID)
-		}
+		; pass them to the worker thread (a-sync)
+		if (Info.Event = "Upload")
+			this.Worker.ahkPostFunction["Upload", Info.ID]
 		
-		else if (Info.Event = "Delete") {
-			this.Worker.Delete(Info.ID, Info.DeleteHash)
-		}
+		else if (Info.Event = "Delete")
+			this.Worker.ahkPostFunction["Delete", Info.ID, Info.DeleteHash]
 	}
 	
 	AdvanceQueue() {
@@ -390,44 +382,17 @@
 		this.Status := Status
 	}
 	
+	; launch worker thread
 	LaunchWorker() {
-		Print("Launching upload worker")
-		Run % this.WorkerScript,, UseErrorLevel
-		if (ErrorLevel = "ERROR")
-			Error("Failed to run Uploader Helper", A_ThisFunc, this.WorkerScript " failed to run, please e-mail me at runar-borge@hotmail.com if this issue persists.",, true)
-		Print("Upload worker launching..")
-	}
-	
-	CheckAlive() {
-		try
-			this.Worker.ArbitraryMethodNameToLureOutAnError()
-		catch e {
-			this.SetStatus(3)
-			this.LaunchWorker()
-			return false
-		} return true
-	}
-	
-	Handshake(Worker) {
-		Print("Upload worker launched")
-		
-		this.Worker := Worker
-		
-		; start queue if the queue is waiting
-		if (this.Status = 3) {
-			this.SetStatus(1)
-			this.StepQueue(false)
-		}
+		this.Worker := AhkThread("Main := ObjShare(" ObjShare(this) ")`n" UploaderScript())
 	}
 	
 	Free() {
-		try ; attempt to close worker
-			this.Worker.Exit()
-		sleep 50
+		ahkthread_free(this.Worker), this.Worker := ""
 	}
 	
 	/*
-		=== GUI CONTROL METHODS ===
+		GUI CONTROL METHODS ===
 	*/
 	
 	GuiAddImage(Index) {
