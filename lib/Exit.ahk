@@ -10,6 +10,5 @@
 	
 	; revoke COM objects
 	ObjRegisterActive(Plugin, "")
-	ObjRegisterActive(Uploader, "")
 	ExitApp
 }

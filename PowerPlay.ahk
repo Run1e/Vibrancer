@@ -1,9 +1,10 @@
+#NoEnv
 #SingleInstance force
 #MaxHotkeysPerInterval 200
 #UseHook
-#NoEnv
 #Persistent
 #NoTrayIcon
+#WarnContinuableException Off
 DetectHiddenWindows On
 SetRegView 64
 SetWinDelay -1
@@ -23,9 +24,10 @@ if !A_IsAdmin && A_IsCompiled {
 }
 
 ; only compiled and tested in 32-bit.
-if (A_PtrSize = 8) {
-	msgbox Please run this script as 32-bit.
+if (A_PtrSize=8) {
+	m("Please run script as 32-bit.")
 	ExitApp
+	return
 }
 
 global AppName, AppVersion, AppVersionString ; app info
@@ -34,8 +36,8 @@ global Settings, Keybinds, GameRules, Images ; JSON
 global Actions, Plug, Uploader, Tray ; objects
 global VERT_SCROLL, pToken ; other
 
-AppName := "Power Play"
-AppVersion := [0, 9, 82]
+AppName := "PowerPlay"
+AppVersion := [0, 9, 9]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -76,7 +78,7 @@ VERT_SCROLL := SysGet(2)
 ; create main gui
 CreateBigGUI()
 
-; init menu from json file
+; create tray menu
 Tray := new Tray
 Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
 Tray.Add("Plugins", Actions.Plugins.Bind(Actions), Icon("plug"))
@@ -141,6 +143,7 @@ Print(text := "") {
 #Include lib\Class OnMouseMove.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class PluginGUI.ahk
+#Include lib\Class Rules.ahk
 #Include lib\Class SettingsGUI.ahk
 #Include lib\Class Uploader.ahk
 #Include lib\Debug.ahk
@@ -158,8 +161,8 @@ Print(text := "") {
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\Update.ahk
+#Include lib\UploaderScript.ahk
 
-#Include *i lib\client_id.ahk
 
 ; thanks fams
 #Include lib\third-party\Class CtlColors.ahk
@@ -174,4 +177,3 @@ Print(text := "") {
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\SetCueBanner.ahk
 #Include lib\third-party\WinGetPosEx.ahk
-#Include lib\Class Rules.ahk
