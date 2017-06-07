@@ -102,20 +102,22 @@ PluginsLaunched() {
 	
 	for Index, Arg in Args {
 		if (Arg = "/UPDATED") {
-			Settings.Delete("UpdateVersion")
 			FileRemoveDir PowerPlay-installer, 1
 			FileDelete PowerPlay-installer.zip
 			
 			if FileExist("PowerPlayUploader.exe") { ; remove/change for 0.9.9 and onwards
 				Settings.Delete("Imgur")
+				Settings.Delete("UpdateVersion")
 				Settings.GuiState.Delete("ExpandState")
 				Settings.Color.Delete("Dark")
+				Settings.Plugins := ["Imgur Uploader"]
 				Settings.Save()
 				FileDelete, data\Keybinds.json
 				FileDelete, PowerPlayUploader.exe
 				FileDelete, plugins\PowerPlayMouseMsg.ahk
+				FileRemoveDir plugins\pluginlib, 1
 				MsgBox,48,Attention!,% "Because of a data structure update, your keybinds have been reset."
-				Run *RunAs "%A_ScriptFullPath%"
+				Run *RunAs "%A_ScriptFullPath%" /UPDATED
 				ExitApp
 			}
 			
@@ -155,6 +157,14 @@ Icon(name := "") {
 	if (name = "")
 		return A_WorkingDir . "\icons\powerplay.ico"
 	return A_WorkingDir . "\icons\octicons\" name ".ico"
+}
+
+BugReport() {
+	MsgBox, 68, GitHub, Do you have a GitHub account?
+	ifMsgBox yes
+		Run("https://github.com/Run1e/PowerPlay/issues")
+	else
+		Run("https://gitreports.com/issue/Run1e/PowerPlay")
 }
 
 Print(text := "") {

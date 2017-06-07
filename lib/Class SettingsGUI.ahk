@@ -54,6 +54,7 @@ Settings() {
 	;SetGUI.Add("Groupbox", "xm y+6 h136 w180", "Imgur")
 	
 	; bottom buttons
+	SetGUI.Add("Button", "x6 w181", "Report a bug", Func("BugReport"))
 	SetGUI.Add("Button", "x6", "Check for updates", Func("CheckForUpdates"))
 	SetGUI.Add("Button", "x137 yp w50", "Save", SetGUI.Save.Bind(SetGUI))
 	

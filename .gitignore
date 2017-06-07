@@ -1,6 +1,7 @@
 *.exe
 notes.txt
 CreateRelease.ahk
+UpdateTest.ahk
 PowerPlaySetup.iss
 backup/*
 data/*
@@ -12,4 +13,3 @@ compiled/*
 plugins/Steam Account Switcher.ahk
 plugins/backup/*
 plugins/imgurlib/backup/*
-Test Updating.ahk
