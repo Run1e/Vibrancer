@@ -26,3 +26,4 @@
 
 # Written in [AutoHotkey_L](https://autohotkey.com/)
 * Some plugins require AHK_H which is packed with the installer/repo
+AHK_H is avaliable here: https://hotkeyit.github.io/v2/
