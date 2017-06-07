@@ -1,8 +1,6 @@
-### [Visit the website for more information](http://runie.me/)
+# [Visit the website for more information](http://runie.me/)
 
-## [Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
-
-# Thanks to:
+### Thanks to:
 
 - jNizM for his [NvAPI wrapper](https://github.com/jNizM/AHK_NVIDIA_NvAPI)
 - 'just me' for his [LV_Colors class](https://github.com/AHK-just-me/Class_LV_Colors), [ImageButton class](https://github.com/AHK-just-me/Class_ImageButton), [CtlColors class](https://github.com/AHK-just-me/Class_CtlColors) and [LV_EX library](https://autohotkey.com/boards/viewtopic.php?t=1256)
