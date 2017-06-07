@@ -52,21 +52,23 @@ FileRead(file) {
 	return out
 }
 
-; https://autohotkey.com/board/topic/60706-native-zip-and-unzip-xpvista7-ahk-l/
-Unz(sZip, sUnz) {
-	fso := ComObjCreate("Scripting.FileSystemObject")
-	If Not fso.FolderExists(sUnz)  ; http://www.autohotkey.com/forum/viewtopic.php?p=402574
-		fso.CreateFolder(sUnz)
-	psh  := ComObjCreate("Shell.Application")
-	zippedItems := psh.Namespace( sZip ).items().count
-	psh.Namespace( sUnz ).CopyHere( psh.Namespace( sZip ).items, 4|16 )
-	Loop {
-		sleep 50
-		unzippedItems := psh.Namespace( sUnz ).items().count
-		IfEqual,zippedItems,%unzippedItems%
-		break
+/*
+	; https://autohotkey.com/board/topic/60706-native-zip-and-unzip-xpvista7-ahk-l/
+	Unz(sZip, sUnz) {
+		fso := ComObjCreate("Scripting.FileSystemObject")
+		If Not fso.FolderExists(sUnz)  ; http://www.autohotkey.com/forum/viewtopic.php?p=402574
+			fso.CreateFolder(sUnz)
+		psh  := ComObjCreate("Shell.Application")
+		zippedItems := psh.Namespace( sZip ).items().count
+		psh.Namespace( sUnz ).CopyHere( psh.Namespace( sZip ).items, 4|16 )
+		Loop {
+			sleep 50
+			unzippedItems := psh.Namespace( sUnz ).items().count
+			IfEqual,zippedItems,%unzippedItems%
+			break
+		}
 	}
-}
+*/
 
 WinActivate(win) {
 	WinActivate % win

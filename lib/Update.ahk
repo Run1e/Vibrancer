@@ -15,7 +15,8 @@
 	if !FileExist("PowerPlay-installer.zip")
 		return TrayTip("Failed downloading update")
 	
-	Unz(A_WorkingDir "\PowerPlay-installer.zip", A_WorkingDir "\PowerPlay-installer\")
+	if !UnZip(A_WorkingDir "\PowerPlay-installer.zip", A_WorkingDir "\PowerPlay-installer\")
+		return TrayTip("Failed Unzipping installer")
 	
 	; check it unzipped properly
 	if !FileExist("PowerPlay-installer\PowerPlay-installer.exe")

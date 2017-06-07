@@ -271,8 +271,8 @@
 		this.Deleted := 0
 		this.QueueFail := []
 		
-		;if !Img.IsVisible
-		TrayTip(Title, Msg)
+		if !Img.IsVisible
+			TrayTip(Title, Msg)
 		
 		
 		Images.Save()

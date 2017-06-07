@@ -2,14 +2,13 @@
 	__New() {
 		this.Listeners := []
 		this.OnExits := []
-		this.CLSID := "{40677552-fdbd-444d-a9dd-6dce43b0cd56}"
 		
 		this.AppName := AppName
 		this.Version := AppVersion
 		this.VersionString := AppVersionString
 		this.Directory := A_WorkingDir
 		
-		ObjRegisterActive(this, this.CLSID)
+		ObjRegisterActive(this, "{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 	}
 	
 	test() {
@@ -104,11 +103,15 @@
 		return Back
 	}
 	
+	Run(Plg) {
+		Run(A_WorkingDir "\lib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+	}
+	
 	Launch(Index) {
 		static MaxWait := 800 ; max amount of time a plugin has to declare it has finished its autoexec
 		if (Plg := Settings.Data().Plugins[Index]) {
 			try
-				Run(A_WorkingDir "\lib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+				this.Run(Plg)
 			catch e
 				Settings.Plugins.Delete(Index)
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)

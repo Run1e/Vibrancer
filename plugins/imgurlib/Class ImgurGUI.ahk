@@ -25,9 +25,6 @@
 		for Index, File in FileArray
 			if (File ~= Uploader.AllowedExt)
 				Uploader.Upload(A_Now "_" A_MSec, File)
-		
-		if (Uploader.Status = 0) && Uploader.Queue.Count()
-			Uploader.StartQueue()
 	}
 	
 	

@@ -40,28 +40,16 @@
 		}
 	}
 	
-	SetList() {
-		i:=0, Checked := {}
-		
+	GetChecked() {
+		i := 0, Plugs := []
 		while i:=this.LV.GetNext(i, "Checked")
-			Checked.Push(this.LV.GetText(i))
-		
-		
-		if !Checked.MaxIndex() {
-			if !Settings.Plugins.MaxIndex()
-				return
-			Settings.Plugins := {}
-			this.UpdatePluginList()
-			return
-		}
-		
-		for Index, Plg in Checked {
-			if (Settings.Data().Plugins[Index] != Plg) || (Settings.Plugins.MaxIndex() > Checked.MaxIndex()) {
-				Settings.Plugins := Checked
-				this.UpdatePluginList(this.LV.GetNext())
-				return
-			}
-		}
+			Plugs.Push(this.LV.GetText(i))
+		return Plugs
+	}
+	
+	SetList() {
+		Settings.Plugins := this.GetChecked()
+		this.UpdatePluginList()
 	}
 	
 	UpdatePluginList(Select := 1) {

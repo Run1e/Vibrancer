@@ -50,13 +50,12 @@ MakeFolders()
 
 Error("", "",,,, "..\logs") ; set error log folder
 
-; port old data
+; port data from pre-v0.9.9
 if FileExist("..\data\Images.json") {
-	for Index, Image in JSON.Load("..\data\Images.json")
-		FileMove, % "..\Images\imgur\" Image.id "." Images.extension, % "..\data\imgur\image\uploaded\" Index "." Image.extension, 1
+	for Index, Image in JSON.Load(FileRead("..\data\Images.json"))
+		FileMove, % "..\images\imgur\" Image.id "." Image.extension, % "..\data\imgur\image\uploaded\" Index "." Image.extension, 1
 	FileMove, ..\data\Images.json, ..\data\imgur\ImgurImages.json
-	FileDelete, ..\data\Images.json
-	FileDelete, ..\Images
+	FileRemoveDir, ..\images, 1
 }
 
 try

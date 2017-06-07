@@ -4,6 +4,7 @@
 #UseHook
 #Persistent
 #NoTrayIcon
+#WarnContinuableException Off
 DetectHiddenWindows On
 SetRegView 64
 SetWinDelay -1
@@ -12,19 +13,18 @@ CoordMode, Mouse, Screen
 CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
-OnExit("Exit")
-
-/*
-	todo:
-*/
 
 ; has to elevate itself to admin so it can create folders/files when installed in program files
 if !A_IsAdmin && A_IsCompiled {
 	Loop %0%
-		pToken .= (InStr(%A_Index%, " ") ? """" : "") . %A_Index% . (InStr(%A_Index%, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath% " %pToken%
+		pToken .= " " . (InStr(%A_Index%, " ") ? """" : "") . %A_Index% . (InStr(%A_Index%, " ") ? """" : "")
+	Run *RunAs "%A_ScriptFullPath%" %pToken%
 	ExitApp
 }
+
+global Args := []
+Loop %0%
+	Args.Push(%A_Index%)
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize=8) {
@@ -32,6 +32,8 @@ if (A_PtrSize=8) {
 	ExitApp
 	return
 }
+
+OnExit("Exit")
 
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
@@ -97,23 +99,34 @@ return
 
 ; runs after plugins have finished launching
 PluginsLaunched() {
-	Loop %0%
-	{
-		if (%A_Index% = "/UPDATED") {
+	
+	for Index, Arg in Args {
+		if (Arg = "/UPDATED") {
 			Settings.Delete("UpdateVersion")
 			FileRemoveDir PowerPlay-installer, 1
 			FileDelete PowerPlay-installer.zip
-			if (AppVersionString = "v0.9.9") {
+			
+			if FileExist("PowerPlayUploader.exe") { ; remove/change for 0.9.9 and onwards
+				Settings.Delete("Imgur")
+				Settings.GuiState.Delete("ExpandState")
+				Settings.Color.Delete("Dark")
+				Settings.Save()
 				FileDelete, data\Keybinds.json
-				m("Because of a data structure update, your keybinds have been reset.")
-				reload
+				FileDelete, PowerPlayUploader.exe
+				FileDelete, plugins\PowerPlayMouseMsg.ahk
+				MsgBox,48,Attention!,% "Because of a data structure update, your keybinds have been reset."
+				Run *RunAs "%A_ScriptFullPath%"
 				ExitApp
-			} else
-				TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+			}
+			
+			TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
 		}
 		
-		else if (%A_Index% = "/OPEN")
+		else if (Arg = "/OPEN") { ; run imgur uploader on users first launch
+			Settings.Plugins := ["Imgur Uploader"]
+			Plugin.Run("Imgur Uploader")
 			Big.Open()
+		}
 	}
 	
 	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
