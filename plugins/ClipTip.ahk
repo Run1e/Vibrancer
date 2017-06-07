@@ -12,7 +12,11 @@ SetBatchLines -1
 global MaxLen := 30
 global MaxLines := 4
 
-Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+try
+	Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+catch e
+	ExitApp
+
 Power.OnExit(Func("Exit"))
 
 OnClipboardChange("ClipTip")

@@ -1,8 +1,7 @@
 ﻿CheckForUpdates() {
 	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases/latest"
 	
-	if Event("CheckForUpdates")
-		return
+	Event("CheckForUpdates")
 	
 	; get github api info on the powerplay repo
 	if !HTTP.Get(URL, Data)

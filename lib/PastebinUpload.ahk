@@ -24,7 +24,7 @@
 	
 	if (InStr(Response, "https://pastebin.com") = 1) {
 		Title := "Clipboard uploaded!"
-		Msg := "Link copied to clipboard." . RunClipboardKeybindText()
+		Msg := "Link copied to clipboard."
 		
 		Clipboard(StrReplace(Response, "https://pastebin.com/", "https://pastebin.com/raw/"))
 		

@@ -73,22 +73,27 @@
 				continue
 			}
 			
-			FileReadLine, Line, % "plugins\" Plg ".ahk", 1
-			Desc := (InStr(Line, "; ") = 1 ? SubStr(Line, 3) : "No description")
-			this.LV.Add("Check1", Plg, Desc), Added[Plg] := ""
+			FileReadLine, Desc, % "plugins\" Plg ".ahk", 1
+			FileReadLine, Author, % "plugins\" Plg ".ahk", 2
+			Desc := (InStr(Desc, "; ") = 1 ? SubStr(Desc, 3) : "No description")
+			Author := (InStr(Author, "; ") = 1 ? SubStr(Author, 3) : " -")
+			this.LV.Add("Check1", Plg, Desc, Author), Added[Plg] := ""
 		}
 		
 		Loop, Files, plugins\*.ahk
 		{
 			if !Added.HasKey(File := rtrim(A_LoopFileName, ".ahk")) {
-				FileReadLine, Line, % A_LoopFileFullPath, 1
-				Desc := (InStr(Line, "; ") = 1 ? SubStr(Line, 3) : "No description")
-				this.LV.Add("Check0", File, Desc)
+				FileReadLine, Desc, % A_LoopFileFullPath, 1
+				FileReadLine, Author, % A_LoopFileFullPath, 2
+				Desc := (InStr(Desc, "; ") = 1 ? SubStr(Desc, 3) : "No description")
+				Author := (InStr(Author, "; ") = 1 ? SubStr(Author, 3) : " -")
+				this.LV.Add("Check0", File, Desc, Author)
 			}
 		}
 		
 		this.LV.ModifyCol(1, "AutoHDR")
 		this.LV.ModifyCol(2, "AutoHDR")
+		this.LV.ModifyCol(3, "AutoHDR")
 		
 		; this.LV.ModifyCol(1, this.WIDTH - (LV_EX_GetRowHeight(this.LV.hwnd) * this.LV.GetCount() > this.LV_HEIGHT ? VERT_SCROLL : 0))
 		
@@ -123,7 +128,7 @@ Plugins() {
 	
 	Plug := new PluginGUI("Plugins", "-MinimizeBox")
 	
-	Plug.WIDTH := WIDTH := 460
+	Plug.WIDTH := WIDTH := 550
 	Plug.HEIGHT := HEIGHT := 250
 	Plug.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
 	Plug.LV_HEIGHT := LV_HEIGHT := HEIGHT - 33
@@ -132,7 +137,7 @@ Plugins() {
 	Plug.Font("s10")
 	Plug.DropFilesToggle(true)
 	
-	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" LV_HEIGHT " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin|Description", Plug.ListViewAction.Bind(Plug))
+	Plug.LV := new Gui.ListView(Plug, "x0 y0 w" WIDTH " h" LV_HEIGHT " -Hdr -Multi Checked AltSubmit -E0x200 -TabStop", "Plugin|Description|Author", Plug.ListViewAction.Bind(Plug))
 	Plug.CLV := new LV_Colors(Plug.LV.hwnd)
 	Plug.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	

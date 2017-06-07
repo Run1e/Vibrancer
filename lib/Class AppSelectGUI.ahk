@@ -14,7 +14,7 @@
 		this.Destroy()
 		
 		if IsObject(Info)
-			Print(Info)
+			Event("AppSelectCallback", Info)
 		
 		this.Callback.Call(Info)
 		Prog := ""

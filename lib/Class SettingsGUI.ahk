@@ -3,31 +3,13 @@
 	; save settings and close
 	Save() {
 		
-		StartUp := this.ControlGet("Checked",, "Button5")
+		StartUp := this.ControlGet("Checked",, "Button4")
 		VibrancyDefault := this.GetText("Edit1")
-		CloseOnCopy := this.ControlGet("Checked",, "Button7")
-		CloseOnOpen := this.ControlGet("Checked",, "Button8")
-		UseGifv := this.ControlGet("Checked",, "Button9")
-		ListViewMax := this.GetText("Edit2")
-		
-		if (ListViewMax < 10)
-			return TrayTip("Invalid parameter", "Please select a value higher than 10 as Image list limit.")
-		
-		if (ListViewMax != Settings.Imgur.ListViewMax) {
-			Settings.Imgur.ListViewMax := ListViewMax
-			Tooltip Working..
-			Big.UpdateImgurList()
-			Tooltip
-		}
 		
 		Settings.StartUp := StartUp
 		Settings.VibrancyDefault := VibrancyDefault
 		
 		Rules.VibAll(VibrancyDefault)
-		
-		Settings.Imgur.CloseOnCopy := CloseOnCopy
-		Settings.Imgur.CloseOnOpen := CloseOnOpen
-		Settings.Imgur.UseGifv := UseGifv
 		
 		Settings.Save()
 		ApplySettings()
@@ -69,7 +51,7 @@ Settings() {
 	
 	; groupboxes
 	SetGUI.Add("Groupbox", "xm y2 h142 w180", AppName)
-	SetGUI.Add("Groupbox", "xm y+6 h136 w180", "Imgur")
+	;SetGUI.Add("Groupbox", "xm y+6 h136 w180", "Imgur")
 	
 	; bottom buttons
 	SetGUI.Add("Button", "x6", "Check for updates", Func("CheckForUpdates"))
@@ -84,14 +66,6 @@ Settings() {
 	SetGUI.Font("s8")
 	SetGUI.Add("Link", "yp+36", "<a href=""https://pastebin.com/api"">Get your Developer API Key here</a>")
 	SetGUI.Font("s10")
-	
-	SetGui.Margin(6, 8)
-	; imgur controls
-	SetGUI.Add("Checkbox", "xm+12 y176 Checked" Settings.Imgur.CloseOnCopy, "Close on copy")
-	SetGUI.Add("Checkbox", "Checked" Settings.Imgur.CloseOnOpen, "Close on open")
-	SetGUI.Add("Checkbox", "Checked" Settings.Imgur.UseGifv, "Link to .gifv")
-	SetGUI.Add("Text",, "Image list limit: ")
-	SetGUI.Add("Edit", "x110 yp-2 w33 Number -Wrap Limit", Settings.Imgur.ListViewMax)
 	
 	SetGUI.Options("-MinimizeBox")
 	SetGUI.Show()

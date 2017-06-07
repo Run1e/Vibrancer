@@ -12,24 +12,18 @@
 	AddImage(File) {
 		; create bitmap from file
 		pBitmap := Gdip_CreateBitmapFromFile(File)
-		
 		if (pBitmap < 1) ; failed at creating bitmap from file
 			return false
-		
 		Icon := this.AddBitmap(pBitmap)
-		
 		Gdip_DisposeImage(pBitmap)
-		
 		return Icon
 	}
 	
 	AddBitmap(pBitmap) {
 		; get a resized bitmap
 		pBitmapResized := this.ScaleBitmap(pBitmap)
-		
 		; get handle
 		hBitmap:=Gdip_CreateHBITMAPFromBitmap(pBitmapResized)
-		
 		return this.Add(hBitmap)
 	}
 	

@@ -2,10 +2,10 @@
 	static Enabled := false
 	
 	Enable(Process) {
-		if Event("RulesEnable", Process, Info := GameRules[Process])
-			return
+		Event("RulesEnable", Process, Info := GameRules[Process])
 		
 		this.Enabled := true
+		this.Process := Process
 		
 		for Index, Screen in Settings.VibrancyScreens
 			this.Vib(Info.Vibrancy, Screen)
@@ -17,10 +17,10 @@
 	}
 	
 	Disable() {
-		if Event("RulesDisable")
-			return
+		Event("RulesDisable")
 		
 		this.Enabled := false
+		this.Process := ""
 		
 		this.VibAll(Settings.VibrancyDefault)
 		
@@ -46,6 +46,10 @@
 		
 		for Process, Info in GameRules.Data() {
 			if (SubStr(ProcessPath, 1, StrLen(Process)) = Process) { ; apply rules to any exe in the dir if only a dir is specified
+				
+				if (this.Process = Process)
+					return
+				
 				if this.Enabled
 					this.Disable()
 				

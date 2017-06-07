@@ -1,92 +1,86 @@
 ﻿Class Actions {
-	static List := GetActionsList()
-	
-	Send(Input) {
-		SendInput % Input
-	}
-	
-	SendRaw(Input) {
-		SendRaw % Input
-	}
-	
-	Run(param) {
-		if !Run(param)
-			Error("Run() failed.", A_ThisFunc, param, true)
-	}
-	
-	Spotify(CMD) {
-		PostMessage, 0x319,, % CMD,, ahk_class SpotifyMainWindow ; 0x319 = WM_APPCOMMAND
-	}
-	
-	SpotifyItem(Top, Sub) {
-		WinMenuSelectItem, ahk_class SpotifyMainWindow, Chrome Legacy Window, % Top, % Sub
-	}
-	
-	Screenshot(Size) {
-		if (Size = "Area")
-			Capture.Rect()
-		else if (Size = "Window")
-			Capture.Window()
-		else if (Size = "Full")
-			Capture.Screen()
-	}
-	
-	; if running the clipboard fails (ie, not a file/link), it googles the clipboard text
-	RunClipboard() {
-		if !StrLen(clipboard)
-			return TrayTip("Clipboard is empty!")
+	Class BuiltIn {
+		Open(tab := "") {
+			Big.Open(tab)
+		}
 		
-		if !Run(clipboard) ; running the clipboard failed, google the contents
-			Run("https://www.google.com/#q=" HTTP.UriEncode(clipboard))
+		; if running the clipboard fails (ie, not a file/link), it googles the clipboard text
+		RunClipboard() {
+			if (clipboard = "")
+				return TrayTip("Clipboard is empty!")
+			
+			try
+				Run(clipboard)
+			catch e
+				Run("https://www.google.com/#q=" HTTP.UriEncode(clipboard))
+		}
+		
+		UploadClip() {
+			PastebinUpload()
+		}
+		
+		Settings() {
+			Settings()
+		}
+		
+		Plugins() {
+			Plugins()
+		}
 	}
 	
-	UploadClip() {
-		PastebinUpload()
+	Class Multimedia {
+		PlayPause() {
+			SendInput % "{Media_Play_Pause}"
+		}
+		
+		Next() {
+			SendInput % "{Media_Next}"
+		}
+		
+		Prev() {
+			SendInput % "{Media_Prev}"
+		}
+		
+		VolUp() {
+			SendInput % "{Volume_Up}"
+		}
+		
+		VolDown() {
+			SendInput % "{Volume_Down}"
+		}
+		
+		VolMute() {
+			SendInput % "{Volume_Mute}"
+		}
 	}
 	
-	Open(tab := "") {
-		Big.Open(tab)
-	}
-	
-	Settings() {
-		Settings()
-	}
-	
-	Plugins() {
-		Plugins()
-	}
-	
-	ListVars() {
-		ListVars
-	}
-	
-	CheckForUpdates() {
-		CheckForUpdates()
-	}
-	
-	PrintHeaders() {
-		for a, b in Uploader.LastHeaders
-			if InStr(a, "X-Post-Rate-Limit")
-				temp .= a ": " b "`n"
-		if StrLen(temp)
-			TrayTip("IMGUR HEADERS", temp)
-		else
-			TrayTip("No headers stored.")
-	}
-	
-	PrintSettings() {
-		m(Settings.Data())
-	}
-	
-	PrintKeybinds() {
-		m(Keybinds.Data())
-	}
-	
-	Donate() {
-		Run("https://www.paypal.me/RUNIE")
-	}
-	
-	Exit() {
-		ExitApp
+	Class Spotify {
+		PlayPause() {
+			this.Msg(0xE0000)
+		}
+		
+		Next() {
+			this.Msg(0xB0000)
+		}
+		
+		Prev() {
+			this.Msg(0xC0000)
+		}
+		
+		VolUp() {
+			this.MenuItem("Playback", "Volume Up")
+		}
+		
+		VolDown() {
+			this.MenuItem("Playback", "Volume Down")
+		}
+		
+		Msg(Msg) {
+			PostMessage, 0x319,, % Msg,, ahk_class SpotifyMainWindow ; 0x319 = WM_APPCOMMAND
+		}
+		
+		MenuItem(Top, Sub) {
+			WinMenuSelectItem, ahk_class SpotifyMainWindow, Chrome Legacy Window, % Top, % Sub
+		}
 	}
 }

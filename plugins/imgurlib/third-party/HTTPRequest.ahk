@@ -994,6 +994,6 @@ HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="", Options="
 	Else If ( MyErrors = "" )
 		In_POST__Out_Data := ""
 	
-	In_Out_HEADERS := SubStr( hbuffer, 1, -1 ) . SubStr( MyErrors, 1, -1 )
+	In_Out_HEADERS := SubStr( hbuffer, 1, -1 ) "`n" SubStr( MyErrors, 1, -1 )
 	Return size, dbuffer := "", hbuffer := "", rbuffer := "", ErrorLevel := Response_Code
 } ; HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="", Options="" ) -----------------------

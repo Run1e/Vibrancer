@@ -4,7 +4,6 @@
 #UseHook
 #Persistent
 #NoTrayIcon
-#WarnContinuableException Off
 DetectHiddenWindows On
 SetRegView 64
 SetWinDelay -1
@@ -14,6 +13,10 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 OnExit("Exit")
+
+/*
+	todo:
+*/
 
 ; has to elevate itself to admin so it can create folders/files when installed in program files
 if !A_IsAdmin && A_IsCompiled {
@@ -32,11 +35,11 @@ if (A_PtrSize=8) {
 
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
-global Settings, Keybinds, GameRules, Images ; JSON
-global Actions, Plug, Uploader, Tray ; objects
+global Settings, Keybinds, GameRules ; JSON
+global Actions, Plug, Uploader, Tray, Binds ; objects
 global VERT_SCROLL, pToken ; other
 
-AppName := "PowerPlay"
+AppName := "Power Play"
 AppVersion := [0, 9, 9]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
@@ -47,9 +50,7 @@ pToken := Gdip_Startup()
 
 ; contains user settings
 Settings := new JSONFile("data\Settings.json")
-Settings.Fill(DefaultSettings())
-if !Settings.FileExist()
-	Settings.Save()
+Settings.Fill(DefaultSettings()), Settings.Save()
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
@@ -61,12 +62,6 @@ GameRules := new JSONFile("data\GameRules.json")
 if !GameRules.FileExist()
 	GameRules.Fill(DefaultGameRules()), GameRules.Save()
 
-; contains list of uploaded imgur images
-Images := new JSONFile("data\Images.json")
-if !Images.FileExist()
-	Images.Save()
-
-Uploader := new Uploader
 Plugin := new Plugin
 
 ; init nvidia api wrapper
@@ -78,52 +73,90 @@ VERT_SCROLL := SysGet(2)
 ; create main gui
 CreateBigGUI()
 
-; create tray menu
-Tray := new Tray
-Tray.Add("Open", Actions.Open.Bind(Actions), Icon("device-desktop"))
-Tray.Add("Plugins", Actions.Plugins.Bind(Actions), Icon("plug"))
-Tray.Add("Settings", Actions.Settings.Bind(Actions), Icon("gear"))
+; tray menu
+Tray.NoStandard()
+Tray.Add("Open", Big.Open.Bind(Big), Icon("device-desktop"))
+Tray.Add("Plugins", Func("Plugins"), Icon("plug"))
+Tray.Add("Settings", Func("Settings"), Icon("gear"))
 Tray.Add()
-Tray.Add("Donate", Actions.Donate.Bind(Actions), Icon("link"))
-Tray.Add("Exit", Actions.Exit.Bind(Actions), Icon("x"))
-Tray.SetDefault("Open")
+Tray.Add("Donate", Func("Donate"), Icon("link"))
+Tray.Add("Exit", Func("Exit"), Icon("x"))
+Tray.Default("Open")
+
+if FileExist(Icon())
+	Tray.Icon(Icon())
+
+Tray.Tip(AppName " " AppVersionString)
+Tray.Icon()
 
 ; apply/reenforce settings that do something external
 ApplySettings()
 
-if FileExist(Icon("icon"))
-	Menu, Tray, Icon, % Icon("icon")
-
-Menu, Tray, Tip, % AppName
-Menu, Tray, Icon ; show trayicon
-
-; detect window activations
-DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
-OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
-
-; bind hotkeys
-Keybinds(true)
-
 Plugin.Launch(1)
+return
 
-Loop %0%
-{
-	if (%A_Index% = "/UPDATED") {
-		Settings.Delete("UpdateVersion")
-		FileRemoveDir PowerPlay-installer, 1
-		FileDelete PowerPlay-installer.zip
-		TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+; runs after plugins have finished launching
+PluginsLaunched() {
+	Loop %0%
+	{
+		if (%A_Index% = "/UPDATED") {
+			Settings.Delete("UpdateVersion")
+			FileRemoveDir PowerPlay-installer, 1
+			FileDelete PowerPlay-installer.zip
+			if (AppVersionString = "v0.9.9") {
+				FileDelete, data\Keybinds.json
+				m("Because of a data structure update, your keybinds have been reset.")
+				reload
+				ExitApp
+			} else
+				TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+		}
+		
+		else if (%A_Index% = "/OPEN")
+			Big.Open()
 	}
 	
-	else if (%A_Index% = "/OPEN")
-		Big.Open()
+	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
+	OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
+	Rules.WinChange(32772, WinActive("A"))
+	
+	Keybinds(true)
 }
 
-Rules.WinChange(32772, WinActive("A"))
-return
+TrayTip(Title, Msg := "") {
+	if !StrLen(Msg)
+		Msg := Title, Title := AppName " " AppVersionString
+	TrayTip, % Title, % Msg
+}
+
+reload() {
+	Exit(false)
+	reload
+}
+
+Donate() {
+	Run("https://www.paypal.me/RUNIE")
+}
+
+Icon(name := "") {
+	if (name = "")
+		return A_WorkingDir . "\icons\powerplay.ico"
+	return A_WorkingDir . "\icons\octicons\" name ".ico"
+}
 
 Print(text := "") {
 	Event("Print", IsObject(text) ? pa(text) : text)
+}
+
+ImageButtonApply(hwnd) {
+	static RoundPx := 2
+	static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
+					, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
+					, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click
+					, [3, "Gray", "Gray", "0x505050", RoundPx,, "Gray"]] ; disabled
+	
+	If !ImageButton.Create(hwnd, ButtonStyle*)
+		MsgBox, 0, ImageButton Error Btn2, % ImageButton.LastError
 }
 
 #Include lib\ApplySettings.ahk
@@ -132,20 +165,17 @@ Print(text := "") {
 #Include lib\Class AppSelectGUI.ahk
 #Include lib\Class BigGUI.ahk
 #Include lib\Class BinderGUI.ahk
-#Include lib\Class Capture.ahk
-#Include lib\Class CustomImageList.ahk
+#Include lib\Class Binds.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
 #Include lib\Class JSONFile.ahk
 #Include lib\Class Menu.ahk
-#Include lib\Class MouseTip.ahk
-#Include lib\Class OnMouseMove.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class PluginGUI.ahk
 #Include lib\Class Rules.ahk
 #Include lib\Class SettingsGUI.ahk
-#Include lib\Class Uploader.ahk
+#Include lib\CreateBigGUI.ahk
 #Include lib\Debug.ahk
 #Include lib\DefaultGameRules.ahk
 #Include lib\DefaultKeybinds.ahk
@@ -153,7 +183,6 @@ Print(text := "") {
 #Include lib\Error.ahk
 #Include lib\Exit.ahk
 #Include lib\Functions.ahk
-#Include lib\GetActionsList.ahk
 #Include lib\GetApplications.ahk
 #Include lib\InitNvAPI.ahk
 #Include lib\Keybinds.ahk
@@ -161,7 +190,6 @@ Print(text := "") {
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\Update.ahk
-#Include lib\UploaderScript.ahk
 
 
 ; thanks fams
@@ -176,4 +204,3 @@ Print(text := "") {
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\SetCueBanner.ahk
-#Include lib\third-party\WinGetPosEx.ahk

@@ -1,20 +1,22 @@
-﻿; passing false disables every hotkey
-; passing true disables every hotkey and then enables user keybinds and if Big is open, the tab hotkeys
-Keybinds(Enable) {
-	
-	; special case! :( Capture.ScreenClass uses a hotkey to close so if it's open, we close it manually before doing hotkey stuff
-	if Capture.ScreenClass.Capturing
-		return Capture.ScreenClass.Close()
-	
-	if Event("Keybinds", Enable)
-		return
+﻿; passing false deletes every hotkey
+; passing true deletes every hotkey and then enables user keybinds and if Big is open, the tab hotkeys
+Keybinds(Enable := true) {
 	
 	Hotkey.DeleteAll()
 	
 	if Enable {
-		for Key, Bind in Keybinds.Data() ; rebind hotkeys
-			new Hotkey(Key, Actions[Bind.Func].Bind(Actions, Bind.Param*))
+		for Key, Bind in Keybinds.Data()
+			BindKey(Key, Bind)
 		Big.SetTabHotkeys(Big.ActiveTab)
 	}
-	
+}
+
+BindKey(Key, Bind) {
+	if Bind.Class {
+		if Actions[Bind.Class].HasKey("__Class") ; wow that worked?
+			new Hotkey(Key, Actions[Bind.Class, Bind.Func].Bind(Actions[Bind.Class], Bind.Param*))
+		else
+			try new Hotkey(Key, Actions[Bind.Class, Bind.Func].Bind(Bind.Param*))
+	} else
+		new Hotkey(Key, Func(Bind.Func).Bind(Bind.Param*))
 }

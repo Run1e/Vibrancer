@@ -12,6 +12,20 @@
 		ObjRegisterActive(this, this.CLSID)
 	}
 	
+	test() {
+		m(Binds.List)
+		m(Actions)
+	}
+	
+	; create an object in here if you need to pass to pp and still have it be for-loopable
+	Object(Param*) {
+		return Object(Param*)
+	}
+	
+	Array(Param*) {
+		return Array(Param*)
+	}
+	
 	; call if you want power play to close your plugin when it exits
 	OnExit(Func) {
 		this.OnExits.Push(Func)
@@ -41,22 +55,29 @@
 		return Func(Name)
 	}
 	
-	AddListener(hwnd) {
-		return (this.Listeners[hwnd] := {})
+	AddListener(Listener) {
+		return this.Listeners[Listener] := {}
 	}
 	
 	CreateMenu(Name) {
 		return new Menu(Name)
 	}
 	
-	TrayAdd(Name, Call := "", Icon := "") {
+	TrayAdd(Name := "", Call := "", Icon := "") {
 		static Added := 1, DefItemCount := 4
-		if !Tray.Insert(DefItemCount + Added "&", Name, Call, Icon)
-			return
+		
+		try
+			Tray.Insert(Added + DefItemCount "&", Name, Call, Icon)
+		catch Exception
+			ErrorEx(Exception, true)
+		
 		Added++
-		if (Added = 2)
-			if !Tray.Insert("Donate", "")
+		if (Added = 2) {
+			try
+				Tray.Insert("Donate", "")
+			catch e
 				Tray.Insert("Exit", "")
+		}
 	}
 	
 	; === PRIVATE METHODS ===
@@ -64,25 +85,36 @@
 	Event(Event, Param*) {
 		for Listener, Events in this.Listeners {
 			if Events.HasKey(Event) {
-				try {
-					Listener.OnEvent(Event, Param*) ; fails here if plugin has exited
-					if Events[Event]
-						Return := true
-				} catch e
+				try Listener.OnEvent(Event, this.MakeLoopable(Listener, this.MakeIndexed(Param)))
+				catch e
 					this.Listeners.Delete(Listener)
 			}
-		} return Return
+		}
+	}
+	
+	MakeLoopable(Listener, Obj) {
+		for Key, Value in Obj, Back := []
+			Back.Push(IsObject(Value) ? this.MakeLoopable(Listener, Value) : Value)
+		return Listener.Object(Back*)
+	}
+	
+	MakeIndexed(Obj) {
+		for Key, Value in Obj, Back := []
+			Back.Push(Key, IsObject(Value) ? this.MakeIndexed(Value) : Value)
+		return Back
 	}
 	
 	Launch(Index) {
 		static MaxWait := 800 ; max amount of time a plugin has to declare it has finished its autoexec
 		if (Plg := Settings.Data().Plugins[Index]) {
-			if !AhkThread("plugins\" Plg ".ahk",, true, "AutoHotkey.dll")
+			try
+				Run(A_WorkingDir "\lib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+			catch e
 				Settings.Plugins.Delete(Index)
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
 			SetTimer, % NextFunc, % "-" MaxWait
 		} else
-			this.NextFunc := ""
+			PluginsLaunched()
 	}
 	
 	Exit() {

@@ -122,7 +122,7 @@ Class Hotkey {
 	}
 	
 	CallFunc(Target) {
-		Target.Call()
+		try Target.Call()
 	}
 	
 	Apply(Label) {

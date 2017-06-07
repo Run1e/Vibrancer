@@ -1,14 +1,10 @@
-﻿Exit() {
+﻿Exit(Exit := true) {
 	CtlColors.Free() ; free ctlcolors
-	Uploader.Free() ; close upload helper
-	
 	Plugin.Exit()
 	
-	ShowCursor(true)
-	
 	Gdip_Shutdown(pToken) ; shut down gdip
+	ObjRegisterActive(Plugin, "") ; revoke COM objects
 	
-	; revoke COM objects
-	ObjRegisterActive(Plugin, "")
-	ExitApp
+	if Exit
+		ExitApp
 }

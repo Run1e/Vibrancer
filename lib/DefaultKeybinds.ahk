@@ -1,11 +1,10 @@
 ﻿DefaultKeybinds() {
-	return 	{ "^Delete": 	Actions.List["Multimedia"][1]
-			, "^PgDn": 	Actions.List["Multimedia"][2]
-			, "^End": 	Actions.List["Multimedia"][3]
-			, "+^1":		Actions.List["Built-in"][5]
-			, "+^2": 		Actions.List["Imgur"][1]
-			, "+^3": 		Actions.List["Imgur"][2]
-			, "+^4": 		Actions.List["Imgur"][3]
-			, "+^5":		Actions.List["Built-in"][2]
-			, "!C": 		Actions.List["Built-in"][1]}
+	return 	{ "^Delete": 	Binds.List.Spotify.1
+			, "^End": 	Binds.List.Spotify.3
+			, "^PgDn": 	Binds.List.Spotify.2
+			, "!C": 		Binds.List["Built-in"].1
+			, "+^1":		{Class: "ImgurUploader", Desc: "Imgur: Open GUI", Func: "Open"}
+			, "+^2":		{Class: "ImgurUploader", Desc: "Imgur: Capture Monitor", Func: "Screen"}
+			, "+^3":		{Class: "ImgurUploader", Desc: "Imgur: Capture Window", Func: "Window"}
+			, "+^4":		{Class: "ImgurUploader", Desc: "Imgur: Capture Area", Func: "Area"}}
 }

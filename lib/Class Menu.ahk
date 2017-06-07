@@ -1,112 +1,109 @@
 ﻿Class Menu {
-	static Instances := []
+	static BoundFuncMap := {}
 	
+	; create new menu
 	__New(Name) {
 		this.Name := Name
-		this.Map := {}
-		Menu.Instances[Name] := this
+		return this
 	}
 	
-	__Destroy() {
-		this.Delete()
+	; add a new item or another sub-menu object
+	Add(Item := "", BoundFunc := "", Icon := "") {
+		if IsObject(Item) {
+			try
+				Menu % this.Name, Add, % Item.Name, % ":" Item.Name
+			catch Exception
+				throw Exception
+		} else {
+			try {
+				Menu % this.Name, Add, % Item, MenuHandler
+				if BoundFunc
+					Menu.BoundFuncMap[this.Name, Item] := BoundFunc
+			} catch Exception
+				throw Exception
+		} if Icon
+			this.Icon(IsObject(Item) ? Item.Name : Item, Icon)
+	}
+	
+	Insert(Pos, Item := "", BoundFunc := "", Icon := "") {
+		if IsObject(Item) {
+			try
+				Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
+			catch Exception
+				throw Exception
+		} else {
+			try {
+				Menu % this.Name, Insert, % Pos, % Item, MenuHandler
+				if BoundFunc
+					Menu.BoundFuncMap[this.Name, Item] := BoundFunc
+			} catch Exception
+				throw Exception
+		} if Icon
+			this.Icon(IsObject(Item) ? Item.Name : Item, Icon)
+	}
+	
+	Delete(Item := "") {
+		try
+			Menu % this.Name, Delete, % Item
+		catch Exception
+			throw Exception
+	}
+	
+	Icon(Item := "", Icon := "") {
+		try
+			Menu % this.Name, Icon, % Item, % Icon
+		catch Exception
+			throw Exception
+	}
+	
+	Default(ItemName) {
+		try {
+			Menu % this.Name, Default, % ItemName
+			this.Default := ItemName
+		} catch Exception
+			throw Exception
 	}
 	
 	Show(x := "", y := "") {
 		Menu % this.Name, Show, % x, % y
 	}
 	
-	Add(Item := "", Target := "", Icon := "") {
-		if IsObject(Item) { ; add menu
-			try
-				Menu % this.Name, Add, % Item.Name, % ":" Item.Name
-			catch e
-				return false
-		} else { ; add item
-			try
-				Menu % this.Name, Add, % Item, MenuHandler
-			catch e
-				return false
-			this.Map[Item] := Target
-		} if StrLen(Icon)
-			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
-		return true
-	}
-	
-	Insert(Pos, Item := "", Target := "", Icon := "") {
-		if IsObject(Item) { ; add menu
-			try
-				Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
-			catch e
-				return false
-		} else { ; add item
-			try
-				Menu % this.Name, Insert, % Pos, % Item, MenuHandler
-			catch e
-				return false
-			this.Map[Item] := Target
-		} if StrLen(Icon)
-			this.Icon(IsObject(Item)?Item.Name:Item, Icon)
-		return true
-	}
-	
-	Delete(ItemName := "") {
-		Menu % this.Name, Delete, % ItemName
-	}
-	
-	Icon(Item, Icon) {
-		if !StrLen(Item)
-			return false
-		if !FileExist(Icon)
-			return false
-		Menu % this.Name, Icon, % Item , % Icon
-		return ErrorLevel
-	}
-	
-	Color(Color) {
-		Menu % this.Name, Color, % Color
-	}
-	
 	GetCount() {
-		return DllCall("GetMenuItemCount", "ptr", MenuGetHandle(this.Name))
+		return DllCall("GetMenuItemCount", "ptr", this.Handle)
 	}
 	
-	Destroy() {
-		this.DeleteAll()
+	Handle[] {
+		get {
+			return MenuGetHandle(this.Name)
+		}
+	}
+}
+
+MenuHandler(MenuItem, MenuPos, MenuName) {
+	Menu.BoundFuncMap[MenuName, MenuItem].Call()
+}
+
+; singleton class for the Tray menu
+Class Tray extends Menu {
+	static _init := Tray.Init()
+	
+	Init() {
+		this.Name := "Tray"
 	}
 	
-	Clear() {
-		this.NoStandard()
-		this.NoDefault()
-		this.DeleteAll()
-	}
-	
-	DeleteAll() {
-		Menu, % this.Name, DeleteAll
+	Tip(TipText) {
+		Menu, Tray, Tip, % TipText
 	}
 	
 	NoDefault() {
-		Menu, % this.Name, NoDefault
+		Menu, Tray, NoDefault
+	}
+	
+	Standard() {
+		Menu, Tray, Standard
 	}
 	
 	NoStandard() {
-		Menu, % this.Name, NoStandard
-	}
-	
-	SetDefault(item) {
-		Menu, % this.Name, Default, % item
-	}
-}
-
-MenuHandler(ItemName, ItemPos, MenuName) {
-	Menu.Instances[MenuName].Map[ItemName].Call()
-}
-
-Class Tray extends Menu {
-	__New() {
-		Name := "Tray"
-		this.Name := Name
-		this.Map := {}
-		Menu.Instances[Name] := this
-		this.Clear()
+		Menu, Tray, NoStandard
 	}
 }

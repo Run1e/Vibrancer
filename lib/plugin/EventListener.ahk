@@ -6,8 +6,8 @@
 		return this
 	}
 	
-	Listen(Event, Call, Stop := false) {
-		this.Listener[Event] := Stop
+	Listen(Event, Call) {
+		this.Listener[Event] := false
 		this.Events[Event] := Call
 	}
 	
@@ -16,12 +16,16 @@
 		this.Events.Delete(Event)
 	}
 	
-	OnEvent(Event, Param*) {
+	OnEvent(Event, Param) {
 		Func := this.Call.Bind(this, this.Events[Event], Param*)
 		SetTimer, %Func%, -1
 	}
 	
 	Call(BoundFunc, Param*) {
 		BoundFunc.Call(Param*)
+	}
+	
+	Object(Param*) {
+		return Object(Param*)
 	}
 }

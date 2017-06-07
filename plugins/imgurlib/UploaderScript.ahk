@@ -7,18 +7,19 @@
 #SingleInstance force
 #Persistent
 #NoTrayIcon
-#Include lib\third-party\HTTPRequest.ahk
+#Include imgurlib\third-party\HTTPRequest.ahk
 
 OnExit("Exit")
 global Main
+global client_id := Main.client_id
 global EndPoint := "https://api.imgur.com/3/image"
 return
 
 UploadUpdate(Percent, FileSize) {
 	static Sent := 0
 	Percent := Round((Percent + 1) * 100)
-	Fives := (Round(percent / 5) * 5)
-	if (Percent < 5)
+	Fives := (Round(percent / 2) * 2)
+	if (Percent < 2)
 		Sent:=0
 	if (Fives > Sent)
 		CallMain("UploadUpdate", Sent := Fives)
@@ -36,28 +37,28 @@ Upload(File) {
 	
 	DownloadedBytes := HTTPRequest( EndPoint
 							, Data
-							, Header := "Authorization: Client-ID " . Main.client_id "``nContent-Length: " FileSize
+							, Header := "Authorization: Client-ID " client_id "``nContent-Length: " FileSize
 							, "Callback: UploadUpdate``nMethod: POST``nUpload: " File)
 	
 	if (DownloadedBytes > 0) && StrLen(Data) {
 		CallMain("HeaderInfo", Header)
-		CallMain("UploadResponse", File, Data)
+		CallMain("UploadResponse", Data)
 	} else
-		CallMain("UploadFailure", File, Header)
+		CallMain("UploadFailure", Header)
 }
 
-Delete(Index, DeleteHash) {
+Delete(DeleteHash) {
 	DownloadedBytes := HTTPRequest( EndPoint "/" DeleteHash
 							, Data
-							, Header := "Authorization: Client-ID " . Main.client_id
+							, Header := "Authorization: Client-ID " client_id
 							, "Method: DELETE")
 	
 	
 	if (DownloadedBytes > 0) && StrLen(data) {
 		CallMain("HeaderInfo", Header)
-		CallMain("DeleteResponse", Index, Data)
+		CallMain("DeleteResponse", Data)
 	} else
-		CallMain("DeleteFailure", Index, Header)
+		CallMain("DeleteFailure", Header)
 }
 
 Exit() {
