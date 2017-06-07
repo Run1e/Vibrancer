@@ -1,16 +1,4 @@
-# Power Play
-
-- Boost ingame vibrancy for any game/program via NVIDIA's API
-- Block alt-tab/windows key when ingame
-- Capture and upload images to imgur
-- Delete and manage uploaded images
-- Easily create powerful keybinds such as multimedia controls
-
-<img src="https://i.imgur.com/3yQgCbY.png">
-
-<img src="https://i.imgur.com/tMfiVyf.png">
-
-<img src="https://i.imgur.com/ND59laF.png">
+### [Visit the website for more information](http://runie.me/)
 
 ## [Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
 
