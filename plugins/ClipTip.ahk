@@ -1,4 +1,5 @@
 ﻿; Show a MouseTip on clipboard change
+; RUNIE
 #SingleInstance force
 #NoEnv
 #Persistent

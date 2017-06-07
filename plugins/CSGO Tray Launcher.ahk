@@ -1,4 +1,5 @@
 ﻿; Add a CS:GO shortcut to tray menu
+; RUNIE
 #SingleInstance force
 #NoEnv
 #Persistent
