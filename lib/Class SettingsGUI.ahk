@@ -3,7 +3,7 @@
 	; save settings and close
 	Save() {
 		
-		StartUp := this.ControlGet("Checked",, "Button4")
+		StartUp := this.ControlGet("Checked",, "Button5")
 		VibrancyDefault := this.GetText("Edit1")
 		
 		Settings.StartUp := StartUp
@@ -13,6 +13,7 @@
 		
 		Settings.Save()
 		ApplySettings()
+		
 		this.Close()
 	}
 	

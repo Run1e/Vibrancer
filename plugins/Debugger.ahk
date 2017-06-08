@@ -49,7 +49,7 @@ Events(Event, Params*) {
 }
 
 GetDownloadCount() {
-	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases"
+	static URL := "https://api.github.com/repos/Run1e/Vibrancer/releases"
 	if !HTTP.Get(URL, Data)
 		return Vib.Call("TrayTip", "Failed getting DL count", "shit")
 	JSONData := JSON.Load(Data.ResponseText)
