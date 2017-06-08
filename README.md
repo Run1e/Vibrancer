@@ -1,4 +1,4 @@
-# [Visit the website for more information](http://runie.me/)
+# [Visit the website for more information](http://vibrancer.com/)
 
 ### Thanks to:
 
@@ -7,7 +7,10 @@
 - Coco for his [JSON class](https://github.com/cocobelgica/AutoHotkey-JSON)
 - tic for his [Gdip wrapper](https://autohotkey.com/boards/viewtopic.php?t=6517)
 - VxE for his [HTTPRequest function](https://autohotkey.com/board/topic/67989-func-httprequest-for-web-apis-ahk-b-ahk-lunicodex64/)
+- jballi for his [WinGetPosEx function](https://autohotkey.com/boards/viewtopic.php?t=3392)
+- derRaphael for his [SB_SetProgress function](https://autohotkey.com/board/topic/34593-stdlib-sb-setprogress/)
 - Klark92 for his [FrameShadow function](https://autohotkey.com/boards/viewtopic.php?f=6&t=29117)
+- Lexikos and HotKeyIt for their work on AutoHotkey
 - tidbit for creative help!
 
 # Written in [AutoHotkey_H](https://autohotkey.com/)
