@@ -102,7 +102,6 @@ PluginsLaunched() {
 	for Index, Arg in Args {
 		
 		if (Arg = "/UPDATED") {
-			FileDelete Vibrancer-installer.zip
 			FileDelete Vibrancer-installer\Vibrancer-installer.exe
 			FileRemoveDir Vibrancer-installer, 1
 			

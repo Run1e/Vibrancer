@@ -7,26 +7,12 @@
 			FileMove, % File, % "plugins\" FileName
 			Update := true
 		} if Update
-			this.UpdatePluginList()
+			this.UpdatePluginList(this.LV.GetNext())
 	}
 	
 	ListViewAction(Control, GuiEvent, EventInfo) {
-		
-		/*
-			static LastC
-			
-			if (GuiEvent = "DoubleClick") && !LastC { ; launch plugin
-				if !(Pos := this.LV.GetNext())
-					return
-				Plg := this.LV.GetText(Pos)
-				MsgBox,68,Run plugin?,Do you want to run %Plg%?
-				ifMsgBox no
-				return
-				Run(A_WorkingDir "\plugins\" this.LV.GetText(this.LV.GetNext()) ".ahk")
-		*/
-		
-		if (GuiEvent = "C")
-			this.SetList()
+		if (GuiEvent = "I") && InStr(ErrorLevel, "C")
+			this.SetList(InStr(ErrorLevel, "C", true) ? this.LV.GetText(EventInfo) : this.LV.GetNext())
 	}
 	
 	Move(Dir) {
@@ -47,13 +33,15 @@
 		return Plugs
 	}
 	
-	SetList() {
+	SetList(Item := "") {
 		Settings.Plugins := this.GetChecked()
-		this.UpdatePluginList()
+		this.UpdatePluginList(Item)
 	}
 	
-	UpdatePluginList(Select := 1) {
+	UpdatePluginList(Select := "") {
 		this.LV.Delete()
+		
+		this.Control("-g", this.LV.hwnd)
 		
 		for Index, Plg in Settings.Plugins, Added := [] {
 			if !FileExist("plugins\" Plg ".ahk") {
@@ -66,6 +54,8 @@
 			Desc := (InStr(Desc, "; ") = 1 ? SubStr(Desc, 3) : "No description")
 			Author := (InStr(Author, "; ") = 1 ? SubStr(Author, 3) : " -")
 			this.LV.Add("Check1", Plg, Desc, Author), Added[Plg] := ""
+			if (Plg = Select)
+				Select := A_Index
 		}
 		
 		Loop, Files, plugins\*.ahk
@@ -87,6 +77,8 @@
 		
 		if Select
 			this.LV.Modify(Select, "Select Vis")
+		
+		this.Control("+g", this.LV.hwnd, this.ListViewAction.Bind(this))
 	}
 	
 	Restart() {
