@@ -102,8 +102,10 @@ PluginsLaunched() {
 	for Index, Arg in Args {
 		
 		if (Arg = "/UPDATED") {
-			FileDelete Vibrancer-installer\Vibrancer-installer.exe
-			FileRemoveDir Vibrancer-installer, 1
+			Loop 10 {
+				FileRemoveDir Vibrancer-installer, 1
+				sleep 50
+			} until !FileExist("Vibrancer-installer")
 			
 			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
 		}
@@ -122,7 +124,7 @@ PluginsLaunched() {
 
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
-		Msg := Title, Title := AppName " " AppVersionString
+		Msg := Title, Title := AppName
 	TrayTip, % Title, % Msg
 }
 
