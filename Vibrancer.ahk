@@ -1,9 +1,8 @@
-#NoEnv
+#NoTrayIcon
 #SingleInstance force
 #MaxHotkeysPerInterval 200
 #UseHook
 #Persistent
-#NoTrayIcon
 #WarnContinuableException Off
 DetectHiddenWindows On
 SetRegView 64
@@ -41,8 +40,8 @@ global Settings, Keybinds, GameRules ; JSON
 global Actions, Plug, Uploader, Tray, Binds ; objects
 global VERT_SCROLL, pToken ; other
 
-AppName := "Power Play"
-AppVersion := [0, 9, 9]
+AppName := "Vibrancer"
+AppVersion := [0, 9, 91]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -101,32 +100,16 @@ return
 PluginsLaunched() {
 	
 	for Index, Arg in Args {
+		
 		if (Arg = "/UPDATED") {
-			FileRemoveDir PowerPlay-installer, 1
-			FileDelete PowerPlay-installer.zip
+			FileDelete Vibrancer-installer.zip
+			FileDelete Vibrancer-installer\Vibrancer-installer.exe
+			FileRemoveDir Vibrancer-installer, 1
 			
-			if FileExist("PowerPlayUploader.exe") { ; remove/change for 0.9.9 and onwards
-				Settings.Delete("Imgur")
-				Settings.Delete("UpdateVersion")
-				Settings.GuiState.Delete("ExpandState")
-				Settings.Color.Delete("Dark")
-				Settings.Plugins := ["Imgur Uploader"]
-				Settings.Save()
-				FileDelete, data\Keybinds.json
-				FileDelete, PowerPlayUploader.exe
-				FileDelete, plugins\PowerPlayMouseMsg.ahk
-				FileRemoveDir plugins\pluginlib, 1
-				MsgBox,48,Attention!,% "Because of a data structure update, your keybinds have been reset."
-				Run *RunAs "%A_ScriptFullPath%" /UPDATED
-				ExitApp
-			}
-			
-			TrayTip("Update successful!", "Power Play has been updated to " AppVersionString)
+			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
 		}
 		
 		else if (Arg = "/OPEN") { ; run imgur uploader on users first launch
-			Settings.Plugins := ["Imgur Uploader"]
-			Plugin.Run("Imgur Uploader")
 			Big.Open()
 		}
 	}
@@ -155,16 +138,16 @@ Donate() {
 
 Icon(name := "") {
 	if (name = "")
-		return A_WorkingDir . "\icons\powerplay.ico"
+		return A_WorkingDir . "\icons\vibrancer.ico"
 	return A_WorkingDir . "\icons\octicons\" name ".ico"
 }
 
 BugReport() {
 	MsgBox, 68, GitHub, Do you have a GitHub account?
 	ifMsgBox yes
-		Run("https://github.com/Run1e/PowerPlay/issues")
+		Run("https://github.com/Run1e/Vibrancer/issues")
 	else
-		Run("https://gitreports.com/issue/Run1e/PowerPlay")
+		Run("https://gitreports.com/issue/Run1e/Vibrancer")
 }
 
 Print(text := "") {

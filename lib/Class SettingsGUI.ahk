@@ -58,7 +58,7 @@ Settings() {
 	SetGUI.Add("Button", "x6", "Check for updates", Func("CheckForUpdates"))
 	SetGUI.Add("Button", "x137 yp w50", "Save", SetGUI.Save.Bind(SetGUI))
 	
-	; power play controls
+	; vibrancer controls
 	SetGUI.Add("Checkbox", "xm+12 y26 w150 Checked" Settings.StartUp, "Launch on Startup")
 	SetGUI.Add("Text",, "Desktop Vibrancy: ")
 	SetGUI.Add("Edit", "x125 yp-2 w49 Number -Wrap Limit")

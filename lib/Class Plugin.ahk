@@ -25,12 +25,12 @@
 		return Array(Param*)
 	}
 	
-	; call if you want power play to close your plugin when it exits
+	; call if you want vibrancer to close your plugin when it exits
 	OnExit(Func) {
 		this.OnExits.Push(Func)
 	}
 	
-	; call this when your plugin autoexec is finished. it tells powerplay to launch the next plugin
+	; call this when your plugin autoexec is finished. it tells vibrancer to launch the next plugin
 	Finished() {
 		if !IsObject(this.NextFunc)
 			return

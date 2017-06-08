@@ -10,7 +10,7 @@
 	
 	Start() {
 		SysGet, MonitorCount, MonitorCount
-		
+		MonitorCOunt = 1
 		if (MonitorCount = 1)
 			return this.CaptureMonitor(1)
 		
@@ -102,7 +102,18 @@
 									, MonitorRight - MonitorLeft
 									, MonitorBottom - MonitorTop)
 			SetTimer, % Func, -1
-		}
+		} else
+			Working := false
+	}
+	
+	CaptureMonitor(MonitorID) {
+		Working := false
+		SysGet, Monitor, Monitor, % MonitorID
+		Func := Func("Capture").Bind(   MonitorLeft
+									, MonitorTop
+									, MonitorRight - MonitorLeft
+									, MonitorBottom - MonitorTop)
+		SetTimer, % Func, -1
 	}
 	
 	Class ScreenGUI extends GUI {

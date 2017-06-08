@@ -20,8 +20,8 @@ CSGO_EXE := CSGO_DIR "\csgo.exe"
 CSGO_LAUNCH := "steam://rungameid/730"
 ; === END ===
 
-Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
-Power.TrayAdd("Edit CS:GO Config", Power.Func("Run").Bind(CSGO_CFG), Power.Call("Icon", "file"))
-Power.TrayAdd("Launch CS:GO", Power.Func("Run").Bind(CSGO_LAUNCH), CSGO_EXE)
-Power.Finished()
+Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+Vib.TrayAdd("Edit CS:GO Config", Vib.Func("Run").Bind(CSGO_CFG), Vib.Call("Icon", "file"))
+Vib.TrayAdd("Launch CS:GO", Vib.Func("Run").Bind(CSGO_LAUNCH), CSGO_EXE)
+Vib.Finished()
 ExitApp

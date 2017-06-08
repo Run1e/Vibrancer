@@ -1,5 +1,5 @@
 ﻿CreateImgurGUI() {
-	Img := new ImgurGUI("Power Play - Imgur Uploader", "+Border +Resize +MinSize500x250")
+	Img := new ImgurGUI("Imgur Uploader", "+Border +Resize +MinSize500x250")
 	
 	Img.WIDTH := WIDTH := 1117 ; Settings.Size.Width
 	Img.HEIGHT := HEIGHT := 750 ; Settings.Size.Height
@@ -33,9 +33,9 @@
 	Img.SB.SetParts(120, 100)
 	Img.SB.SetText("Ready", 1)
 	Img.SB.SetText("Queue: 0", 2)
-	Img.SB.SetText("Keybinds can be bound in Power Play.", 3)
+	Img.SB.SetText("Keybinds can be bound in the Vibrancer GUI.", 3)
 	
-	Img.SetIcon(Power.Call("Icon"))
+	Img.SetIcon(Vib.Call("Icon"))
 	Img.Margin(0, 0)
 	Img.DropFilesToggle(true)
 }

@@ -16,28 +16,28 @@ SetBatchLines -1
 
 Events := ["RulesEnable", "RulesDisable", "AppSelectCallback", "BindCallback", "GuiOpen", "GuiClose", "GuiSetTab", "CheckForUpdates", "Updating", "SetScreens"]
 
-global Power, Listener
+global Vib, Listener
 
 try
-	Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+	Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 catch e
 	ExitApp
 
-Power.OnExit(Func("Exit"))
+Vib.OnExit(Func("Exit"))
 
-Listener := new EventListener(Power)
+Listener := new EventListener(Vib)
 for Index, Event in Events
 	Listener.Listen(Event, Func("Events").Bind(Event))
 
-Menu := Power.CreateMenu("Debugger")
-Menu.Add("Open directory", Power.Func("Run").Bind(Power.Directory))
-Menu.Add("Open data folder", Power.Func("Run").Bind(Power.Directory "\data"))
+Menu := Vib.CreateMenu("Debugger")
+Menu.Add("Open directory", Vib.Func("Run").Bind(Vib.Directory))
+Menu.Add("Open data folder", Vib.Func("Run").Bind(Vib.Directory "\data"))
 Menu.Add("Get download count", Func("GetDownloadCount"))
 
-Power.TrayAdd(Menu,, Power.Call("Icon", "bug"))
-Power.TrayAdd("reload", Power.Func("reload"))
+Vib.TrayAdd(Menu,, Vib.Call("Icon", "bug"))
+Vib.TrayAdd("reload", Vib.Func("reload"))
 
-Power.Finished()
+Vib.Finished()
 return
 
 Events(Event, Params*) {
@@ -51,11 +51,11 @@ Events(Event, Params*) {
 GetDownloadCount() {
 	static URL := "https://api.github.com/repos/Run1e/PowerPlay/releases"
 	if !HTTP.Get(URL, Data)
-		return Power.Call("TrayTip", "Failed getting DL count", "shit")
+		return Vib.Call("TrayTip", "Failed getting DL count", "shit")
 	JSONData := JSON.Load(Data.ResponseText)
 	for a, b in JSONData
 		count += b.assets.1.download_count
-	Power.Call("TrayTip", "Download count", count)
+	Vib.Call("TrayTip", "Download count", count)
 }
 
 p(x*) {

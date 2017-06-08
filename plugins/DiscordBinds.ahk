@@ -18,13 +18,13 @@ if (A_ComputerName = "DESKTOP-AAVK743")
 	NICK := "<@265644569784221696>"
 
 try
-	Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+	Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 catch e
 	ExitApp
 
-Power.OnExit(Func("Exit"))
+Vib.OnExit(Func("Exit"))
 
-Binds := new BindSection(Power, "Discord", "Discord")
+Binds := new BindSection(Vib, "Discord", "Discord")
 
 Binds.AddFunc("NowPlaying", Func("NowPlaying"))
 Binds.AddFunc("ServerMove", Func("ServerMove"))
@@ -38,7 +38,7 @@ Binds.AddBind("Server Down", "ServerMove", "Down")
 
 Binds.Register()
 
-Power.Finished()
+Vib.Finished()
 return
 
 NowPlaying() {

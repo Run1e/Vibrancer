@@ -4,7 +4,6 @@
 	static AnimatedEnabled := false
 	
 	Open() {
-		this.ImgurLV.Modify(0, "-Select")
 		this.Show("w" this.WIDTH " h" this.HEIGHT)
 		new Hotkey("Delete", this.Delete.Bind(this), this.ahkid)
 		this.Animate(true)
@@ -12,6 +11,8 @@
 	
 	Close() {
 		this.Hide()
+		this.ImgurLV.Modify(0, "-Select")
+		this.ImgurLV.Modify(1, "Vis")
 		this.Animate(false)
 		Settings.Size.Width := this.WIDTH
 		Settings.Size.Height := this.HEIGHT

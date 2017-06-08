@@ -59,14 +59,14 @@ if FileExist("..\data\Images.json") {
 }
 
 try
-	Power := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+	Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 catch e
 	ExitApp
 
-Power.OnExit(Func("Exit"))
+Vib.OnExit(Func("Exit"))
 
 global pToken := Gdip_Startup()
-global Working := false, Images, Settings, Img, Power, Uploader
+global Working := false, Images, Settings, Img, Vib, Uploader
 
 Uploader := new Uploader
 
@@ -83,7 +83,7 @@ if !Images.FileExist()
 	Images.Save()
 
 ; bind section
-Binds := new BindSection(Power, "Imgur", "ImgurUploader")
+Binds := new BindSection(Vib, "Imgur", "ImgurUploader")
 Binds.AddFunc("Area", Func("Area"))
 Binds.AddFunc("Window", Func("Window"))
 Binds.AddFunc("Screen", Func("Screen"))
@@ -94,9 +94,9 @@ Binds.AddBind("Capture Monitor", "Screen")
 Binds.AddBind("Open GUI", "Open")
 Binds.Register()
 
-Power.TrayAdd("Images", Func("Open"), Power.Call("Icon", "device-camera"))
+Vib.TrayAdd("Images", Func("Open"), Vib.Call("Icon", "device-camera"))
 
-Power.Finished() ; pp can continue on its adventures now it dun have to wait for this plugin to load it's images
+Vib.Finished() ; pp can continue on its adventures now it dun have to wait for this plugin to load it's images
 
 ; create gui
 CreateImgurGUI()
@@ -118,7 +118,7 @@ Open() {
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
 		Msg := Title, Title := "Imgur Uploader"
-	Power.Call("TrayTip", Title, Msg)
+	Vib.Call("TrayTip", Title, Msg)
 }
 
 Capture(x := "", y := "", w := "", h := "") {
