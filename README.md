@@ -1,20 +1,6 @@
-# Power Play
+# [Visit the website for more information](http://runie.me/)
 
-- Boost ingame vibrancy for any game/program via NVIDIA's API
-- Block alt-tab/windows key when ingame
-- Capture and upload images to imgur
-- Delete and manage uploaded images
-- Easily create powerful keybinds such as multimedia controls
-
-<img src="https://i.imgur.com/3yQgCbY.png">
-
-<img src="https://i.imgur.com/tMfiVyf.png">
-
-<img src="https://i.imgur.com/ND59laF.png">
-
-## [Download here](https://github.com/Run1e/PowerPlay/releases/latest) 
-
-# Thanks to:
+### Thanks to:
 
 - jNizM for his [NvAPI wrapper](https://github.com/jNizM/AHK_NVIDIA_NvAPI)
 - 'just me' for his [LV_Colors class](https://github.com/AHK-just-me/Class_LV_Colors), [ImageButton class](https://github.com/AHK-just-me/Class_ImageButton), [CtlColors class](https://github.com/AHK-just-me/Class_CtlColors) and [LV_EX library](https://autohotkey.com/boards/viewtopic.php?t=1256)
