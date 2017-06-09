@@ -14,8 +14,8 @@
 	; ==========================================
 	
 	; tab text controls
-	Big.GamesHWND := Big.Add("Button", "x0 y0 w" HALF_WIDTH - 1 " h" TAB_HEIGHT - 1, "Games")
-	Big.KeybindsHWND := Big.Add("Button", "x" HALF_WIDTH " y0 w" HALF_WIDTH " h" TAB_HEIGHT - 1, "Keybinds")
+	Big.GamesTabHWND := Big.Add("Button", "x0 y0 w" HALF_WIDTH - 1 " h" TAB_HEIGHT - 1, "Games")
+	Big.KeybindsTabHWND := Big.Add("Button", "x" HALF_WIDTH " y0 w" HALF_WIDTH " h" TAB_HEIGHT - 1, "Keybinds")
 	
 	bordermix := 0xFFEEEEEE ;CK
 	NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0xFFFFFFFF, 1] ; normal
@@ -24,7 +24,7 @@
 			,  [0, Settings.Color.Tab, , 0xFFFFFF, 0, , Settings.Color.Tab, 1] ; disabled
 			,  [0, 0xFFFFFFFF, , 0xFF000000, 0, , 0xFFFFFFFF, 1]] ; default
 	
-	for Index, TabberBOYE in [Big.GamesHWND, Big.KeybindsHWND]
+	for Index, TabberBOYE in [Big.GamesTabHWND, Big.KeybindsTabHWND]
 		ImageButton.Create(TabberBOYE, NORMAL*)
 	
 	; separators
@@ -53,9 +53,9 @@
 	Big.Font("s11")
 	
 	Big.Margin(6, 4) ; nicerino margerino
-	Big.VibranceTextHWND := Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + 8 " w" HALF_WIDTH " Center", "NVIDIA Vibrancy Boost")
-	Big.BoostSliderHWND := Big.Add("Slider", "x" HALF_WIDTH + 12 " yp+25 w" HALF_WIDTH - 24 " Range50-100 ToolTip Center",, Big.GamesSlider.Bind(Big))
-	Big.Add("CheckBox", "yp+56", "Block Windows Key", Big.GamesWinBlock.Bind(Big))
+	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + 8 " w" HALF_WIDTH " Center", "NVIDIA Vibrance Boost")
+	Big.VibrancySliderHWND := Big.Add("Slider", "x" HALF_WIDTH + 12 " yp+25 w" HALF_WIDTH - 24 " Range50-100 ToolTip Center",, Big.GamesSlider.Bind(Big))
+	Big.WinKeyBlockHWND := Big.Add("CheckBox", "yp+56", "Block Windows Key", Big.GamesWinBlock.Bind(Big))
 	Big.AltTabBlockHWND := Big.Add("CheckBox", "x430 yp", "Block Alt-Tab", Big.GamesAltTabBlock.Bind(Big))
 	
 	Big.Add("Text", "x" HALF_WIDTH + 6 " y" 158 " W" HALF_WIDTH - 12 " Center", "Vibrancy Screen:")
@@ -80,8 +80,7 @@
 	}
 	
 	if Settings.NvAPI_InitFail { ; no nvidia card detected, grey out/disable some controls..
-		Big.Control("Disable", Big.BoostSliderHWND)
-		Big.Control("Disable", Big.DefaultSliderHWND)
+		Big.Control("Disable", Big.VibrancySlider)
 		Big.Font("s11 c808080")
 		Big.Control("Font", "Static9")
 		Big.Font("cBlack")

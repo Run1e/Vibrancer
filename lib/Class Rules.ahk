@@ -7,8 +7,7 @@
 		this.Enabled := true
 		this.Process := Process
 		
-		for Index, Screen in Settings.VibrancyScreens
-			this.Vib(Info.Vibrancy, Screen)
+		this.VibSelected(Info.Vibrancy)
 		
 		if Info.BlockWinKey
 			new Hotkey("LWin", "")
@@ -31,6 +30,11 @@
 	Vib(Vibrancy, Screen := 1) {
 		if !Settings.NvAPI_InitFail
 			NvAPI.SetDVCLevelEx(Vibrancy, Screen - 1)
+	}
+	
+	VibSelected(Vibrancy) {
+		for Index, Screen in Settings.VibrancyScreens
+			this.Vib(Vibrancy, Screen)
 	}
 	
 	VibAll(Vibrancy) {

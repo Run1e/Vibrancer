@@ -37,7 +37,7 @@ OnExit("Exit")
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules ; JSON
-global Actions, Plug, Uploader, Tray, Binds ; objects
+global Actions, Plug, Uploader, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"

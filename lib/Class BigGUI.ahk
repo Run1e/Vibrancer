@@ -146,17 +146,17 @@
 	
 	GamesWinBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockWinKey := Big.GuiControlGet(, "Button5")
+			GameRules[Key].BlockWinKey := Big.GuiControlGet(, this.WinKeyBlockHWND)
 	}
 	
 	GamesAltTabBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockAltTab := Big.GuiControlGet(, "Button6")
+			GameRules[Key].BlockAltTab := Big.GuiControlGet(, this.AltTabBlockHWND)
 	}
 	
 	GamesSlider() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].Vibrancy := Big.GuiControlGet(, "msctls_trackbar321")
+			GameRules[Key].Vibrancy := Big.GuiControlGet(, this.VibrancySliderHWND)
 	}
 	
 	GamesGetKey() {
@@ -206,24 +206,24 @@
 			if Pos {
 				Key := this.GameLV.GetText(Pos, 2)
 				if (Key = "path") || !StrLen(Key) {
-					this.Control("Disable", "msctls_trackbar321")
-					this.Control("Disable", "Button5")
-					this.Control("Disable", "Button6")
-					this.SetText("msctls_trackbar321", 50)
-					this.SetText("Button5", false)
-					this.SetText("Button6", false)
+					this.Control("Disable", this.VibrancySliderHWND)
+					this.Control("Disable", this.WinKeyBlockHWND)
+					this.Control("Disable", this.AltTabBlockHWND)
+					this.SetText(this.VibrancySliderHWND, 50)
+					this.SetText(this.WinKeyBlockHWND, false)
+					this.SetText(this.AltTabBlockHWND, false)
 					ControlsDisabled := true
 					return
 				} else if ControlsDisabled {
 					if !Settings.NvAPI_InitFail
-						this.Control("Enabled", "msctls_trackbar321")
-					this.Control("Enabled", "Button5")
-					this.Control("Enabled", "Button6")
+						this.Control("Enabled", this.VibrancySliderHWND)
+					this.Control("Enabled", this.WinKeyBlockHWND)
+					this.Control("Enabled", this.AltTabBlockHWND)
 					ControlsDisabled := false
 				}
-				this.SetText("msctls_trackbar321", GameRules[Key].Vibrancy)
-				this.SetText("Button5", GameRules[Key].BlockWinKey)
-				this.SetText("Button6", GameRules[Key].BlockAltTab)
+				this.SetText(this.VibrancySliderHWND, GameRules[Key].Vibrancy)
+				this.SetText(this.WinKeyBlockHWND, GameRules[Key].BlockWinKey)
+				this.SetText(this.AltTabBlockHWND, GameRules[Key].BlockAltTab)
 				Settings.GuiState.GameListPos := Pos
 			}
 			
@@ -366,7 +366,7 @@
 	
 	TabAction(Control, GuiEvent, EventInfo) {
 		this.Default()
-		Tab := Control = this.GamesHWND ? 1 : 2
+		Tab := Control = this.GamesTabHWND ? 1 : 2
 		this.SetTabColor(Tab)
 		this.SetTab(Tab)
 	}
@@ -386,10 +386,10 @@
 		if (tab = 1) {
 			this.ColorScreens()
 			this.DropFilesToggle(true)
-			this.Control("Focus", "SysListView321")
+			this.Control("Focus", this.GameLV.hwnd)
 		} else {
 			this.DropFilesToggle(false)
-			this.Control("Focus", "SysListView322")
+			this.Control("Focus", this.BindLV.hwnd)
 		}
 	}
 	
@@ -407,7 +407,7 @@
 	}
 	
 	SetTabColor(tab) {
-		for Index, TabCtrl in [this.GamesHWND, this.KeybindsHWND] {
+		for Index, TabCtrl in [this.GamesTabHWND, this.KeybindsTabHWND] {
 			if (A_Index = tab)
 				this.Control("Disable", TabCtrl)
 			else
@@ -482,7 +482,7 @@
 	; change the stupid tab IMMEDIATELY NICE HACK RUNE
 	MouseClick() {
 		MouseGetPos,,, hwnd, Ctrl
-		if (Ctrl ~= "^(Button(1|2|3))$") && (hwnd = this.hwnd)
+		if (Ctrl ~= "^(Button(1|2))$") && (hwnd = this.hwnd)
 			this.SetTab(SubStr(Ctrl, 7, 1))
 	}
 }

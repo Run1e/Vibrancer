@@ -9,7 +9,7 @@ images/*
 logs/*
 lib/backup/*
 lib/plugin/backup/*
-compiled/*
+Vibrancer/*
 plugins/Steam Account Switcher.ahk
 plugins/backup/*
 plugins/imgurlib/backup/*
