@@ -84,7 +84,8 @@
 	Event(Event, Param*) {
 		for Listener, Events in this.Listeners {
 			if Events.HasKey(Event) {
-				try Listener.OnEvent(Event, this.MakeLoopable(Listener, this.MakeIndexed(Param)))
+				try
+					Listener.OnEvent(Event, this.MakeLoopable(Listener, this.MakeIndexed(Param)))
 				catch e
 					this.Listeners.Delete(Listener)
 			}

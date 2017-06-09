@@ -224,6 +224,11 @@
 		}
 	}
 	
+	/*
+		whatchu doing reading this?
+		have some capybaras instead http://i.imgur.com/VNxT3FU.gifv
+	*/
+	
 	RateLimitAlert() {
 		this.AllowPause(true)
 		this.RateAlertTimer := false

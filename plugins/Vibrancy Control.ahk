@@ -40,8 +40,7 @@ VibChange(num) {
 	GameRules[Rules.Process].Vibrancy := Vibrance
 	Rules.VibSelected(Vibrance)
 	
-	if Big.IsVisible
-		if (Big.GameLV.GetText(Big.GameLV.GetNext(), 2) = Rules.Process)
+	if Big.IsVisible && (Big.GameLV.GetText(Big.GameLV.GetNext(), 2) = Rules.Process)
 			Big.SetText(Big.VibrancySliderHWND, Vibrance)
 }
 

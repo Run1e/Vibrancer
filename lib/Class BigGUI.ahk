@@ -394,15 +394,12 @@
 	}
 	
 	SetTabHotkeys(tab) {
-		new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist") ; always bound
 		if (tab = 1) {
 			new Hotkey("Delete", this.GameDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.GameRegret.Bind(this), this.ahkid)
-			Hotkey.GetKey("Space", this.ahkid).Delete()
 		} else {
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
-			Hotkey.GetKey("Space", this.ahkid).Delete()
 		}
 	}
 	
@@ -441,6 +438,8 @@
 		
 		this.Control(, this.ProgressHWND, 50)
 		
+		this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist")
+		
 		; init CLV here
 		if !this.GameLV.CLV {
 			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)
@@ -475,6 +474,8 @@
 	Close() {
 		Event("GuiClose")
 		this.Hide()
+		this.LButtonHtk.Delete()
+		this.LButtonHtk := ""
 		Keybinds(true)
 		this.Save()
 	}

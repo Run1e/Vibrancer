@@ -10,7 +10,7 @@
 	
 	Start() {
 		SysGet, MonitorCount, MonitorCount
-		MonitorCOunt = 1
+		
 		if (MonitorCount = 1)
 			return this.CaptureMonitor(1)
 		

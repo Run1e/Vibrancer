@@ -41,7 +41,7 @@ global Actions, Plug, Uploader, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 91]
+AppVersion := [0, 9, 92]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 ; make necessary sub-folders
@@ -110,7 +110,7 @@ PluginsLaunched() {
 			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
 		}
 		
-		else if (Arg = "/OPEN") { ; run imgur uploader on users first launch
+		else if (Arg = "/OPEN") {
 			Big.Open()
 		}
 	}
@@ -119,6 +119,7 @@ PluginsLaunched() {
 	OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
 	Rules.WinChange(32772, WinActive("A"))
 	
+	Print("CUCK")
 	Keybinds(true)
 }
 

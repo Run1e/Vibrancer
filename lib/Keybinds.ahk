@@ -7,7 +7,8 @@ Keybinds(Enable := true) {
 	if Enable {
 		for Key, Bind in Keybinds.Data()
 			BindKey(Key, Bind)
-		Big.SetTabHotkeys(Big.ActiveTab)
+		if Big.IsVisible
+			Big.SetTabHotkeys(Big.ActiveTab)
 	}
 }
 
