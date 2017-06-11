@@ -62,7 +62,7 @@
 					GameRules[Process].Title := Title
 					Info.Title := Title
 					GameRules.Save()
-					Big.UpdateGameList()
+					Big.UpdateGameList(Process)
 				}
 				
 				return this.Enable(Process)
