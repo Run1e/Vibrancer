@@ -91,6 +91,8 @@
 	}
 	
 	Close() {
+		this.CLV.OnMessage(False)
+		this.CLV := ""
 		this.Destroy()
 		Plug := ""
 		Settings.Save()

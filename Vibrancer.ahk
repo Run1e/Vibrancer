@@ -88,7 +88,6 @@ if FileExist(Icon())
 	Tray.Icon(Icon())
 
 Tray.Tip(AppName " " AppVersionString)
-Tray.Icon()
 
 ; apply/reenforce settings that do something external
 ApplySettings()
@@ -98,13 +97,19 @@ return
 
 ; runs after plugins have finished launching
 PluginsLaunched() {
+	Tray.Icon()
+	Keybinds(true)
+	
+	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
+	OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
+	Rules.WinChange(32772, WinActive("A"))
 	
 	for Index, Arg in Args {
 		
 		if (Arg = "/UPDATED") {
 			Loop 10 {
 				FileRemoveDir Vibrancer-installer, 1
-				sleep 50
+				sleep 60
 			} until !FileExist("Vibrancer-installer")
 			
 			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
@@ -114,13 +119,6 @@ PluginsLaunched() {
 			Big.Open()
 		}
 	}
-	
-	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
-	OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
-	Rules.WinChange(32772, WinActive("A"))
-	
-	Print("CUCK")
-	Keybinds(true)
 }
 
 TrayTip(Title, Msg := "") {
@@ -145,11 +143,15 @@ Icon(name := "") {
 }
 
 BugReport() {
-	MsgBox, 68, GitHub, Do you have a GitHub account?
-	ifMsgBox yes
+	/*
+		MsgBox, 68, GitHub, Do you have a GitHub account?
+		ifMsgBox yes
+	*/
 		Run("https://github.com/Run1e/Vibrancer/issues")
-	else
-		Run("https://gitreports.com/issue/Run1e/Vibrancer")
+	/*
+		else
+			Run("https://gitreports.com/issue/Run1e/Vibrancer")
+	*/
 }
 
 Print(text := "") {
@@ -198,7 +200,6 @@ ImageButtonApply(hwnd) {
 #Include lib\MonitorSetup.ahk
 #Include lib\PastebinUpload.ahk
 #Include lib\Update.ahk
-
 
 ; thanks fams
 #Include lib\third-party\Class CtlColors.ahk

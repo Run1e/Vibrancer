@@ -118,11 +118,9 @@
 		Mons := []
 		Mons[Select] := true
 		
-		if (GetKeyState("CTRL", "P") || GetKeyState("SHIFT", "P")) {
-			Multi := true
+		if GetKeyState("CTRL", "P") || GetKeyState("SHIFT", "P") || GetKeyState("RButton", "P")
 			for Index, Screen in Settings.VibrancyScreens
 				Mons[Screen] := true
-		}
 		
 		for Screen in Mons, Screens := []
 			Screens.Push(Screen)
@@ -134,6 +132,7 @@
 	}
 	
 	ColorScreens() {
+		;msgbox
 		for ColorScreen, HWND in this.MonitorHWND {
 			for Index, SavedScreen in Settings.VibrancyScreens {
 				if (ColorScreen = SavedScreen) {
@@ -142,6 +141,13 @@
 				} 
 			} CtlColors.Change(HWND, "FFFFFF", "000000")
 		}
+	}
+	
+	SelectScreenKey() {
+		MouseGetPos,,,, ctrl, 2
+		for Index, Control in this.MonitorHWND
+			if (Control+0 = ctrl)
+				ControlClick,, % "ahk_id" ctrl
 	}
 	
 	GamesWinBlock() {
@@ -176,7 +182,7 @@
 	UpdateGameList(FocusKey := "") {
 		Critical 500
 		
-		IL := new this.ImageList(this.GameLV)
+		IL := new Gui.ImageList(this.GameLV)
 		
 		this.GameLV.Redraw(false)
 		this.GameLV.SetImageList(IL.ID)
@@ -187,15 +193,19 @@
 				Title := Info.Title
 			else
 				SplitPath, Process,,,, Title
-			
 			Pos := this.GameLV.Add("Icon" . IL.Add(StrLen(Info.Icon)?Info.Icon:Process), StrLen(Title)?Title:FileName, Process)
-			
-			if (FocusKey = Process)
-				Settings.GuiState.GameListPos := Pos
 		}
 		
 		this.GameListViewAction("", "C", Settings.GuiState.GameListPos)
 		this.GameListViewSize()
+		this.GameLV.ModifyCol(1, "Sort")
+		Loop % this.GameLV.GetCount()
+		{
+			if (this.GameLV.GetText(A_Index, 2) = FocusKey) {
+				this.GameLV.Modify(A_Index, "Select Focus Vis")
+				break
+			}
+		}
 		this.GameLV.Redraw(true)
 	}
 	
@@ -261,6 +271,7 @@
 		
 		if !IsObject(Bind) {
 			Keybinds(true)
+			this.SetTabHotkeys(this.ActiveTab)
 			this.Enable()
 			this.Activate()
 			return
@@ -268,6 +279,7 @@
 		
 		Keybinds[Key] := Bind
 		Keybinds(true)
+		this.SetTabHotkeys(this.ActiveTab)
 		this.UpdateBindList(Key)
 		
 		Loop % this.BindLV.GetCount() {
@@ -295,7 +307,6 @@
 		this.BindLV.Delete(Pos)
 		
 		this.BindLV.Modify((this.BindLV.GetCount()<Pos?this.BindLV.GetCount():Pos), "Focus Select Vis") ; select closest new row
-		
 		this.BindListViewSize()
 		
 		Hotkey.GetKey(RealKey).Delete()
@@ -316,8 +327,6 @@
 			this.BindLV.Delete(NewPos := Info.Pos)
 			Hotkey.GetKey(Info.Key).Delete()
 		}
-		
-		;p(newpos, ((NewPos > Keybinds.MaxIndex()) ? Keybinds.MaxIndex() : NewPos))
 		
 		this.BindListViewSize()
 		this.BindListViewAction("", "C", (NewPos > ArraySize(Keybinds) ? ArraySize(Keybinds) : NewPos))
@@ -401,6 +410,11 @@
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
 		}
+		
+		if !this.LButtonHtk
+			this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid)
+		if !this.RButtonHtk
+			this.RButtonHtk := new Hotkey("~*RButton", this.SelectScreenKey.Bind(this), this.ahkid)
 	}
 	
 	SetTabColor(tab) {
@@ -438,8 +452,6 @@
 		
 		this.Control(, this.ProgressHWND, 50)
 		
-		this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist")
-		
 		; init CLV here
 		if !this.GameLV.CLV {
 			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)
@@ -476,6 +488,8 @@
 		this.Hide()
 		this.LButtonHtk.Delete()
 		this.LButtonHtk := ""
+		this.RButtonHtk.Delete()
+		this.RButtonHtk := ""
 		Keybinds(true)
 		this.Save()
 	}

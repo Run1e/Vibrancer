@@ -4,12 +4,9 @@ Keybinds(Enable := true) {
 	
 	Hotkey.DeleteAll()
 	
-	if Enable {
+	if Enable
 		for Key, Bind in Keybinds.Data()
 			BindKey(Key, Bind)
-		if Big.IsVisible
-			Big.SetTabHotkeys(Big.ActiveTab)
-	}
 }
 
 BindKey(Key, Bind) {
