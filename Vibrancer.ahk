@@ -105,7 +105,6 @@ PluginsLaunched() {
 	Rules.WinChange(32772, WinActive("A"))
 	
 	for Index, Arg in Args {
-		
 		if (Arg = "/UPDATED") {
 			Loop 10 {
 				FileRemoveDir Vibrancer-installer, 1

@@ -1,4 +1,4 @@
-﻿Class Gui {
+﻿Class GUI {
 	static Instances := []
 	
 	__New(Title := "AutoHotkey Window", Options := "") {
@@ -281,31 +281,31 @@
 }
 
 GuiClose(GuiHwnd) {
-	Gui.Instances[GuiHwnd].Close.Call(Gui.Instances[GuiHwnd])
+	return Gui.Instances[GuiHwnd].Close.Call(Gui.Instances[GuiHwnd])
 }
 
 GuiEscape(GuiHwnd) {
-	Gui.Instances[GuiHwnd].Escape.Call(Gui.Instances[GuiHwnd])
+	return Gui.Instances[GuiHwnd].Escape.Call(Gui.Instances[GuiHwnd])
 }
 
 GuiSize(GuiHwnd, EventInfo, Width, Height) {
-	Gui.Instances[GuiHwnd].Size.Call(	  Gui.Instances[GuiHwnd]
-								, EventInfo
-								, Width
-								, Height)
+	return Gui.Instances[GuiHwnd].Size.Call(  Gui.Instances[GuiHwnd]
+									, EventInfo
+									, Width
+									, Height)
 }
 
 GuiDropFiles(GuiHwnd, FileArray, CtrlHwnd, X, Y) {
-	Gui.Instances[GuiHwnd].DropFiles.Call(	  Gui.Instances[GuiHwnd]
-									, FileArray
-									, CtrlHwnd
-									, X, Y)
+	return Gui.Instances[GuiHwnd].DropFiles.Call(  Gui.Instances[GuiHwnd]
+										, FileArray
+										, CtrlHwnd
+										, X, Y)
 }
 
 GuiContextMenu(GuiHwnd, CtrlHwnd, EventInfo, IsRightClick, X, Y) {
-	Gui.Instances[GuiHwnd].ContextMenu.Call(  Gui.Instances[GuiHwnd]
-									, CtrlHwnd
-									, EventInfo
-									, IsRightClick
-									, X, Y)
+	return Gui.Instances[GuiHwnd].ContextMenu.Call(Gui.Instances[GuiHwnd]
+										, CtrlHwnd
+										, EventInfo
+										, IsRightClick
+										, X, Y)
 }
