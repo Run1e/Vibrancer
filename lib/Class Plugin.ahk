@@ -109,7 +109,7 @@
 	}
 	
 	Launch(Index) {
-		static MaxWait := 1500 ; max amount of time a plugin has to declare it has finished its autoexec
+		static MaxWait := 1600 ; max amount of time a plugin has to declare it has finished its autoexec
 		if (Plg := Settings.Data().Plugins[Index]) {
 			try
 				this.Run(Plg)

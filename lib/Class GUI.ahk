@@ -109,7 +109,7 @@
 	}
 	
 	Submit(Hide := false, Options := "") {
-		Gui % this.hwnd ":Submit", % (this.IsVisible:=!Hide ? "" : "NoHide") " " Options
+		Gui % this.hwnd ":Submit", % (this.IsVisible := !Hide ? "" : "NoHide") " " Options
 	}
 	
 	GetText(Control) {

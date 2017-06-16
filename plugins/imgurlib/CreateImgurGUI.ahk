@@ -2,7 +2,7 @@
 	Img := new ImgurGUI("Imgur Uploader", "+Border +Resize +MinSize500x250")
 	
 	Img.WIDTH := WIDTH := 1117 ; Settings.Size.Width
-	Img.HEIGHT := HEIGHT := 750 ; Settings.Size.Height
+	Img.HEIGHT := HEIGHT := A_ScreenHeight * 0.7 ; Settings.Size.Height
 	Img.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
 	Img.BUTTON_WIDTH := BUTTON_WIDTH := WIDTH/4
 	Img.BUTTON_TOTAL_HEIGHT := BUTTON_TOTAL_HEIGHT := 104

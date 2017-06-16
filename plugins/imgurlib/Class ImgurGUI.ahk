@@ -4,7 +4,7 @@
 	static AnimatedEnabled := false
 	
 	Open() {
-		this.Show("w" this.WIDTH " h" this.HEIGHT)
+		this.Show("w" this.WIDTH " h" this.HEIGHT " Center")
 		new Hotkey("Delete", this.Delete.Bind(this), this.ahkid)
 		this.Animate(true)
 	}
@@ -37,7 +37,7 @@
 		this.Control("MoveDraw", "Button4", "x" w/4*3 " y" h - this.SB_HEIGHT - this.BUTTON_HEIGHT " w" w/4 " h" this.BUTTON_HEIGHT)
 		this.SB.SetProgress("", 3, "Hide")
 		this.SB.SetParts(120, 100, w - 220)
-		this.WIDTH := w, this.HEIGHT := h
+		;this.WIDTH := w, this.HEIGHT := h
 		this.FixOrder()
 	}
 	

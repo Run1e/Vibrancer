@@ -32,6 +32,10 @@ if (A_PtrSize=8) {
 	return
 }
 
+; make necessary sub-folders
+MakeFolders()
+
+; runs on program exit
 OnExit("Exit")
 
 global AppName, AppVersion, AppVersionString ; app info
@@ -43,9 +47,6 @@ global VERT_SCROLL, pToken ; other
 AppName := "Vibrancer"
 AppVersion := [0, 9, 92]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
-
-; make necessary sub-folders
-MakeFolders()
 
 pToken := Gdip_Startup()
 
