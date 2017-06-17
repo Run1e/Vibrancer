@@ -15,10 +15,6 @@
 				Run("https://www.google.com/#q=" HTTP.UriEncode(clipboard))
 		}
 		
-		UploadClip() {
-			PastebinUpload()
-		}
-		
 		Settings() {
 			Settings()
 		}

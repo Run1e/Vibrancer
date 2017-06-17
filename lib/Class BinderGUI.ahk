@@ -119,9 +119,9 @@
 		this.Function := this.GetText("ComboBox2")
 	}
 	
-	SetAssignment(Assignment) { ; Static3
+	SetAssignment(Assignment) {
 		if Binds.List.HasKey(Assignment) { ; function needs a ddl control
-			for Index, Functions in Binds.List[Assignment], DDLList:=""
+			for Index, Functions in Binds.List[Assignment]
 				DDLList .= Functions.Desc "|"
 			this.SetText(Binder.AssignmentTextHWND, "Function:")
 			this.Control("Text", "ComboBox2", "|" DDLList)
@@ -267,14 +267,15 @@ CreateNugget(Callback, Owner := "") {
 	Binder.Margin(6, 10)
 	Binder.Add("Text", "x6 yp+" 8 + CONTROL_HEIGHT " w" WIDTH - 12 " h1 0x08") ; separator
 	Binder.Add("Button", "x6 yp+8 h" CONTROL_HEIGHT, "Cancel", Binder.Close.Bind(Binder))
-	Binder.Add("Button", "xp" WIDTH - 61 " yp h" CONTROL_HEIGHT, HotkeyMode?"Add Keybind":"Create", Binder.AddButton.Bind(Binder))
+	Binder.Add("Button", "xp" WIDTH - 61 " yp h" CONTROL_HEIGHT, "Create", Binder.AddButton.Bind(Binder))
 	
-	; set initial values
-	Binder.Assignment := "Built-in"
-	Binder.SetAssignment(Binder.Assignment)
+	for Assignment in Binds.List {
+		Binder.Assignment := Assignment
+		Binder.SetAssignment(Assignment)
+		break
+	}
 	
 	FrameShadow(Binder.hwnd)
-	
 	new Hotkey("*Delete", Binder.DeletePress.Bind(Binder), Binder.ahkid)
 	
 	if (OwnerPos := WinGetPos("ahk_id" Owner))

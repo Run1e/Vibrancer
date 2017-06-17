@@ -9,8 +9,8 @@ logs/*
 lib/backup/*
 lib/plugin/backup/*
 Vibrancer/*
-plugins/Steam Account Switcher.ahk
 plugins/backup/*
 plugins/imgurlib/backup/*
 msvcr100.dll
 lib/AutoHotkey.dll
+plugins/Steam Account Switcher.ahk

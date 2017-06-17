@@ -49,6 +49,13 @@
 			throw Exception
 	}
 	
+	DeleteAll() {
+		try
+			Menu % this.Name, DeleteAll
+		catch Exception
+			throw Exception
+	}
+	
 	Icon(Item := "", Icon := "") {
 		try
 			Menu % this.Name, Icon, % Item, % Icon

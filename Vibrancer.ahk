@@ -45,7 +45,7 @@ global Actions, Plug, Uploader, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 92]
+AppVersion := [0, 9, 93]
 AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 pToken := Gdip_Startup()
@@ -109,10 +109,24 @@ PluginsLaunched() {
 		if (Arg = "/UPDATED") {
 			Loop 10 {
 				FileRemoveDir Vibrancer-installer, 1
-				sleep 60
+				sleep 50
 			} until !FileExist("Vibrancer-installer")
 			
 			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
+		}
+		
+		else if (Arg = "/UPDATEFAIL") {
+			if FileExist("Vibrancer-installer") {
+				Loop 10 {
+					FileRemoveDir Vibrancer-installer, 1
+					sleep 50
+				} until !FileExist("Vibrancer-installer")
+			}
+			
+			if FileExist("Vibrancer-installer.zip")
+				FileDelete Vibrancer-installer.zip
+			
+			TrayTip("Update failed!", Args[Index+1])
 		}
 		
 		else if (Arg = "/OPEN") {
@@ -198,7 +212,6 @@ ImageButtonApply(hwnd) {
 #Include lib\Keybinds.ahk
 #Include lib\MakeFolders.ahk
 #Include lib\MonitorSetup.ahk
-#Include lib\PastebinUpload.ahk
 #Include lib\Update.ahk
 
 ; thanks fams

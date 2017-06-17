@@ -28,7 +28,6 @@ Class Binds {
 					, {Desc: "Windows Features", Func: "Run", Param:["OptionalFeatures"]}]
 		
 		BuiltIn := 	[ {Desc: "Run Clipboard", Class: "BuiltIn", Func: "RunClipboard"}
-					, {Desc: "Upload Clipboard (Pastebin)", Func: "PastebinUpload"}
 					, {Desc: "Open GUI", Class: "BuiltIn", Func: "Open"}
 					, {Desc: "Open Games", Class: "BuiltIn", Func: "Open", Param: [1]}
 					, {Desc: "Open Keybinds", Class: "BuiltIn", Func: "Open", Param: [2]}

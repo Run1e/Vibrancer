@@ -123,7 +123,7 @@ Plugins() {
 	Plug.CLV := new LV_Colors(Plug.LV.hwnd)
 	Plug.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
-	Plug.UpdatePluginList()
+	Plug.UpdatePluginList(1)
 	
 	Plug.Add("Text", "x0 y" HEIGHT - 35 " h1 w" WIDTH " 0x08")
 	Plug.Add("Text", "x8 yp+9", "Load order:")

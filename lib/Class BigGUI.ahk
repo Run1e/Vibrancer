@@ -412,9 +412,9 @@
 		}
 		
 		if !this.LButtonHtk
-			this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid)
+			this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist")
 		if !this.RButtonHtk
-			this.RButtonHtk := new Hotkey("~*RButton", this.SelectScreenKey.Bind(this), this.ahkid)
+			this.RButtonHtk := new Hotkey("~*RButton", this.SelectScreenKey.Bind(this), this.ahkid, "Exist")
 	}
 	
 	SetTabColor(tab) {
@@ -442,9 +442,12 @@
 		Event("GuiOpen")
 		
 		this.LVRedraw(false)
+		
 		this.Pos(A_ScreenWidth/2 - this.HALF_WIDTH, A_ScreenHeight/2 - 164, this.HALF_WIDTH*2)
 		this.SetTab(tab?tab:this.ActiveTab)
+		
 		this.Show()
+		
 		this.LVRedraw(true)
 		
 		if (this.ActiveTab = 1)
