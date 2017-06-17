@@ -102,7 +102,7 @@ PluginsLaunched() {
 	Keybinds(true)
 	
 	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
-	OnMessage(DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.WinChange.Bind(Rules))
+	OnMessage(Rules.OnMsgMsg := DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.OnMsgFunc := Rules.WinChange.Bind(Rules))
 	Rules.WinChange(32772, WinActive("A"))
 	
 	for Index, Arg in Args {

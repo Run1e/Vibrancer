@@ -5,6 +5,7 @@
 	SetGUI.Destroy(), SetGUI := ""
 	Plug.Destroy(), Plug := ""
 	Tray.DeleteAll()
+	OnMessage(Rules.OnMsgMsg, Rules.OnMsgFunc, 0)
 	
 	; maybe also disable winactivechange
 	

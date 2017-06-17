@@ -33,7 +33,7 @@ Settings() {
 	if IsObject(SetGUI)
 		return SetGUI.Activate()
 	
-	SetGUI := new SettingsGUI("Settings")
+	SetGUI := new SettingsGUI("Settings (" SubStr(AppVersionString, 2) ")")
 	
 	if Big.IsVisible {
 		Big.Close()
@@ -63,5 +63,5 @@ Settings() {
 	SetGUI.Options("-MinimizeBox")
 	SetGUI.Show()
 	
-	SetGUI.SetIcon(Icon("gear"))
+	SetGUI.SetIcon(Icon())
 }
