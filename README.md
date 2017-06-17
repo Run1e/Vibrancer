@@ -10,6 +10,7 @@
 - jballi for his [WinGetPosEx function](https://autohotkey.com/boards/viewtopic.php?t=3392)
 - derRaphael for his [SB_SetProgress function](https://autohotkey.com/board/topic/34593-stdlib-sb-setprogress/)
 - Klark92 for his [FrameShadow function](https://autohotkey.com/boards/viewtopic.php?f=6&t=29117)
+- Lexikos for his [ObjRegisterActive function](https://autohotkey.com/boards/viewtopic.php?t=6148)
 - Lexikos and HotKeyIt for their work on AutoHotkey
 - tidbit for creative help!
 
