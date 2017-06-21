@@ -13,17 +13,13 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
-; has to elevate itself to admin so it can create folders/files when installed in program files
-if !A_IsAdmin && A_IsCompiled {
-	Loop %0%
-		pToken .= " " . (InStr(%A_Index%, " ") ? """" : "") . %A_Index% . (InStr(%A_Index%, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath%" %pToken%
-	ExitApp
-}
-
 global Args := []
 Loop %0%
 	Args.Push(%A_Index%)
+
+; has to elevate itself to admin so it can create folders/files when installed in program files
+if !A_IsAdmin && A_IsCompiled
+	Elevate()
 
 ; only compiled and tested in 32-bit.
 if (A_PtrSize=8) {
@@ -126,13 +122,20 @@ PluginsLaunched() {
 			if FileExist("Vibrancer-installer.zip")
 				FileDelete Vibrancer-installer.zip
 			
-			TrayTip("Update failed!", Args[Index+1])
+			TrayTip("Update failed!", Args[Index + 1])
 		}
 		
 		else if (Arg = "/OPEN") {
 			Big.Open()
 		}
 	}
+}
+
+Elevate() {
+	for Index, Arg in Args
+		Argss .= " " . (InStr(Arg, " ") ? """" : "") Arg (InStr(Arg, " ") ? """" : "")
+	Run *RunAs "%A_ScriptFullPath%" %Argss%
+	ExitApp
 }
 
 TrayTip(Title, Msg := "") {

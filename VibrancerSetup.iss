@@ -1,5 +1,5 @@
 #define MyAppName "Vibrancer"
-#define MyAppVersion "0.9.92"
+#define MyAppVersion "0.9.93"
 #define MyAppURL "https://github.com/Run1e/Vibrancer"
 #define MyAppWiki "https://github.com/Run1e/Vibrancer/wiki"
 #define MyAppExeName "Vibrancer.exe"

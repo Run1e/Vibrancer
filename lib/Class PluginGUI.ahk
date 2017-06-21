@@ -111,7 +111,7 @@ Plugins() {
 	Plug := new PluginGUI("Plugins", "-MinimizeBox")
 	
 	Plug.WIDTH := WIDTH := 550
-	Plug.HEIGHT := HEIGHT := 250
+	Plug.HEIGHT := HEIGHT := 255
 	Plug.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
 	Plug.LV_HEIGHT := LV_HEIGHT := HEIGHT - 33
 	
@@ -125,7 +125,7 @@ Plugins() {
 	
 	Plug.UpdatePluginList(1)
 	
-	Plug.Add("Text", "x0 y" HEIGHT - 35 " h1 w" WIDTH " 0x08")
+	Plug.Add("Text", "x0 y" HEIGHT - 32 " h1 w" WIDTH " 0x08")
 	Plug.Add("Text", "x8 yp+9", "Load order:")
 	
 	Plug.Font("s8")
