@@ -130,8 +130,8 @@ PluginsLaunched() {
 
 Elevate() {
 	for Index, Arg in Args
-		Args2 .= " " . (InStr(Arg, " ") ? """" : "") . Arg . (InStr(Arg, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath%" %Args2%
+		ArgsText .= " " . (InStr(Arg, " ") ? """" : "") . Arg . (InStr(Arg, " ") ? """" : "")
+	Run *RunAs "%A_ScriptFullPath%" %ArgsText%
 	ExitApp
 }
 
