@@ -1,6 +1,5 @@
 *.exe
 notes.txt
-CreateRelease.ahk
 UpdateTest.ahk
 backup/*
 data/*

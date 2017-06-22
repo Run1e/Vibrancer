@@ -1,6 +1,15 @@
 ﻿Class Rules {
 	static Enabled := false
 	
+	Listen() {
+		DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
+		OnMessage(this.Msg := DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), this.WinChange.Bind(this))
+	}
+	
+	UnListen() {
+		OnMessage(this.Msg, "")
+	}
+	
 	Enable(Process) {
 		Event("RulesEnable", Process, Info := GameRules[Process])
 		

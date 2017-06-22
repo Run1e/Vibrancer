@@ -33,7 +33,7 @@ Settings() {
 	if IsObject(SetGUI)
 		return SetGUI.Activate()
 	
-	SetGUI := new SettingsGUI("Settings (" SubStr(AppVersionString, 2) ")")
+	SetGUI := new SettingsGUI("Settings (" AppVersionString ")")
 	
 	if Big.IsVisible {
 		Big.Close()

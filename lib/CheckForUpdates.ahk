@@ -14,16 +14,22 @@
 	GitJSON := JSON.Load(Data.ResponseText)
 	Installer := "https://github.com/Run1e/Vibrancer/releases/download/" GitJSON.tag_name "/Vibrancer-installer.zip"
 	
-	if (GitJSON.tag_name > SubStr(AppVersionString, 2)) {
+	if (GitJSON.tag_name > AppVersionString) {
+		
+		for Index, Line in StrSplit(GitJSON.Body, "`r`n")
+			if (InStr(Line, "- ") = 1)
+				Notes .= "`n" Line
+			
 		if A_IsCompiled {
-			MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to update?"
+			MsgBox, 68, % AppName " v" AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to update?"
 			ifMsgBox yes
 			Update(Installer)
 		} else {
-			MsgBox, 68, % AppName " " AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nDo you want to visit download page?"
+			MsgBox, 68, % AppName " v" AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to visit download page?"
 			ifMsgBox yes
 			Run("https://github.com/Run1e/Vibrancer/releases/latest")
 		}
+		
 	} else
 		TrayTip("You're up to date!")
 	

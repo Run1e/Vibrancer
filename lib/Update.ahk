@@ -1,13 +1,16 @@
 ﻿Update(URL) {
 	
 	Keybinds(false)
+	Rules.UnListen()
+	
 	Big.Destroy(), Big := ""
 	SetGUI.Destroy(), SetGUI := ""
 	Plug.Destroy(), Plug := ""
-	Tray.DeleteAll()
-	OnMessage(Rules.OnMsgMsg, Rules.OnMsgFunc, 0)
 	
-	; maybe also disable winactivechange
+	Tray.Tip("Please wait..")
+	Tray.DeleteAll()
+	
+	TrayTip("Downloading update..")
 	
 	; download the newest installer
 	try

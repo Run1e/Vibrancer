@@ -37,12 +37,12 @@ OnExit("Exit")
 global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules ; JSON
-global Actions, Plug, Uploader, Tray, Binds, Rules ; objects
+global Actions, Plug, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 93]
-AppVersionString := "v" AppVersion.1 "." AppVersion.2 "." AppVersion.3
+AppVersion := [0, 9, 92]
+AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 pToken := Gdip_Startup()
 
@@ -81,10 +81,8 @@ Tray.Add("Donate", Func("Donate"), Icon("link"))
 Tray.Add("Exit", Func("Exit"), Icon("x"))
 Tray.Default("Open")
 
-if FileExist(Icon())
-	Tray.Icon(Icon())
-
-Tray.Tip(AppName " " AppVersionString)
+Tray.Icon(Icon())
+Tray.Tip(AppName " v" AppVersionString)
 
 ; apply/reenforce settings that do something external
 ApplySettings()
@@ -97,8 +95,7 @@ PluginsLaunched() {
 	Tray.Icon()
 	Keybinds(true)
 	
-	DllCall("RegisterShellHookWindow", "ptr", Big.hwnd)
-	OnMessage(Rules.OnMsgMsg := DllCall("RegisterWindowMessage", "Str", "SHELLHOOK"), Rules.OnMsgFunc := Rules.WinChange.Bind(Rules))
+	Rules.Listen()
 	Rules.WinChange(32772, WinActive("A"))
 	
 	for Index, Arg in Args {
@@ -108,7 +105,7 @@ PluginsLaunched() {
 				sleep 50
 			} until !FileExist("Vibrancer-installer")
 			
-			TrayTip("Update successful!", AppName " has been updated to " AppVersionString)
+			TrayTip("Update successful!", AppName " has been updated to v" AppVersionString)
 		}
 		
 		else if (Arg = "/UPDATEFAIL") {
@@ -133,8 +130,8 @@ PluginsLaunched() {
 
 Elevate() {
 	for Index, Arg in Args
-		Argss .= " " . (InStr(Arg, " ") ? """" : "") Arg (InStr(Arg, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath%" %Argss%
+		Args2 .= " " . (InStr(Arg, " ") ? """" : "") . Arg . (InStr(Arg, " ") ? """" : "")
+	Run *RunAs "%A_ScriptFullPath%" %Args2%w
 	ExitApp
 }
 
