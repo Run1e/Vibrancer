@@ -125,32 +125,30 @@
 		this.Options((Toggle ? "+" : "-") . "E0x10")
 	}
 	
-	/*
-		Animate(Type, Duration := 80) {
-			static Anims := {ROLL_LEFT_TO_RIGHT:	0x20001
-						, ROLL_RIGHT_TO_LEFT:	0x20002
-						, ROLL_TOP_TO_BOTTOM:	0x20004
-						, ROLL_BOTTOM_TO_TOP:	0x20008
-						, ROLL_DIAG_TL_TO_BR:	0x20005
-						, ROLL_DIAG_TR_TO_BL:	0x20006
-						, ROLL_DIAG_BL_TO_TR:	0x20009
-						, ROLL_DIAG_BR_TO_TL:	0x2000a
-						, SLIDE_LEFT_TO_RIGHT:	0x40001
-						, SLIDE_RIGHT_TO_LEFT:	0x40002
-						, SLIDE_TOP_TO_BOTTOM:	0x40004
-						, SLIDE_BOTTOM_TO_TOP:	0x40008
-						, SLIDE_DIAG_TL_TO_BR:	0x40005
-						, SLIDE_DIAG_TR_TO_BL:	0x40006
-						, SLIDE_DIAG_BL_TO_TR:	0x40009
-						, SLIDE_DIAG_BR_TO_TL:	0x40010
-						, ZOOM_IN:			0x16
-						, ZOOM_OUT:			0x10010
-						, FADE_IN:			0xa0000
-						, FADE_OUT:			0x90000}
-			
-			return DllCall("AnimateWindow", "UInt", this.hwnd, "Int", Duration, "UInt", Anims.HasKey(Type)?Anims[Type]:Type)
-		}
-	*/
+	Animate(Type, Duration := 80) {
+		static Anims := {ROLL_LEFT_TO_RIGHT:	0x20001
+					, ROLL_RIGHT_TO_LEFT:	0x20002
+					, ROLL_TOP_TO_BOTTOM:	0x20004
+					, ROLL_BOTTOM_TO_TOP:	0x20008
+					, ROLL_DIAG_TL_TO_BR:	0x20005
+					, ROLL_DIAG_TR_TO_BL:	0x20006
+					, ROLL_DIAG_BL_TO_TR:	0x20009
+					, ROLL_DIAG_BR_TO_TL:	0x2000a
+					, SLIDE_LEFT_TO_RIGHT:	0x40001
+					, SLIDE_RIGHT_TO_LEFT:	0x40002
+					, SLIDE_TOP_TO_BOTTOM:	0x40004
+					, SLIDE_BOTTOM_TO_TOP:	0x40008
+					, SLIDE_DIAG_TL_TO_BR:	0x40005
+					, SLIDE_DIAG_TR_TO_BL:	0x40006
+					, SLIDE_DIAG_BL_TO_TR:	0x40009
+					, SLIDE_DIAG_BR_TO_TL:	0x40010
+					, ZOOM_IN:			0x16
+					, ZOOM_OUT:			0x10010
+					, FADE_IN:			0xa0000
+					, FADE_OUT:			0x90000}
+		
+		return DllCall("AnimateWindow", "UInt", this.hwnd, "Int", Duration, "UInt", Anims.HasKey(Type)?Anims[Type]:Type)
+	}
 	
 	WinSet(Command, Param := "") {
 		WinSet, % Command, % Param, % this.ahkid

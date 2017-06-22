@@ -41,7 +41,7 @@ global Actions, Plug, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 92]
+AppVersion := [0, 9, 94]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 pToken := Gdip_Startup()
@@ -131,7 +131,7 @@ PluginsLaunched() {
 Elevate() {
 	for Index, Arg in Args
 		Args2 .= " " . (InStr(Arg, " ") ? """" : "") . Arg . (InStr(Arg, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath%" %Args2%w
+	Run *RunAs "%A_ScriptFullPath%" %Args2%
 	ExitApp
 }
 

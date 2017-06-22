@@ -357,7 +357,7 @@
 		Critical 500
 		
 		if (LV_EX_GetRowHeight(this.BindLV.hwnd)*this.BindLV.GetCount() > this.LV_HEIGHT)
-			this.BindLV.ModifyCol(2, this.HALF_WIDTH - VERT_SCROLL)
+			this.BindLV.ModifyCol(2, this.HALF_WIDTH - VERT_SCROLL + 1)
 		else
 			this.BindLV.ModifyCol(2, this.HALF_WIDTH)
 		

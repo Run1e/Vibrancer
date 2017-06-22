@@ -77,17 +77,12 @@ icon := "D:\Documents\Scripts\Vibrancer\icons\vibrancer.ico"
 in := "D:\Documents\Scripts\Vibrancer\Vibrancer.ahk"
 out := "D:\Documents\Scripts\Vibrancer\Vibrancer\Vibrancer.exe"
 
-p(), p(ahk2exe)
-p("in: "in)
-p("out: " out)
-p("icon: " icon)
-p("bin: " bin)
 p(), p("Compiling")
 
 RunWait, %ahk2exe% /in "%in%" /out "%out%" /icon "%icon%" /bin "%bin%"
 if !FileExist(out)
 	Error("Failed compiling, target does not exist: " out)
-p("Finished")
+p("Finished!")
 sleep 500
 ExitApp
 
