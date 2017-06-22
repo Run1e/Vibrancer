@@ -1,5 +1,7 @@
 ﻿Class Plugin {
-	__New() {
+	static _init := Plugin.Init()
+	
+	Init() {
 		this.Listeners := []
 		this.OnExits := []
 		

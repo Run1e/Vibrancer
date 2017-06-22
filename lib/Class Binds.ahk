@@ -1,12 +1,4 @@
-﻿/*
-	in keybinds:
-	"key": {
-		func: funcname
-		params: [array of parameters]
-	}
-*/
-
-Class Binds {
+﻿Class Binds {
 	static _init := Binds.Init()
 	
 	Init() {

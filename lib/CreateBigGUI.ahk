@@ -9,7 +9,6 @@
 	Big.TAB_HEIGHT := TAB_HEIGHT := 32
 	Big.LV_HEIGHT := LV_HEIGHT := 240
 	Big.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
-	Big.EXPAND_SIZE := EXPAND_SIZE := 200
 	
 	; ==========================================
 	
@@ -112,9 +111,6 @@
 	Big.UpdateBindList()
 	
 	Big.ActiveTab := Settings.GuiState.ActiveTab
-	Big.ExpandState := Settings.GuiState.ExpandState
-	
-	Big.SetIcon(Icon())
 	
 	if (Settings.GuiState.GameListPos > ArraySize(GameRules))
 		Pos := ArraySize(GameRules)
@@ -132,6 +128,7 @@
 		Pos := Settings.GuiState.BindListPos
 	Big.BindListViewAction("", "C", Pos)
 	
+	Big.SetIcon(Icon())
 	Big.Margin(0, 1) ; bottom pixel
 	return
 }

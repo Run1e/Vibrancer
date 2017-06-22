@@ -48,7 +48,9 @@ pToken := Gdip_Startup()
 
 ; contains user settings
 Settings := new JSONFile("data\Settings.json")
-Settings.Fill(DefaultSettings()), Settings.Save()
+Settings.Fill(DefaultSettings())
+if !Settings.FileExist()
+	Settings.Save()
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
@@ -59,8 +61,6 @@ if !Keybinds.FileExist()
 GameRules := new JSONFile("data\GameRules.json")
 if !GameRules.FileExist()
 	GameRules.Fill(DefaultGameRules()), GameRules.Save()
-
-Plugin := new Plugin
 
 ; init nvidia api wrapper
 InitNvAPI()

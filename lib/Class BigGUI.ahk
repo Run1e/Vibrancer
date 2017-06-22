@@ -118,7 +118,10 @@
 		Mons := []
 		Mons[Select] := true
 		
-		if GetKeyState("CTRL", "P") || GetKeyState("SHIFT", "P") || GetKeyState("RButton", "P")
+		if this.MultiSelect || GetKeyState("CTRL", "P") || GetKeyState("SHIFT", "P")
+			Multi := !(this.MultiSelect := false)
+		
+		if Multi
 			for Index, Screen in Settings.VibrancyScreens
 				Mons[Screen] := true
 		
@@ -141,13 +144,6 @@
 				} 
 			} CtlColors.Change(HWND, "FFFFFF", "000000")
 		}
-	}
-	
-	SelectScreenKey() {
-		MouseGetPos,,,, ctrl, 2
-		for Index, Control in this.MonitorHWND
-			if (Control+0 = ctrl)
-				ControlClick,, % "ahk_id" ctrl
 	}
 	
 	GamesWinBlock() {
@@ -410,11 +406,6 @@
 			new Hotkey("Delete", this.BindDelete.Bind(this), this.ahkid)
 			new Hotkey("^z", this.BindRegret.Bind(this), this.ahkid)
 		}
-		
-		if !this.LButtonHtk
-			this.LButtonHtk := new Hotkey("~*LButton", this.MouseClick.Bind(this), this.ahkid, "Exist")
-		if !this.RButtonHtk
-			this.RButtonHtk := new Hotkey("~*RButton", this.SelectScreenKey.Bind(this), this.ahkid, "Exist")
 	}
 	
 	SetTabColor(tab) {
@@ -453,7 +444,8 @@
 		if (this.ActiveTab = 1)
 			this.ColorScreens()
 		
-		this.Control(, this.ProgressHWND, 50)
+		OnMessage(0x201, "LButton")
+		OnMessage(0x204, "RButton")
 		
 		; init CLV here
 		if !this.GameLV.CLV {
@@ -476,7 +468,6 @@
 	
 	Save() {
 		Settings.GuiState.ActiveTab := this.ActiveTab
-		Settings.GuiState.ExpandState := this.ExpandState
 		Settings.Save()
 		Keybinds.Save()
 		GameRules.Save()
@@ -489,18 +480,30 @@
 	Close() {
 		Event("GuiClose")
 		this.Hide()
-		this.LButtonHtk.Delete()
-		this.LButtonHtk := ""
-		this.RButtonHtk.Delete()
-		this.RButtonHtk := ""
+		OnMessage(0x201, "")
+		OnMessage(0x204, "")
 		Keybinds(true)
 		this.Save()
 	}
-	
-	; change the stupid tab IMMEDIATELY NICE HACK RUNE
-	MouseClick() {
-		MouseGetPos,,, hwnd, Ctrl
-		if (Ctrl ~= "^(Button(1|2))$") && (hwnd = this.hwnd)
-			this.SetTab(SubStr(Ctrl, 7, 1))
+}
+
+; for some reason the message doesn't unregsiter if the target is a boundfunc, fix?
+
+; change the stupid tab IMMEDIATELY NICE HACK RUNE
+; edit 22/06/2017: using system messages now, not really hack anymore!
+; v(^_^)v (>^_^)> ^(^_^)> ^(^_^)^ <(^_^<) <(^_^)^ (>^_^)> <(^_^<) :D
+LButton() {
+	MouseGetPos,,, hwnd, Ctrl
+	if (Ctrl ~= "^(Button(1|2))$") && (hwnd = Big.hwnd) ; returns true so the gui doesn't get the lbuttondown msg and the color changes immediately
+		return true, Big.SetTab(SubStr(Ctrl, 7))
+}
+
+RButton() {
+	MouseGetPos,,,, ctrl, 2
+	for Index, Control in Big.MonitorHWND {
+		if (Control+0 = ctrl) {
+			Big.MultiSelect := true
+			ControlClick,, % "ahk_id" ctrl
+		}
 	}
 }
