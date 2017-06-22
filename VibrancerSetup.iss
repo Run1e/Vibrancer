@@ -30,6 +30,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
          
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\lib"
+Type: filesandordirs; Name: "{app}\plugins\imgurlib"
 Type: filesandordirs; Name: "{app}\Vibrancer-Installer.zip"
 Type: files; Name: "{app}\PowerPlay.exe"
 Type: filesandordirs; Name: "{app}\PowerPlay-installer"

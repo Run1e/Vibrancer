@@ -8,7 +8,8 @@ Plugins := ["Imgur Uploader"
 		, "Pastebin Upload"
 		, "Remove Donate Button"
 		, "Steam Game Launcher"
-		, "Vibrancy Control"]
+		, "Vibrancy Control"
+		, "Window Switcher"]
 
 Libs :=	[ "Class GUI"
 		, "Class Hotkey"

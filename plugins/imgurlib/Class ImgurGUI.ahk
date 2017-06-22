@@ -4,7 +4,13 @@
 	static AnimatedEnabled := false
 	
 	Open() {
-		this.Show("w" this.WIDTH " h" this.HEIGHT " Center")
+		static Go := false
+		if Working
+			return
+		if !Go
+			this.Show("w1117 h" A_ScreenHeight*0.7 " Center"), Go := true
+		else
+			this.Show()
 		new Hotkey("Delete", this.Delete.Bind(this), this.ahkid)
 		this.Animate(true)
 	}
@@ -14,8 +20,6 @@
 		this.ImgurLV.Modify(0, "-Select")
 		this.ImgurLV.Modify(1, "Vis")
 		this.Animate(false)
-		Settings.Size.Width := this.WIDTH
-		Settings.Size.Height := this.HEIGHT
 	}
 	
 	Escape() {
@@ -28,7 +32,6 @@
 				Uploader.Upload(A_Now "_" A_MSec, File)
 	}
 	
-	
 	Size(Event, w, h) {
 		this.Control("Move", this.ImgurLV.hwnd, "x0 y0 w" w " h" h - this.SB_HEIGHT - this.BUTTON_HEIGHT)
 		this.Control("MoveDraw", "Button1", "x0 y" h - this.SB_HEIGHT - this.BUTTON_HEIGHT " w" w/4 " h" this.BUTTON_HEIGHT)
@@ -37,7 +40,6 @@
 		this.Control("MoveDraw", "Button4", "x" w/4*3 " y" h - this.SB_HEIGHT - this.BUTTON_HEIGHT " w" w/4 " h" this.BUTTON_HEIGHT)
 		this.SB.SetProgress("", 3, "Hide")
 		this.SB.SetParts(120, 100, w - 220)
-		;this.WIDTH := w, this.HEIGHT := h
 		this.FixOrder()
 	}
 	
@@ -143,8 +145,8 @@
 	AnimateTick() {
 		; find the next image to show for each animated image
 		for Index, Pos in this.AnimatedPositions {
-			if this.AnimatedImages[Index].HasKey(Pos+1)
-				this.AnimatedPositions[Index] := Pos+1
+			if this.AnimatedImages[Index].HasKey(Pos + 1)
+				this.AnimatedPositions[Index] := Pos + 1
 			else
 				this.AnimatedPositions[Index] := 1
 		} 

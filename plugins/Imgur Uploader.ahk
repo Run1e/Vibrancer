@@ -1,4 +1,4 @@
-﻿; Capture, upload and delete images
+; Capture, upload and delete images
 ; RUNIE
 #SingleInstance force
 #NoEnv
@@ -32,7 +32,6 @@ OnExit("Exit")
 
 #Include imgurlib\Class CustomImageList.ahk
 #Include imgurlib\Class ImgurGUI.ahk
-#Include imgurlib\Class Queue.ahk
 #Include imgurlib\Class RectClass.ahk
 #Include imgurlib\Class ScreenClass.ahk
 #Include imgurlib\Class Uploader.ahk
@@ -40,7 +39,6 @@ OnExit("Exit")
 #Include imgurlib\DefaultSettings.ahk
 #Include imgurlib\Functions.ahk
 #Include imgurlib\MakeFolders.ahk
-#Include imgurlib\Screencap.ahk
 #Include imgurlib\UploaderScript.ahk
 
 #Include imgurlib\third-party\SB_SetProgress.ahk
@@ -149,4 +147,54 @@ Exit() {
 	Uploader.Free()
 	Gdip_Shutdown(pToken)
 	ExitApp
+}
+
+Area() {
+	if Working
+		return
+	RectClass.Start()
+}
+
+Window() {
+	if Working
+		return
+	Working := true
+	
+	Mon := []
+	SysGet, MonitorCount, MonitorCount
+	Loop, %MonitorCount%
+	{
+		SysGet, Monitor, Monitor, %A_Index%
+		Mon[A_Index] := {Top:MonitorTop, Left: MonitorLeft, Bottom:MonitorBottom, Right:MonitorRight}
+	}
+	
+	Left := MonGetLow(Mon, "Left")
+	Right := MonGetHigh(Mon, "Right")
+	Top := MonGetLow(Mon, "Top")
+	Bottom := MonGetHigh(Mon, "Bottom")
+	
+	if !WinGetPosEx(WinActive("A"), x, y, w, h)
+		return Working := false
+	
+	if (x < Left)
+		w -= Left-x, x := Left
+	if (y < Top)
+		h -= Top-y, y := Top
+	if ((x+w) > Right)
+		w -= x+w-Right
+	if ((y+h) > Bottom)
+		h -= y+h-Bottom
+	
+	if (w<0) || (h<0)
+		return Working := false
+	
+	Working := false
+	Func := Func("Capture").Bind(x, y, w, h)
+	SetTimer, % Func, -1
+}
+
+Screen() {
+	if Working
+		return
+	ScreenClass.Start()
 }
