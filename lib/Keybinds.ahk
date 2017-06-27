@@ -4,7 +4,7 @@ Keybinds(Enable := true) {
 	Hotkey.DeleteAll()
 	
 	if Enable
-		for Key, Bind in Keybinds.Data()
+		for Key, Bind in Keybinds.Object()
 			BindKey(Key, Bind)
 }
 

@@ -54,7 +54,7 @@ UploadClip() {
 	if (POST.Status = 200) {
 		Title := "Clipboard uploaded!"
 		Msg := "Link copied to clipboard."
-		Clipboard(StrReplace(Link, "?p=", "?r="))
+		Clipboard(Link)
 	} else {
 		Title := "Paste failed!"
 		Msg := (Response ? "Error: " Response : "Request timed out.")

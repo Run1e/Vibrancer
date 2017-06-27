@@ -11,7 +11,7 @@
 		
 		Rules.VibAll(VibrancyDefault)
 		
-		Settings.Save()
+		Settings.Save(true)
 		ApplySettings()
 		
 		this.Close()

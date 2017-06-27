@@ -45,7 +45,7 @@
 	
 	LoadImages() {
 		this.ImgurLV.Redraw(false)
-		for Index in Images.Data()
+		for Index in Images.Object()
 			this.AddImage(Index, false)
 		this.FixOrder()
 		this.ImgurLV.Redraw(true)

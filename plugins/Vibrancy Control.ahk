@@ -20,7 +20,7 @@ Vib.OnExit(Func("Exit"))
 
 global Big := Vib.Get("Big")
 global Rules := Vib.Get("Rules")
-global GameRules := Vib.Get("GameRules").Data()
+global GameRules := Vib.Get("GameRules").Object()
 
 Binds := new BindSection(Vib, "Vibrancy Control", "VibrancyControl")
 Binds.AddFunc("VibChange", Func("VibChange"))

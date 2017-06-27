@@ -17,7 +17,6 @@ OnExit("Exit")
 
 #Include ..\lib\Class GUI.ahk
 #Include ..\lib\Class Hotkey.ahk
-#Include ..\lib\Class OnMouseMove.ahk
 #Include ..\lib\Class JSONFile.ahk
 #Include ..\lib\Class Menu.ahk
 #Include ..\lib\Debug.ahk
@@ -34,6 +33,7 @@ OnExit("Exit")
 #Include imgurlib\Class ImgurGUI.ahk
 #Include imgurlib\Class RectClass.ahk
 #Include imgurlib\Class ScreenClass.ahk
+#Include imgurlib\Class OnMouseMove.ahk
 #Include imgurlib\Class Uploader.ahk
 #Include imgurlib\CreateImgurGUI.ahk
 #Include imgurlib\DefaultSettings.ahk
@@ -72,12 +72,12 @@ Uploader := new Uploader
 
 Settings := new JSONFile("..\data\imgur\ImgurSettings.json")
 Settings.Fill(DefaultSettings())
-if !Settings.FileExist()
-	Settings.Save()
+if Settings.IsNew()
+	Settings.Save(true)
 
 ; json file containing image data
 Images := new JSONFile("..\data\imgur\ImgurImages.json")
-if !Images.FileExist()
+if Images.IsNew()
 	Images.Save()
 
 ; bind section
@@ -142,9 +142,11 @@ Capture(x := "", y := "", w := "", h := "") {
 }
 
 Exit() {
-	Settings.Save()
-	Images.Save()
 	Uploader.Free()
+	Settings.Save(true)
+	Images.Save()
+	Settings := ""
+	Images := ""
 	Gdip_Shutdown(pToken)
 	ExitApp
 }

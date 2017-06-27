@@ -58,7 +58,7 @@
 		
 		GameRules[Info.InstallLocation] := Game
 		
-		GameRules.Save()
+		GameRules.Save(true)
 		this.UpdateGameList(Info.InstallLocation)
 		
 		Loop % this.GameLV.GetCount() {
@@ -184,7 +184,7 @@
 		this.GameLV.SetImageList(IL.ID)
 		this.GameLV.Delete()
 		
-		for Process, Info in GameRules.Data() {
+		for Process, Info in GameRules.Object() {
 			if StrLen(Info.Title)
 				Title := Info.Title
 			else
@@ -334,7 +334,7 @@
 		this.BindLV.Redraw(false)
 		this.BindLV.Delete()
 		
-		for Key, Bind in Keybinds.Data() {
+		for Key, Bind in Keybinds.Object() {
 			Pos := this.BindLV.Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
 			
 			if (Key = FocusKey)
@@ -468,9 +468,9 @@
 	
 	Save() {
 		Settings.GuiState.ActiveTab := this.ActiveTab
-		Settings.Save()
-		Keybinds.Save()
-		GameRules.Save()
+		Settings.Save(true)
+		Keybinds.Save(true)
+		GameRules.Save(true)
 	}
 	
 	Escape() {

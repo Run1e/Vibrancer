@@ -1,82 +1,106 @@
-﻿; wraps coco's JSON class and handles everything I need in regards to JSON files
-Class JSONFile {
+﻿Class JSONFile {
 	static Instances := []
 	
 	__New(File) {
-		JSONFile.Instances[this] := []
-		Contents := "{}"
-		if FileExist(File)
-			FileRead, Contents, % File
-		try
-			JSONFile.Instances[this].Data := JSON.Load(Contents)
-		catch e
-			JSONFile.Instances[this].Data := {}
-		if !IsObject(JSONFile.Instances[this].Data)
-			JSONFile.Instances[this].Data := {}
-		JSONFile.Instances[this].File := File
+		FileExist := FileExist(File)
+		
+		JSONFile.Instances[this] := {File: File, Object: {}, FileObj: FileOpen(File, "rw")}
+		ObjRelease(&this)
+		
+		if !IsObject(JSONFile.Instances[this].FileObj)
+			throw Exception("Can't access file for JSONFile instance: " File, -1)
+		
+		if FileExist {
+			try
+				JSONFile.Instances[this].Object := JSON.Load(JSONFile.Instances[this].FileObj.Read())
+			catch e {
+				this.__Delete()
+				throw e
+			}
+			if (JSONFile.Instances[this].Object = "")
+				JSONFile.Instances[this].Object := {}
+		}
+		
 		return this
 	}
 	
-	__Destroy() {
-		JSONFile.Instances.Remove(this)
+	__Delete() {
+		if JSONFile.Instances.HasKey(this) {
+			JSONFile.Instances[this].FileObj.Close()
+			ObjAddRef(&this)
+			JSONFile.Instances.Delete(this)
+		}
 	}
 	
 	__Call(Func, Param*) {
-		if (JSONFile.Instances[this].HasKey(Func))
+		if JSONFile.Instances[this].HasKey(Func)
 			return JSONFile.Instances[this][Func]
 		
+		; return formatted json
+		if (Func = "JSON")
+			return StrReplace(JSON.Dump(this.Object(),, Param.1 ? A_Tab : ""), "`n", "`r`n")
+		
+		; save the json file
+		if (Func = "Save") {
+			try
+				New := this.JSON(Param.1)
+			catch e
+				return false
+			this.FileObj().Length := 0
+			this.FileObj().Write(New)
+			this.FileObj().__Handle
+			return true
+		}
+		
 		; fill from specified array into the JSON array
-		else if (Func = "Fill") {
+		if (Func = "Fill") {
 			if !IsObject(Param.2)
 				Param.2 := []
 			for Key, Val in Param.1 {
 				if (A_Index > 1)
 					Param.2.Pop()
-				HasKey := (Param.2.MaxIndex() ? this.Data()[Param.2*].HasKey(Key) : this.Data().HasKey(Key))
+				HasKey := Param.2.MaxIndex()
+						? this.Object()[Param.2*].HasKey(Key) 
+						: this.Object().HasKey(Key)
 				Param.2.Push(Key)
 				if IsObject(Val) && HasKey
 					this.Fill(Val, Param.2), Param.2.Pop()
 				else if !HasKey
-					this.Data()[Param.2*] := Val
+					this.Object()[Param.2*] := Val
 			} return
 		}
 		
-		; save the json file
-		else if (Func = "Save") {
-			FileRead, Contents, % this.File()
-			FileDelete, % this.File()
-			try
-				FileAppend, % this.JSON(), % this.File()
-			catch e {
-				FileAppend, % Contents, % this.File()
-				throw e
-			} return
+		if (Func = "Select") {
+			Type := Param.1, Where := Param.2, Is := Param.3
+			Obj := Param.4, Results := Param.5
+			if !IsObject(Obj)
+				Obj := this.Object()
+			if !IsObject(Results)
+				Results := []
+			for Key, Value in Obj {
+				if IsObject(Value)
+					this.Select(Type, Where, Is, Value, Results)
+				else {
+					if (Where = "*" && (Value = Is || Is = "*")) 
+					|| (Is = "*" && (Key = Where || Where = "*")) 
+					|| (Where = Key && Is = Value) {
+						if (Type = "Object")
+							return Results.Push(Obj)
+						else
+							Results.Push(Type = "Key" ? Key : Value)
+					}
+				}
+			} return Results
 		}
 		
-		; reset the object from file
-		else if (Func = "Refresh") {
-			FileRead, Contents, % this.File()
-			JSONFile.Instances[this].Data := JSON.Load(Contents)
-		}
-		
-		; get the plain text json
-		else if (Func = "JSON")
-			return JSON.Dump(this.Data(),, A_Tab)
-		
-		; check if files exists
-		else if (Func = "FileExist")
-			return !!FileExist(this.File())
-		
-		; else, call the object method on the data object
-		else
-			return Obj%Func%(this.Data(), Param*)
+		return Obj%Func%(this.Object(), Param*)
 	}
 	
 	__Set(Key, Val) {
-		return this.Data()[Key] := Val
+		return this.Object()[Key] := Val
 	}
 	
 	__Get(Key) {
-		return this.Data()[Key]
+		return this.Object()[Key]
 	}
 }

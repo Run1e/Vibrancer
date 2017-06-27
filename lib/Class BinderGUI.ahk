@@ -63,7 +63,7 @@
 	
 	; checks if key exists in the saved keybinds data
 	KeyExists(Key) {
-		for SavedKey in Keybinds.Data() {
+		for SavedKey in Keybinds.Object() {
 			if (StrReplace(StrReplace(SavedKey, "*", ""), "~", "") = StrReplace(StrReplace(Key, "*", ""), "~", ""))
 				return SavedKey
 		} return false

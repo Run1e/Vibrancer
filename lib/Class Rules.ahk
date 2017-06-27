@@ -57,7 +57,7 @@
 		
 		WinGet, ProcessPath, ProcessPath, ahk_id %hwnd%
 		
-		for Process, Info in GameRules.Data() {
+		for Process, Info in GameRules.Object() {
 			if (SubStr(ProcessPath, 1, StrLen(Process)) = Process) { ; apply rules to any exe in the dir if only a dir is specified
 				
 				if (this.Process = Process)
@@ -70,7 +70,7 @@
 					WinGetTitle, Title, ahk_id %hwnd%
 					GameRules[Process].Title := Title
 					Info.Title := Title
-					GameRules.Save()
+					GameRules.Save(true)
 					Big.UpdateGameList(Process)
 				}
 				

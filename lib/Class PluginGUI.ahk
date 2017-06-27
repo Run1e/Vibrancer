@@ -95,7 +95,7 @@
 		this.CLV := ""
 		this.Destroy()
 		Plug := ""
-		Settings.Save()
+		Settings.Save(true)
 	}
 }
 
