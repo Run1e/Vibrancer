@@ -3,36 +3,33 @@
 	
 	__New(File) {
 		FileExist := FileExist(File)
-		
-		JSONFile.Instances[this] := {File: File, Object: {}, FileObj: FileOpen(File, "rw")}
+		JSONFile.Instances[this] := {File: File, Object: {}}
 		ObjRelease(&this)
-		
-		if !IsObject(JSONFile.Instances[this].FileObj)
+		FileObj := FileOpen(File, "rw")
+		if !IsObject(FileObj)
 			throw Exception("Can't access file for JSONFile instance: " File, -1)
-		
 		if FileExist {
 			try
-				JSONFile.Instances[this].Object := JSON.Load(JSONFile.Instances[this].FileObj.Read())
+				JSONFile.Instances[this].Object := JSON.Load(FileObj.Read())
 			catch e {
 				this.__Delete()
 				throw e
-			}
-			if (JSONFile.Instances[this].Object = "")
+			} if (JSONFile.Instances[this].Object = "")
 				JSONFile.Instances[this].Object := {}
-		}
-		
+		} else
+			JSONFile.Instances[this].IsNew := true
 		return this
 	}
 	
 	__Delete() {
 		if JSONFile.Instances.HasKey(this) {
-			JSONFile.Instances[this].FileObj.Close()
 			ObjAddRef(&this)
 			JSONFile.Instances.Delete(this)
 		}
 	}
 	
 	__Call(Func, Param*) {
+		; return instance value (File, Object, FileObj, IsNew)
 		if JSONFile.Instances[this].HasKey(Func)
 			return JSONFile.Instances[this][Func]
 		
@@ -46,9 +43,10 @@
 				New := this.JSON(Param.1)
 			catch e
 				return false
-			this.FileObj().Length := 0
-			this.FileObj().Write(New)
-			this.FileObj().__Handle
+			FileObj := FileOpen(this.File(), "w")
+			FileObj.Length := 0
+			FileObj.Write(New)
+			FileObj.__Handle
 			return true
 		}
 		

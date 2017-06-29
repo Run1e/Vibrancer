@@ -4,7 +4,6 @@
 cd := "Vibrancer"
 
 Plugins := ["Imgur Uploader"
-		, "Debugger"
 		, "Pastebin Upload"
 		, "Remove Donate Button"
 		, "Steam Game Launcher"

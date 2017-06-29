@@ -1,5 +1,4 @@
 ﻿Exit(Exit := true) {
-	
 	CtlColors.Free() ; free ctlcolors
 	Plugin.Exit()
 	

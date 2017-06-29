@@ -49,21 +49,18 @@ pToken := Gdip_Startup()
 ; contains user settings
 Settings := new JSONFile("data\Settings.json")
 Settings.Fill(DefaultSettings())
-Settings.Save(true)
+if Settings.IsNew()
+	Settings.Save(true)
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
-Keybinds.Fill(DefaultKeybinds())
-Keybinds.Save(true)
+if Keybinds.IsNew()
+	Keybinds.Fill(DefaultKeybinds()), Keybinds.Save(true)
 
 ; contains game rules
 GameRules := new JSONFile("data\GameRules.json")
-GameRules.Fill(DefaultGameRules())
-GameRules.Save(true)
-
-m(Keybinds.Select("Object", "Class", "ImgurUploader"))
-
-
+if GameRules.IsNew()
+	GameRules.Fill(DefaultGameRules()), GameRules.Save(true)
 
 ; init nvidia api wrapper
 InitNvAPI()
