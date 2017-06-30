@@ -41,7 +41,7 @@ global Actions, Plug, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 94]
+AppVersion := [0, 9, 95]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 pToken := Gdip_Startup()

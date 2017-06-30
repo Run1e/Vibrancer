@@ -21,10 +21,6 @@ Run(File, WorkingDir := "") {
 		throw Exception
 }
 
-as(arr) {
-	return ArraySize(arr)
-}
-
 ArraySize(arr) {
 	return NumGet(&arr, 4*A_PtrSize)
 }
@@ -96,13 +92,6 @@ HotkeyToString(Key) {
 Random(min, max) {
 	Random, out, % min, % max
 	return out
-}
-
-RandB64(length) {
-	static pool := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-	Loop % length
-		str .= SubStr(pool, Random(1, 64), 1)
-	return str
 }
 
 RegRead(root, sub, value) {

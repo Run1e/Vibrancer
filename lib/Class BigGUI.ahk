@@ -148,17 +148,17 @@
 	
 	GamesWinBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockWinKey := Big.GuiControlGet(, this.WinKeyBlockHWND)
+			GameRules[Key].BlockWinKey := Big.GuiControlGet(, this.WinKeyBlockHWND) + 0
 	}
 	
 	GamesAltTabBlock() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].BlockAltTab := Big.GuiControlGet(, this.AltTabBlockHWND)
+			GameRules[Key].BlockAltTab := Big.GuiControlGet(, this.AltTabBlockHWND) + 0
 	}
 	
 	GamesSlider() {
 		if (Key := this.GamesGetKey())
-			GameRules[Key].Vibrancy := Big.GuiControlGet(, this.VibrancySliderHWND)
+			GameRules[Key].Vibrancy := Big.GuiControlGet(, this.VibrancySliderHWND) + 0
 	}
 	
 	GamesGetKey() {

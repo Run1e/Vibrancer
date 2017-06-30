@@ -1,4 +1,28 @@
-﻿Class JSONFile {
+﻿/*
+	Class JSONFile
+	Written by:  Runar "RUNIE" Borge
+	
+	Dependencies:
+	JSON loader/dumper by cocobelgica: https://github.com/cocobelgica/AutoHotkey-JSON
+	However the class can easily be modified to use another JSON dump/load lib.
+	
+	To create a new JSON file wrapper:
+	MyJSON := new JSONFile(filepath)
+	
+	And to destroy it:
+	MyJSON := ""
+	
+	Methods:
+		.Save(Prettify := false) - save object to file
+		.JSON(Prettify := false) - Get JSON text
+		.Fill(Object) - fill keys in from another object into the instance object
+		
+	Instance variables:
+		.File() - get file path
+		.Object() - get data object
+*/
+
+Class JSONFile {
 	static Instances := []
 	
 	__New(File) {
@@ -66,29 +90,6 @@
 				else if !HasKey
 					this.Object()[Param.2*] := Val
 			} return
-		}
-		
-		if (Func = "Select") {
-			Type := Param.1, Where := Param.2, Is := Param.3
-			Obj := Param.4, Results := Param.5
-			if !IsObject(Obj)
-				Obj := this.Object()
-			if !IsObject(Results)
-				Results := []
-			for Key, Value in Obj {
-				if IsObject(Value)
-					this.Select(Type, Where, Is, Value, Results)
-				else {
-					if (Where = "*" && (Value = Is || Is = "*")) 
-					|| (Is = "*" && (Key = Where || Where = "*")) 
-					|| (Where = Key && Is = Value) {
-						if (Type = "Object")
-							return Results.Push(Obj)
-						else
-							Results.Push(Type = "Key" ? Key : Value)
-					}
-				}
-			} return Results
 		}
 		
 		return Obj%Func%(this.Object(), Param*)

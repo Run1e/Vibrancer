@@ -1,7 +1,7 @@
 ﻿DefaultGameRules() {
 	Games := []
 	for Index, Game in GetSteamGames()
-		Games[Game.InstallLocation] := {Icon:Game.DisplayIcon, Title:Game.DisplayName, BlockAltTab:false, BlockWinKey:true, Vibrancy:50}
+		Games[Game.InstallLocation] := {Icon: Game.DisplayIcon, Title: Game.DisplayName, BlockAltTab: false, BlockWinKey: true, Vibrancy: 50}
 	
 	SteamDir := GetSteamDir()
 	Games[SteamDir "\steamapps\common\Counter-Strike Global Offensive"].Vibrancy := 85

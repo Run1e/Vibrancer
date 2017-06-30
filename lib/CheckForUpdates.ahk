@@ -11,7 +11,11 @@
 		return TrayTip("GitHub request failed")
 	
 	; load into obj
-	GitJSON := JSON.Load(Data.ResponseText)
+	try
+		GitJSON := JSON.Load(Data.ResponseText)
+	catch e
+		return TrayTip("Update response malformed")
+	
 	Installer := "https://github.com/Run1e/Vibrancer/releases/download/" GitJSON.tag_name "/Vibrancer-installer.zip"
 	
 	if (GitJSON.tag_name > AppVersionString) {

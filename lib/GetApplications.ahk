@@ -36,10 +36,6 @@ GetPrograms() {
 	} return ret
 }
 
-GetGOGGames() {
-	
-}
-
 GetSteamGames() {
 	ret:=[]
 	for Index, Key in ["HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall","HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"]
