@@ -12,7 +12,7 @@
 		if IsObject(Item)
 			Menu % this.Name, Add, % Item.Name, % ":" Item.Name
 		else {
-			if BoundFuncMap[this.Name].HasKey(Item)
+			if Menu.BoundFuncMap[this.Name].HasKey(Item)
 				return
 			Menu % this.Name, Add, % Item, MenuHandler
 			if BoundFunc
@@ -25,7 +25,7 @@
 		if IsObject(Item)
 			Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
 		else {
-			if BoundFuncMap[this.Name].HasKey(Item)
+			if Menu.BoundFuncMap[this.Name].HasKey(Item)
 				return
 			Menu % this.Name, Insert, % Pos, % Item, MenuHandler
 			if BoundFunc
