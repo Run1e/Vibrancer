@@ -27,7 +27,7 @@
 	Img.Add("Button", "Disabled", "Start queue", Uploader.StartStop.Bind(Uploader))
 	Img.Add("Button", "Disabled", "Clear queue", Uploader.ClearQueue.Bind(Uploader))
 	Img.Add("Button", "Disabled", "Clear failed items", Uploader.ClearFailedQueue.Bind(Uploader))
-	Img.Add("Button", "Disabled", "Settings", Func("Settings"))
+	Img.Add("Button",, "Settings", Func("Settings"))
 	
 	Img.SB := new Gui.StatusBar(Img, "0x100", "Ready")
 	Img.SB.SetParts(120, 100)

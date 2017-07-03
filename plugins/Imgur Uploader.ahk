@@ -15,11 +15,11 @@ OnExit("Exit")
 #Include %A_ScriptDir%
 #Include ..\lib\plugin\BindSection.ahk
 
+#Include ..\lib\Debug.ahk
 #Include ..\lib\Class GUI.ahk
 #Include ..\lib\Class Hotkey.ahk
 #Include ..\lib\Class JSONFile.ahk
 #Include ..\lib\Class Menu.ahk
-#Include ..\lib\Debug.ahk
 #Include ..\lib\Error.ahk
 #Include ..\lib\Functions.ahk
 #Include ..\lib\MonitorSetup.ahk
@@ -64,11 +64,9 @@ catch e
 Vib.OnExit(Func("Exit"))
 
 global pToken := Gdip_Startup()
-global Working := false, Images, Settings, Img, Vib, Uploader
+global Working := false, Images, Settings, Img, Vib, Uploader, SetGUI
 
 Uploader := new Uploader
-
-; call exit when pp closes
 
 Settings := new JSONFile("..\data\imgur\ImgurSettings.json")
 Settings.Fill(DefaultSettings())
@@ -99,14 +97,6 @@ Vib.Finished() ; pp can continue on its adventures now it dun have to wait for t
 ; create gui
 CreateImgurGUI()
 Img.LoadImages()
-
-/*
-	Tray.NoStandard()
-	Tray.Add("Open", Img.Open.Bind(Img))
-	Tray.Add("Exit", Func("Exit"))
-	Tray.Default("Open")
-	Tray.Icon()
-*/
 return
 
 Open() {
@@ -200,3 +190,4 @@ Screen() {
 		return
 	ScreenClass.Start()
 }
+#Include imgurlib\Class ImgurSettingsGUI.ahk

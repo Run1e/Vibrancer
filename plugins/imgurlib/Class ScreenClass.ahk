@@ -54,7 +54,7 @@
 			
 			Gdip_TextToGraphics(G, MonitorID
 							, "x" Mon.x " y" Mon.y + Mon.h/2 - 56 " w" Mon.w " h" Mon.h " Centre s96 cFFFFFFFF"
-							, Settings.Font
+							, "Segoe UI Light"
 							, this.Width
 							, this.Height)
 			
