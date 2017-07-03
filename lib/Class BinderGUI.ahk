@@ -212,8 +212,7 @@
 		
 		this.Destroy()
 		
-		if IsObject(Bind)
-			Event("BindCallback", ID, Bind)
+		od("Bind callback: ", Bind)
 		
 		this.Callback.Call(Bind, ID)
 	}

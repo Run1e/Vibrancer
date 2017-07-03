@@ -13,8 +13,7 @@
 		this.ListViewCLV := ""
 		this.Destroy()
 		
-		if IsObject(Info)
-			Event("AppSelectCallback", Info)
+		od("App selected: ", Info)
 		
 		this.Callback.Call(Info)
 		Prog := ""

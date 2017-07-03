@@ -11,10 +11,16 @@ pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
 			if (IsObject(v) && depth>1)
 				lst.="`n" pa(v, depth-1, indentLevel . "    ")
 			else
-				lst.=" => " v
+				lst.=" -> " v
 			lst.="`n"
 		} return rtrim(lst, "`r`n `t")	
 	} return
+}
+
+od(x*) {
+	for a, b in x
+		text .= "`n" (IsObject(b)?pa(b):b)
+	OutputDebug % "VIB: " StrReplace(trim(text, "`n"), "`n", "`nVIB: ")
 }
 
 pas(array, depth=5) { ; tidbit, this has saved my life

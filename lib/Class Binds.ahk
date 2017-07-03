@@ -41,10 +41,12 @@
 	}
 	
 	Add(Name, Bind) {
+		od("Adding func to " Name ": ", Bind)
 		this.List[Name].Push(Bind)
 	}
 	
 	NewClass(Name, ClassName, Class) {
+		od("Creating new class: ", {Name: Name, ClassName: ClassName})
 		Actions[ClassName] := Class
 		return this.List[Name] := []
 	}

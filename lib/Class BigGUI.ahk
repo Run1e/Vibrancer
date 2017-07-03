@@ -128,8 +128,6 @@
 		for Screen in Mons, Screens := []
 			Screens.Push(Screen)
 		
-		Event("SetScreens", Screens)
-		
 		Settings.VibrancyScreens := Screens
 		this.ColorScreens()
 	}

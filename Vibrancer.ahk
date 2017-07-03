@@ -13,6 +13,24 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
+QPC(true)
+
+/*
+	#Include %A_ScriptDir%
+	#Include lib\third-party\Class JSON.ahk
+	try
+		Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
+	catch e
+		ExitApp
+	FileRead, temp, data\GameRules.json
+	FileDelete % data\GameRules.json
+	n := {}, j := JSON.Load(temp)
+	for a, b in j
+		n[StrReplace(a, "", "")] := b
+	FileAppend, % JSON.Dump(n,, A_Tab)
+	return
+*/
+
 global Args := []
 Loop %0%
 	Args.Push(%A_Index%)
@@ -22,10 +40,9 @@ if !A_IsAdmin && A_IsCompiled
 	Elevate()
 
 ; only compiled and tested in 32-bit.
-if (A_PtrSize=8) {
+if (A_PtrSize = 8) {
 	m("Please run script as 32-bit.")
 	ExitApp
-	return
 }
 
 ; make necessary sub-folders
@@ -43,6 +60,8 @@ global VERT_SCROLL, pToken ; other
 AppName := "Vibrancer"
 AppVersion := [0, 9, 95]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
+
+od("Launching " AppName " v" AppVersionString)
 
 pToken := Gdip_Startup()
 
@@ -126,6 +145,8 @@ PluginsLaunched() {
 			Big.Open()
 		}
 	}
+	
+	od("Startup time: " QPC(false) "s")
 }
 
 Elevate() {
@@ -166,10 +187,6 @@ BugReport() {
 		else
 			Run("https://gitreports.com/issue/Run1e/Vibrancer")
 	*/
-}
-
-Print(text := "") {
-	Event("Print", IsObject(text) ? pa(text) : text)
 }
 
 ImageButtonApply(hwnd) {

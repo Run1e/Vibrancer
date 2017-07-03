@@ -29,7 +29,6 @@
 }
 
 Settings() {
-	
 	if IsObject(SetGUI)
 		return SetGUI.Activate()
 	

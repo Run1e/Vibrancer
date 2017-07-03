@@ -7,6 +7,8 @@
 		if !this.IsConnected()
 			return false
 		
+		this.Log("POST: " URL)
+		
 		if IsObject(Post)
 			for Key, Value in Post
 				Post .= (A_Index > 1 ? "&" : "") Key "=" this.UriEncode(Value)
@@ -20,7 +22,7 @@
 			if this.HTTP.WaitForResponse(this.Timeout) {
 				Post := this.GetData()
 				Headers := this.GetHeaders()
-				this.Log("POST request SUCCESS`nURL: " URL "`nStatus: " Post.Status " (" Post.StatusText ")")
+				this.Log("POST request SUCCESS" "`nStatus: " Post.Status " (" Post.StatusText ")")
 				return true
 			}
 		}
@@ -34,6 +36,8 @@
 		if !this.IsConnected()
 			return false
 		
+		this.Log("GET: " URL)
+		
 		this.HTTP.Open("GET", URL, true)
 		this.SetHeaders(Headers)
 		this.AutoProxy()
@@ -43,7 +47,7 @@
 			if this.HTTP.WaitForResponse(this.Timeout) {
 				OutData := this.GetData()
 				Headers := this.GetHeaders()
-				this.Log("GET request SUCCESS`nURL: " URL "`nStatus: " OutData.Status " (" OutData.StatusText ")")
+				this.Log("GET request SUCCESS`nStatus: " OutData.Status " (" OutData.StatusText ")")
 				return true
 			}
 		}
@@ -65,7 +69,9 @@
 	*/
 	
 	Log(Text) {
-		
+		static out := Func("od")
+		if out
+			%out%(text)
 	}
 	
 	GetData() {

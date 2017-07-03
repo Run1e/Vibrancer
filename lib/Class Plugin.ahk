@@ -84,6 +84,7 @@
 	; === PRIVATE METHODS ===
 	
 	Event(Event, Param*) {
+		od("EVENT: " Event, Param)
 		for Listener, Events in this.Listeners {
 			if Events.HasKey(Event) {
 				try
@@ -107,6 +108,7 @@
 	}
 	
 	Run(Plg) {
+		od("Running plugin: " Plg)
 		Run(A_WorkingDir "\lib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
 	}
 	
