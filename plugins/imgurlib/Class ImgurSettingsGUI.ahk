@@ -36,7 +36,7 @@ Settings() {
 	if IsObject(SetGUI)
 		return SetGUI.Activate()
 	
-	SetGUI := new ImgurSettingsGUI("Imgur Settings")
+	SetGUI := new ImgurSettingsGUI("Imgur Settings", "-MinimizeBox")
 	
 	SetGUI.Font("s10", "Segoe UI Light")
 	SetGUI.Color("FFFFFF")
@@ -54,7 +54,6 @@ Settings() {
 	; bottom buttons
 	SetGUI.Add("Button", "x60 w60", "Save", SetGUI.Save.Bind(SetGUI))
 	
-	SetGUI.Options("-MinimizeBox")
 	SetGUI.Show()
 	
 	SetGUI.SetIcon(Vib.Call("Icon"))

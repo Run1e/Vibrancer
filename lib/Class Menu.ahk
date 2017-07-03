@@ -9,66 +9,46 @@
 	
 	; add a new item or another sub-menu object
 	Add(Item := "", BoundFunc := "", Icon := "") {
-		if IsObject(Item) {
-			try
-				Menu % this.Name, Add, % Item.Name, % ":" Item.Name
-			catch Exception
-				throw Exception
-		} else {
-			try {
-				Menu % this.Name, Add, % Item, MenuHandler
-				if BoundFunc
-					Menu.BoundFuncMap[this.Name, Item] := BoundFunc
-			} catch Exception
-				throw Exception
+		if IsObject(Item)
+			Menu % this.Name, Add, % Item.Name, % ":" Item.Name
+		else {
+			if BoundFuncMap[this.Name].HasKey(Item)
+				return
+			Menu % this.Name, Add, % Item, MenuHandler
+			if BoundFunc
+				Menu.BoundFuncMap[this.Name, Item] := BoundFunc
 		} if Icon
 			this.Icon(IsObject(Item) ? Item.Name : Item, Icon)
 	}
 	
 	Insert(Pos, Item := "", BoundFunc := "", Icon := "") {
-		if IsObject(Item) {
-			try
-				Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
-			catch Exception
-				throw Exception
-		} else {
-			try {
-				Menu % this.Name, Insert, % Pos, % Item, MenuHandler
-				if BoundFunc
-					Menu.BoundFuncMap[this.Name, Item] := BoundFunc
-			} catch Exception
-				throw Exception
+		if IsObject(Item)
+			Menu % this.Name, Insert, % Pos, % Item.Name, % ":" Item.Name
+		else {
+			if BoundFuncMap[this.Name].HasKey(Item)
+				return
+			Menu % this.Name, Insert, % Pos, % Item, MenuHandler
+			if BoundFunc
+				Menu.BoundFuncMap[this.Name, Item] := BoundFunc
 		} if Icon
 			this.Icon(IsObject(Item) ? Item.Name : Item, Icon)
 	}
 	
 	Delete(Item := "") {
-		try
-			Menu % this.Name, Delete, % Item
-		catch Exception
-			throw Exception
+		Menu % this.Name, Delete, % Item
 	}
 	
 	DeleteAll() {
-		try
-			Menu % this.Name, DeleteAll
-		catch Exception
-			throw Exception
+		Menu % this.Name, DeleteAll
 	}
 	
 	Icon(Item := "", Icon := "") {
-		try
-			Menu % this.Name, Icon, % Item, % Icon
-		catch Exception
-			throw Exception
+		Menu % this.Name, Icon, % Item, % Icon
 	}
 	
 	Default(ItemName) {
-		try {
-			Menu % this.Name, Default, % ItemName
-			this.Default := ItemName
-		} catch Exception
-			throw Exception
+		Menu % this.Name, Default, % ItemName
+		this.Default := ItemName
 	}
 	
 	Show(x := "", y := "") {
