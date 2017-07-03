@@ -9,7 +9,7 @@
 		
 		Loop 3 {
 			if this.ControlGet("Checked",, "Button" (3 + A_Index)) {
-				CopyOnUpload := A_Index - 1
+				CopyOnUpload := {1:2, 2:1, 3:0}[A_Index]
 				break
 			} else if (A_Index = 4) ; wut how
 				break
@@ -28,8 +28,7 @@
 	; close gui
 	Close(OpenMain := true) {
 		this.Destroy()
-		
-		SetGUI := "" ; remove global ref
+		SetGUI := ""
 	}
 }
 
@@ -48,9 +47,9 @@ Settings() {
 	SetGUI.Add("Checkbox", "xp yp+22 wp Disabled Checked" Settings.CloseOnOpen, "Close on Open")
 	SetGUI.Add("Checkbox", "xp yp+22 wp Checked" Settings.UseGifv, "Copy gif as gifv")
 	SetGUI.Add("Text",, "Copy to clipboard:")
-	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 0 ? true : false), "Never")
-	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 1 ? true : false), "When minimized")
 	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 2 ? true : false), "Always")
+	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 1 ? true : false), "When minimized")
+	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 0 ? true : false), "Never")
 	
 	; bottom buttons
 	SetGUI.Add("Button", "x60 w60", "Save", SetGUI.Save.Bind(SetGUI))
