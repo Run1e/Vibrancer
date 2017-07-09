@@ -15,22 +15,6 @@ SetWorkingDir % A_ScriptDir
 
 QPC(true)
 
-/*
-	#Include %A_ScriptDir%
-	#Include lib\third-party\Class JSON.ahk
-	try
-		Vib := ComObjActive("{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
-	catch e
-		ExitApp
-	FileRead, temp, data\GameRules.json
-	FileDelete % data\GameRules.json
-	n := {}, j := JSON.Load(temp)
-	for a, b in j
-		n[StrReplace(a, "", "")] := b
-	FileAppend, % JSON.Dump(n,, A_Tab)
-	return
-*/
-
 global Args := []
 Loop %0%
 	Args.Push(%A_Index%)
@@ -73,13 +57,17 @@ if Settings.IsNew()
 
 ; contains keybind information
 Keybinds := new JSONFile("data\Keybinds.json")
-if Keybinds.IsNew()
-	Keybinds.Fill(DefaultKeybinds()), Keybinds.Save(true)
+if Keybinds.IsNew() {
+	Keybinds.Fill(DefaultKeybinds())
+	Keybinds.Save(true)
+}
 
 ; contains game rules
 GameRules := new JSONFile("data\GameRules.json")
-if GameRules.IsNew()
-	GameRules.Fill(DefaultGameRules()), GameRules.Save(true)
+if GameRules.IsNew() {
+	GameRules.Fill(DefaultGameRules())
+	GameRules.Save(true)
+}
 
 ; init nvidia api wrapper
 InitNvAPI()
@@ -191,8 +179,8 @@ BugReport() {
 
 ImageButtonApply(hwnd) {
 	static RoundPx := 2
-	static ButtonStyle:= [[3, "0xEEEEEE", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; normal
-					, [3, "0xFFFFFF", "0xDDDDDD", "Black", RoundPx,, "Gray"] ; hover
+	static ButtonStyle:= [[3, "0xEEEEEE", "0xCFCFCF", "Black", RoundPx,, "Gray"] ; normal
+					, [3, "0xFFFFFF", "0xCFCFCF", "Black", RoundPx,, "Gray"] ; hover
 					, [3, "White", "White", "Black", RoundPx,, "Gray"] ; click
 					, [3, "Gray", "Gray", "0x505050", RoundPx,, "Gray"]] ; disabled
 	
@@ -212,6 +200,7 @@ ImageButtonApply(hwnd) {
 #Include lib\Class HTTP.ahk
 #Include lib\Class JSONFile.ahk
 #Include lib\Class Menu.ahk
+#Include lib\Class ObjSelect.ahk
 #Include lib\Class Plugin.ahk
 #Include lib\Class PluginGUI.ahk
 #Include lib\Class Rules.ahk

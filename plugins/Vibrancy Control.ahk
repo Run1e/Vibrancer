@@ -35,15 +35,20 @@ VibChange(num) {
 	if (Rules.Process = "")
 		return
 	
-	Vibrance := GameRules[Rules.Process].Vibrancy + num
+	Vibrance := (temp := GameRules[Rules.Process].Vibrancy) + num
 	Vibrance := Vibrance > 100 ? 100 : (Vibrance < 50 ? 50 : Vibrance)
 	GameRules[Rules.Process].Vibrancy := Vibrance
 	Rules.VibSelected(Vibrance)
-	
+
 	if Big.IsVisible && (Big.GameLV.GetText(Big.GameLV.GetNext(), 2) = Rules.Process)
 			Big.SetText(Big.VibrancySliderHWND, Vibrance)
 }
 
 Exit() {
 	ExitApp
+}
+
+s(text := "") {
+	static oVoice := ComObjCreate("SAPI.SpVoice")
+	oVoice.Speak(text, 1)
 }
