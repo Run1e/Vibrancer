@@ -27,7 +27,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
-         
+ 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\lib"
 Type: filesandordirs; Name: "{app}\plugins\imgurlib"
@@ -39,6 +39,9 @@ Type: files; Name: "{app}\icons\powerplay.ico"
 [Files]
 Source: "D:\Documents\Scripts\Vibrancer\Vibrancer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[Dirs]
+Name: "{app}"; Permissions: users-full
+                         
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon

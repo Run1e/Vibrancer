@@ -36,6 +36,7 @@
 	
 	Delete(Item := "") {
 		Menu % this.Name, Delete, % Item
+		Menu.BoundFuncMap[this.Name].Delete(Item)
 	}
 	
 	DeleteAll() {
@@ -67,7 +68,10 @@
 }
 
 MenuHandler(MenuItem, MenuPos, MenuName) {
-	Menu.BoundFuncMap[MenuName, MenuItem].Call()
+	if (MenuName = "Tray") && (MenuItem = "Open")
+		Big.Open()
+	else
+		try Menu.BoundFuncMap[MenuName, MenuItem].Call()
 }
 
 ; singleton class for the Tray menu

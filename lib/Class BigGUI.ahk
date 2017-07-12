@@ -430,26 +430,20 @@
 		
 		Event("GuiOpen")
 		
-		
 		this.LVRedraw(false)
 		
 		this.Pos(A_ScreenWidth/2 - this.HALF_WIDTH, A_ScreenHeight/2 - 164, this.HALF_WIDTH*2)
 		this.SetTab(tab?tab:this.ActiveTab)
 		
-		m(1)
 		this.Show()
-		m(2)
 		this.LVRedraw(true)
-		m(3)
 		
 		if (this.ActiveTab = 1)
 			this.ColorScreens()
-		m(4)
 		
 		OnMessage(0x201, "LButton")
 		OnMessage(0x204, "RButton")
 		
-		m(5)
 		; init CLV here
 		if !this.GameLV.CLV {
 			this.GameLV.CLV := new LV_Colors(this.GameLV.hwnd)

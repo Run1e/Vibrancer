@@ -19,10 +19,6 @@ global Args := []
 Loop %0%
 	Args.Push(%A_Index%)
 
-; has to elevate itself to admin so it can create folders/files when installed in program files
-if !A_IsAdmin && A_IsCompiled
-	Elevate()
-
 ; only compiled and tested in 32-bit.
 if (A_PtrSize = 8) {
 	m("Please run script as 32-bit.")
@@ -42,7 +38,7 @@ global Actions, Plug, Tray, Binds, Rules ; objects
 global VERT_SCROLL, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 95]
+AppVersion := [0, 9, 96]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 od("Launching " AppName " v" AppVersionString)
@@ -135,13 +131,6 @@ PluginsLaunched() {
 	}
 	
 	od("Startup time: " QPC(false) "s")
-}
-
-Elevate() {
-	for Index, Arg in Args
-		ArgsText .= " " . (InStr(Arg, " ") ? """" : "") . Arg . (InStr(Arg, " ") ? """" : "")
-	Run *RunAs "%A_ScriptFullPath%" %ArgsText%
-	ExitApp
 }
 
 TrayTip(Title, Msg := "") {
