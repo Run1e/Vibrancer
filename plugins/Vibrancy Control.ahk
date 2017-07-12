@@ -39,9 +39,12 @@ VibChange(num) {
 	Vibrance := Vibrance > 100 ? 100 : (Vibrance < 50 ? 50 : Vibrance)
 	GameRules[Rules.Process].Vibrancy := Vibrance
 	Rules.VibSelected(Vibrance)
-
+	
 	if Big.IsVisible && (Big.GameLV.GetText(Big.GameLV.GetNext(), 2) = Rules.Process)
-			Big.SetText(Big.VibrancySliderHWND, Vibrance)
+		Big.SetText(Big.VibrancySliderHWND, Vibrance)
+	
+	if ((Vibrance = 100) && (temp < 100)) || ((Vibrance = 50) && (temp > 50))
+		SoundBeep
 }
 
 Exit() {
