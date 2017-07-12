@@ -5,9 +5,9 @@
 	Gdip_Shutdown(pToken) ; shut down gdip
 	ObjRegisterActive(Plugin, "") ; revoke COM objects
 	
-	Settings.Save()
-	Keybinds.Save()
-	GameRules.Save()
+	Settings.Save(true)
+	Keybinds.Save(true)
+	GameRules.Save(true)
 	
 	Settings := ""
 	Keybinds := ""
