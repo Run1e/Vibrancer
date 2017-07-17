@@ -314,7 +314,7 @@
 		
 		if (Info.Event = "Deletion") {
 			Keybinds[Info.Key] := Info.Bind
-			NewPos := this.BindLV.Insert(Info.Pos, "Focus Select Vis", HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
+			NewPos := this.BindLV.Insert(Info.Pos, "Focus Select Vis Icon" . (Actions[Info.Bind.Class].HasKey("__Class") ? 1 : 2), HotkeyToString(Info.Key), Info.Bind.Desc, Info.Key)
 			BindKey(Info.Key, Info.Bind)
 		} else if (Info.Event = "Addition") { ; a fine one
 			Keybinds.Remove(Info.Key)
@@ -326,14 +326,22 @@
 		this.BindListViewAction("", "C", (NewPos > ArraySize(Keybinds) ? ArraySize(Keybinds) : NewPos))
 	}
 	
-	UpdateBindList(FocusKey:= "") {
+	UpdateBindList(FocusKey := "") {
 		Critical 500
 		
 		this.BindLV.Redraw(false)
 		this.BindLV.Delete()
 		
+		IL := new Gui.ImageList(this.GameLV)
+		IL.Add(Icon("device-desktop"))
+		IL.Add(Icon("plug"))
+		
+		this.BindLV.SetImageList(IL.ID)
+		
 		for Key, Bind in Keybinds.Object() {
-			Pos := this.BindLV.Add(, HotkeyToString(Key), Keybinds[Key].Desc, Key)
+			Pos := this.BindLV.Add("Icon" . (Actions[Bind.Class].HasKey("__Class") ? 1 : 2), HotkeyToString(Key), Keybinds[Key].Desc, Key)
+			
+			;m(Bind, Actions[Bind.Class].HasKey("__Class"))
 			
 			if (Key = FocusKey)
 				Settings.GuiState.BindListPos := Pos
