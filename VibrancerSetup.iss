@@ -1,5 +1,5 @@
 #define MyAppName "Vibrancer"
-#define MyAppVersion "0.9.96"
+#define MyAppVersion "0.9.97"
 #define MyAppURL "https://github.com/Run1e/Vibrancer"
 #define MyAppWiki "https://github.com/Run1e/Vibrancer/wiki"
 #define MyAppExeName "Vibrancer.exe"
@@ -50,5 +50,5 @@ Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "/OPEN"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\{#MyAppExeName}"; Parameters: "/UPDATED"; Flags: nowait skipifnotsilent
+Filename: "{app}\{#MyAppExeName}"; Parameters: "Vibrancer.ahk /OPEN"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Parameters: "Vibrancer.ahk /UPDATED"; Flags: nowait skipifnotsilent
