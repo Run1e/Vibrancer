@@ -190,6 +190,7 @@
 			Pos := this.GameLV.Add("Icon" . IL.Add(StrLen(Info.Icon)?Info.Icon:Process), StrLen(Title)?Title:FileName, Process)
 		}
 		
+		this.GameLV.Modify(Settings.GuiState.GameListPos, "Select Vis")
 		this.GameListViewAction("", "C", Settings.GuiState.GameListPos)
 		this.GameListViewSize()
 		this.GameLV.ModifyCol(1, "Sort")

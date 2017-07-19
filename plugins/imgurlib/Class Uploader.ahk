@@ -341,7 +341,7 @@
 	
 	; launch worker thread
 	LaunchWorker() {
-		this.Worker := AhkThread("Main := ObjShare(" ObjShare(this) ")`n" UploaderScript(),,, "..\lib\AutoHotkey.dll")
+		this.Worker := AhkThread("Main := ObjShare(" ObjShare(this) ")`n" UploaderScript())
 	}
 	
 	Free() {

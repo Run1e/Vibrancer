@@ -109,7 +109,7 @@
 	
 	Run(Plg) {
 		od("Running plugin: " Plg)
-		Run(A_WorkingDir "\lib\AutoHotkey.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+		Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
 	}
 	
 	Launch(Index) {
