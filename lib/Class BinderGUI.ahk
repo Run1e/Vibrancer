@@ -241,22 +241,22 @@ CreateNugget(Callback, Owner := "") {
 	Binder.HEIGHT := HEIGHT := 247
 	Binder.CONTROL_HEIGHT := CONTROL_HEIGHT := 26
 	
-	Binder.Add("Text", "Center x0 w" WIDTH, "Key:")
+	Binder.Add("Text", "Center x0 w" WIDTH, Lang.BINDER.KEY)
 	
 	Binder.MainHotkeyHWND := Binder.Add("Hotkey", "x6 yp+25 w" WIDTH - 12 " Center",, Binder.HotkeyChange.Bind(Binder))
 	; Binder.Add("Button", "x" 6 + WIDTH - 38 " yp-1 w" 27 " h" 27, "M", Binder.EditModifiers.Bind(Binder))
 	
-	Binder.Add("Checkbox", "x8 yp+32", "Passthrough", Binder.PassthroughChange.Bind(Binder))
-	Binder.Add("Checkbox", "x" WIDTH/2 + 10 " yp", "Wildcard", Binder.WildcardChange.Bind(Binder))
+	Binder.Add("Checkbox", "x8 yp+32", Lang.BINDER.PASSTHROUGH, Binder.PassthroughChange.Bind(Binder))
+	Binder.Add("Checkbox", "x" WIDTH/2 + 10 " yp", Lang.BINDER.WILDCARD, Binder.WildcardChange.Bind(Binder))
 	
 	Binder.Add("Text", "x6 yp+" CONTROL_HEIGHT " w" WIDTH-12 " h1 0x08") ; separator
 	
-	Binder.Add("Text", "x0 w" WIDTH " Center", "Assignment:")
+	Binder.Add("Text", "x0 w" WIDTH " Center", Lang.BINDER.ASSIGNMENT)
 	Binder.Add("DropDownList", "x6 w" WIDTH - 12 " h" CONTROL_HEIGHT " Choose1 R99", Assignments, Binder.AssignmentDDL.Bind(Binder))
 	
 	Binder.Add("Text", "x6 yp+" 8+CONTROL_HEIGHT " w" WIDTH - 12 " h1 0x08") ; separator
 	
-	Binder.AssignmentTextHWND := Binder.Add("Text", "x0 w" WIDTH " Center", "Function:")
+	Binder.AssignmentTextHWND := Binder.Add("Text", "x0 w" WIDTH " Center", Lang.BINDER.FUNCTION)
 	Binder.Add("DropDownList", "x6 w" WIDTH - 12 " h" CONTROL_HEIGHT " Choose1 Hidden R99",, Binder.FunctionDDL.Bind(Binder))
 	Binder.EditHWND := Binder.Add("Edit", "x6 yp w" WIDTH - 12 " h" CONTROL_HEIGHT)
 	Binder.Font("s9", "Wingdings")
@@ -265,8 +265,8 @@ CreateNugget(Callback, Owner := "") {
 	
 	Binder.Margin(6, 10)
 	Binder.Add("Text", "x6 yp+" 8 + CONTROL_HEIGHT " w" WIDTH - 12 " h1 0x08") ; separator
-	Binder.Add("Button", "x6 yp+8 h" CONTROL_HEIGHT, "Cancel", Binder.Close.Bind(Binder))
-	Binder.Add("Button", "xp" WIDTH - 61 " yp h" CONTROL_HEIGHT, "Create", Binder.AddButton.Bind(Binder))
+	Binder.Add("Button", "x6 yp+8 w70 h" CONTROL_HEIGHT, Lang.BINDER.CANCEL, Binder.Close.Bind(Binder))
+	Binder.Add("Button", "xp" WIDTH - 81 " yp w70 h" CONTROL_HEIGHT, Lang.BINDER.CREATE, Binder.AddButton.Bind(Binder))
 	
 	for Assignment in Binds.List {
 		Binder.Assignment := Assignment

@@ -4,7 +4,7 @@
 	MsgBox, 0, msgbox, % text
 }
 
-pa(array, depth=5, indentLevel:="   ") { ; tidbit, this has saved my life
+pa(array, depth=5, indentLevel:="   ") {
 	try {
 		for k,v in Array {
 			lst.= indentLevel "[" k "]"

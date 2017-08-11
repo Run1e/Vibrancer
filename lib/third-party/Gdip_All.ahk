@@ -2013,9 +2013,9 @@ Gdip_SetStringFormatAlign(hFormat, Align)
 ; StringFormatFlagsNoWrap                  = 0x00001000
 ; StringFormatFlagsLineLimit               = 0x00002000
 ; StringFormatFlagsNoClip                  = 0x00004000 
-Gdip_StringFormatCreate(Format=0, Lang=0)
+Gdip_StringFormatCreate(Format=0, Langs=0)
 {
-   DllCall("gdiplus\GdipCreateStringFormat", "int", Format, "int", Lang, "uint*", hFormat)
+   DllCall("gdiplus\GdipCreateStringFormat", "int", Format, "int", Langs, "uint*", hFormat)
    return hFormat
 }
 

@@ -101,14 +101,13 @@
 
 ; game: how many variations of "plugin" can I come up with?
 Plugins() {
-	
 	if IsObject(Plug)
 		return
 	
 	if IsObject(SetGUI)
 		SetGUI.Close(false)
 	
-	Plug := new PluginGUI("Plugins", "-MinimizeBox")
+	Plug := new PluginGUI(Lang.PLUGIN.PLUGINS, "-MinimizeBox")
 	
 	Plug.WIDTH := WIDTH := 550
 	Plug.HEIGHT := HEIGHT := 255
@@ -125,15 +124,17 @@ Plugins() {
 	
 	Plug.UpdatePluginList(1)
 	
+	Plug.Margin(4, 4)
+	
 	Plug.Add("Text", "x0 y" HEIGHT - 35 " h1 w" WIDTH " 0x08")
-	Plug.Add("Text", "x8 yp+9", "Load order:")
+	Plug.Add("Text", "x8 yp+9", Lang.PLUGIN.LOAD_ORDER)
 	
 	Plug.Font("s8")
-	Plug.Add("Button", "x80 yp-4 w63 h" BUTTON_HEIGHT, "Move up", Plug.Move.Bind(Plug, -1))
-	Plug.Add("Button", "x145 yp w72 h" BUTTON_HEIGHT, "Move down", Plug.Move.Bind(Plug, 1))
+	Plug.Add("Button", "x+m yp-4 h" BUTTON_HEIGHT, Lang.PLUGIN.MOVE_UP, Plug.Move.Bind(Plug, -1))
+	Plug.Add("Button", "x+m yp h" BUTTON_HEIGHT, Lang.PLUGIN.MOVE_DOWN, Plug.Move.Bind(Plug, 1))
 	
-	Plug.Add("Button", "x" WIDTH - 180 " yp h" BUTTON_HEIGHT, "Open plugin folder", Plug.OpenFolder.Bind(Plug))
-	Plug.Add("Button", "xp+100 yp h" BUTTON_HEIGHT, "Apply (reload)", Plug.Restart.Bind(Plug))
+	Plug.Add("Button", "x+m" WIDTH - 180 " yp h" BUTTON_HEIGHT, Lang.PLUGIN.OPEN_FOLDER, Plug.OpenFolder.Bind(Plug))
+	Plug.Add("Button", "x+m yp h" BUTTON_HEIGHT, Lang.PLUGIN.APPLY, Plug.Restart.Bind(Plug))
 	
 	Plug.Show("w" WIDTH " h" HEIGHT)
 }

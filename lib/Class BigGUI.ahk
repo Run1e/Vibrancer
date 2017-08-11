@@ -239,6 +239,7 @@
 	
 	GameListViewSize() {
 		Critical 500
+		static VERT_SCROLL := SysGet(2)
 		
 		; removed width if scroll is visible
 		if ((LV_EX_GetRowHeight(this.GameLV.hwnd) * this.GameLV.GetCount()) > this.LV_HEIGHT)
@@ -362,6 +363,7 @@
 	
 	BindListViewSize() {
 		Critical 500
+		static VERT_SCROLL := SysGet(2)
 		
 		if (LV_EX_GetRowHeight(this.BindLV.hwnd)*this.BindLV.GetCount() > this.LV_HEIGHT)
 			this.BindLV.ModifyCol(2, this.HALF_WIDTH - VERT_SCROLL + 1)

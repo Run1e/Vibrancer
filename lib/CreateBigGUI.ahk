@@ -5,16 +5,16 @@
 	Big.Color("FFFFFF")
 	Big.Margin(0, 0)
 	
-	Big.HALF_WIDTH := HALF_WIDTH := 270
+	Big.HALF_WIDTH := HALF_WIDTH := 280
 	Big.TAB_HEIGHT := TAB_HEIGHT := 32
-	Big.LV_HEIGHT := LV_HEIGHT := 240
+	Big.LV_HEIGHT := LV_HEIGHT := 264
 	Big.BUTTON_HEIGHT := BUTTON_HEIGHT := 26
 	
 	; ==========================================
 	
 	; tab text controls
-	Big.GamesTabHWND := Big.Add("Button", "x0 y0 w" HALF_WIDTH - 1 " h" TAB_HEIGHT - 1, "Games")
-	Big.KeybindsTabHWND := Big.Add("Button", "x" HALF_WIDTH " y0 w" HALF_WIDTH " h" TAB_HEIGHT - 1, "Keybinds")
+	Big.GamesTabHWND := Big.Add("Button", "x0 y0 w" HALF_WIDTH - 1 " h" TAB_HEIGHT - 1)
+	Big.KeybindsTabHWND := Big.Add("Button", "x" HALF_WIDTH " y0 w" HALF_WIDTH " h" TAB_HEIGHT - 1)
 	
 	bordermix := 0xFFEEEEEE ;CK
 	NORMAL := [  [0, 0x80FFFFFF, , 0xD3000000, 0, , 0xFFFFFFFF, 1] ; normal
@@ -40,37 +40,35 @@
 	
 	Big.Font("s10")
 	
-	Button := Big.Add("Button", "x1 y" TAB_HEIGHT+LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1, "Remove", Big.GameDelete.Bind(Big))
-	ImageButtonApply(Button)
-	
-	Button := Big.Add("Button", "x" Round(HALF_WIDTH/5*2) + 1 " yp w" HALF_WIDTH-Round(HALF_WIDTH/5*2) - 1 " h" BUTTON_HEIGHT - 1, "Add Program", Big.AddGame.Bind(Big))
-	ImageButtonApply(Button)
+	Big.GameDeleteHWND := Big.Add("Button", "x1 y" TAB_HEIGHT+LV_HEIGHT + 1 " w" Round(HALF_WIDTH/5*2) - 2 " h" BUTTON_HEIGHT - 1,, Big.GameDelete.Bind(Big))
+	Big.GameAddHWND := Big.Add("Button", "x" Round(HALF_WIDTH/5*2) + 1 " yp w" HALF_WIDTH-Round(HALF_WIDTH/5*2) - 1 " h" BUTTON_HEIGHT - 1,, Big.AddGame.Bind(Big))
 	
 	Big.Add("Text", "x" HALF_WIDTH - 1 " y" TAB_HEIGHT " w1 h" LV_HEIGHT " 0x08") ; skille
-	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT/2 " w" HALF_WIDTH " h1 0x08") ; skille
+	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + LV_HEIGHT/2 + 8 " w" HALF_WIDTH " h1 0x08") ; skille
 	
 	Big.Font("s11")
 	
 	Big.Margin(6, 4) ; nicerino margerino
-	Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + 8 " w" HALF_WIDTH " Center", "NVIDIA Vibrance Boost")
+	Big.VibrancySliderTextHWND := Big.Add("Text", "x" HALF_WIDTH " y" TAB_HEIGHT + 8 " w" HALF_WIDTH " Center")
 	Big.VibrancySliderHWND := Big.Add("Slider", "x" HALF_WIDTH + 12 " yp+25 w" HALF_WIDTH - 24 " Range50-100 ToolTip Center",, Big.GamesSlider.Bind(Big))
-	Big.WinKeyBlockHWND := Big.Add("CheckBox", "yp+56", "Block Windows Key", Big.GamesWinBlock.Bind(Big))
-	Big.AltTabBlockHWND := Big.Add("CheckBox", "x430 yp", "Block Alt-Tab", Big.GamesAltTabBlock.Bind(Big))
 	
-	Big.Add("Text", "x" HALF_WIDTH + 6 " y" 158 " W" HALF_WIDTH - 12 " Center", "Vibrancy Screen:")
+	Big.WinKeyBlockHWND := Big.Add("CheckBox", "x" HALF_WIDTH + 16 " yp+54 w122 h40",, Big.GamesWinBlock.Bind(Big)) ; egt 70
+	Big.AltTabBlockHWND := Big.Add("CheckBox", "x" HALF_WIDTH/2*3 + 6 " yp w125 h40",, Big.GamesAltTabBlock.Bind(Big))
+	
+	Big.VibrancyScreenHWND := Big.Add("Text", "x" HALF_WIDTH + 6 " y" 182 " W" HALF_WIDTH - 12 " Center")
 	
 	MonitorCount := SysGet("MonitorCount")
 	
 	Big.Font(MonitorCount>1?"s16":"s14")
 	
 	if (MonitorCount = 1) {
-		Big.Add("Text", "x" HALF_WIDTH + 1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center", "Primary screen selected!")
+		Big.PrimarySelectedHWND := Big.Add("Text", "x" HALF_WIDTH + 1 " y" TAB_HEIGHT + LV_HEIGHT*3/4 " w" HALF_WIDTH - 12 " Center")
 		Settings.VibrancyScreens := [SysGet("MonitorPrimary")] ; reset it so it doesn't get messed up and the user is stuck and can't change
 	} else {
 		for MonID, Mon in MonitorSetup(HALF_WIDTH - 16, 100, 4) {
 			HWND := Big.Add("Text"
 					, "x" HALF_WIDTH + 8 + Mon.X
-					. " y" 186 + Mon.Y
+					. " y" 210 + Mon.Y
 					. " w" Mon.W
 					. " h" Mon.H
 					. " +Border 0x200 Center", MonID, Big.SelectScreen.Bind(Big, MonID))
@@ -102,11 +100,8 @@
 	
 	Big.Font("s10")
 	
-	Button := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1, "Delete Keybind", Big.BindDelete.Bind(Big))
-	ImageButtonApply(Button)
-	
-	Button := Big.Add("Button", "x" HALF_WIDTH + 1 " yp w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center", "Add a Keybind", Big.AddBind.Bind(Big))
-	ImageButtonApply(Button)
+	Big.BindDeleteHWND := Big.Add("Button", "x1 y" TAB_HEIGHT + LV_HEIGHT + 1 " w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1,, Big.BindDelete.Bind(Big))
+	Big.BindAddHWND := Big.Add("Button", "x" HALF_WIDTH + 1 " yp w" HALF_WIDTH - 2 " h" BUTTON_HEIGHT - 1 " Center",, Big.AddBind.Bind(Big))
 	
 	Big.UpdateBindList()
 	

@@ -35,7 +35,7 @@ global AppName, AppVersion, AppVersionString ; app info
 global Big, Binder, Settings, Prog, SetGUI ; GUI
 global Settings, Keybinds, GameRules ; JSON
 global Actions, Plug, Tray, Binds, Rules ; objects
-global VERT_SCROLL, pToken ; other
+global Lang, pToken ; other
 
 AppName := "Vibrancer"
 AppVersion := [0, 9, 97]
@@ -68,11 +68,11 @@ if GameRules.IsNew() {
 ; init nvidia api wrapper
 InitNvAPI()
 
-; get vertical scrollbar width, used in listviews
-VERT_SCROLL := SysGet(2)
-
 ; create main gui
 CreateBigGUI()
+
+; set language
+SetLanguage()
 
 ; tray menu
 Tray.NoStandard()
@@ -221,3 +221,6 @@ ImageButtonApply(hwnd) {
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\SetCueBanner.ahk
+
+
+#Include lib\Language.ahk

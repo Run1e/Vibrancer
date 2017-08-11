@@ -33,7 +33,8 @@
 }
 
 AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
-	Prog := new AppSelectGUI("Select an application")
+	static VERT_SCROLL := SysGet(2)
+	Prog := new AppSelectGUI(Lang.PROGRAM.TITLE)
 	
 	Prog.Default()
 	
@@ -44,15 +45,15 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog.Callback := Callback
 	Prog.Owner := Owner
 	
-	Prog.Add("Text",, "Select a program:")
+	Prog.Add("Text",, Lang.PROGRAM.SELECT_PROGRAM)
 	
 	Prog.AppLV := new Prog.ListView(Prog, "w250 h265 -HDR -Multi", "prog|id", Prog.AppListViewAction.Bind(Prog))
 	
 	Prog.AppLV.CLV := new LV_Colors(Prog.AppLV.hwnd)
 	Prog.AppLV.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
-	Prog.Add("Text", "y+10", "Not in the list? Select manually: ")
-	Prog.Add("Button", "x193 yp-5", "Select exe", Prog.SelectFile.Bind(Prog))
+	Prog.Add("Text", "y+10", Lang.PROGRAM.MANUAL_PROMPT)
+	Prog.Add("Button", "x193 yp-5", Lang.PROGRAM.SELECT_EXE, Prog.SelectFile.Bind(Prog))
 	
 	IL := new Prog.ImageList
 	Prog.IL := IL

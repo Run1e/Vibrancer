@@ -16,13 +16,11 @@ Files := 	[ "LICENSE.txt"
 
 Dirs := 	[ "lib"
 		, "icons"
+		, "language"
 		, "plugins\imgurlib"]
 
 FileRemoveDir, % cd, 1
-
 FileCreateDir % cd
-
-
 
 for index, dir in Dirs {
 	p("Copying dir: " dir)
