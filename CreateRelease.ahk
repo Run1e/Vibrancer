@@ -36,13 +36,6 @@ for index, file in Files {
 		Error("Failed copying file: " file)
 }
 
-for index, plug in Plugins {
-	p("Copying plugin: " plug ".ahk")
-	FileCopy, % "plugins\" plug ".ahk", % cd "\plugins\" plug ".ahk"
-	if !FileExist(cd "\plugins\" plug ".ahk")
-		Error("Failed copying plugin: " plug ".ahk")
-}
-
 /*
 	ahk2exe := "C:\Program Files (x86)\AutoHotkey_H\Compiler\Ahk2Exe.ahk"
 	bin := "C:\Program Files (x86)\AutoHotkey_H\Win32w\AutoHotkeySC.bin"
