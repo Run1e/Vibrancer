@@ -64,7 +64,8 @@ Settings() {
 	SetGUI.Add("Text", "xm+12 y26 w150", Lang.SETTINGS.SELECT_LANG)
 	Loop, Files, language\*.ini
 	{
-		langs .= "|" SubStr(A_LoopFileName, 1, -4)
+		StringUpper, file, A_LoopFileName, T
+		langs .= "|" SubStr(file, 1, -4)
 		if (SubStr(A_LoopFileName, 1, -4) = Settings.Language)
 			Sel := A_Index
 	}
