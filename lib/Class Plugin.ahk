@@ -109,7 +109,10 @@
 	
 	Run(Plg) {
 		od("Running plugin: " Plg)
-		Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+		if FileExist(A_WorkingDir "\Vibrancer.exe")
+			Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
+		else
+			Run(A_WorkingDir "\plugins\" Plg ".ahk")
 	}
 	
 	Launch(Index) {

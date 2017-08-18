@@ -26,7 +26,7 @@
 			if (InStr(Line, "- ") = 1)
 				Notes .= "`n" Line
 		
-		if A_IsCompiled {
+		if FileExist("Vibrancer.exe") {
 			MsgBox, 68, % AppName " v" AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to update?"
 			ifMsgBox yes
 			Update(Installer)
