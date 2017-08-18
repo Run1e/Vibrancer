@@ -123,7 +123,7 @@
 		if Binds.List.HasKey(Assignment) { ; function needs a ddl control
 			for Index, Functions in Binds.List[Assignment]
 				DDLList .= Functions.Desc "|"
-			this.SetText(Binder.AssignmentTextHWND, "Function:")
+			this.SetText(Binder.AssignmentTextHWND, Lang.BINDER.FUNCTION)
 			this.Control("Text", "ComboBox2", "|" DDLList)
 			this.Control("Choose", "ComboBox2", 1)
 			this.ControlShow("ComboBox2")
@@ -132,9 +132,9 @@
 			this.SetText("Edit1")
 			this.ControlShow("Edit1")
 			if (Assignment = "Launch Website")
-				this.SetText(Binder.AssignmentTextHWND, "Website URL:")
+				this.SetText(Binder.AssignmentTextHWND, Lang.BINDER.WEBSITE_URL)
 			else if (Assignment = "Launch File/Program") {
-				this.SetText(Binder.AssignmentTextHWND, "Select file:")
+				this.SetText(Binder.AssignmentTextHWND, Lang.BINDER.SELECT_FILE)
 				this.ControlShow("Button3") ; hide 'em all
 				this.Control("Show", "Edit1")
 				this.Control("Enable", "Edit1")

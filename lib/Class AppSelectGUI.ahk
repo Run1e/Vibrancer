@@ -1,7 +1,7 @@
 ﻿Class AppSelectGUI extends GUI {
 	SelectFile() {
 		this.Options("+OwnDialogs")
-		FileSelectFile, Game, 3, % A_ProgramFiles, Select an .exe file, *.exe
+		FileSelectFile, Game, 3, % A_ProgramFiles, % Lang.PROGRAM.SELECT_EXE_LONG, *.exe
 		if ErrorLevel
 			return
 		SplitPath, Game, Name
@@ -53,7 +53,7 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	Prog.AppLV.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
 	Prog.Add("Text", "y+10", Lang.PROGRAM.MANUAL_PROMPT)
-	Prog.Add("Button", "x193 yp-5", Lang.PROGRAM.SELECT_EXE, Prog.SelectFile.Bind(Prog))
+	Prog.Add("Button", "x+m yp-5", Lang.PROGRAM.SELECT_EXE, Prog.SelectFile.Bind(Prog))
 	
 	IL := new Prog.ImageList
 	Prog.IL := IL
