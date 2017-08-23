@@ -38,7 +38,7 @@ global Actions, Plug, Tray, Binds, Rules ; objects
 global Lang, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 98]
+AppVersion := [0, 9, 99]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 od("Launching " AppName " v" AppVersionString)
