@@ -52,7 +52,8 @@ Settings() {
 	SetGui.Margin(6, 10)
 	
 	; groupboxes
-	SetGUI.Add("Groupbox", "xm y2 h145 w200", AppName)
+	SetGUI.Add("Groupbox", "xm y2 h160 w200", AppName)
+	
 	;SetGUI.Add("Groupbox", "xm y+6 h136 w180", "newsection")
 	
 	; bottom buttons
@@ -70,9 +71,9 @@ Settings() {
 			Sel := A_Index
 	}
 	SetGUI.Add("DropDownList", "w180 Choose" Sel, SubStr(langs, 2), SetGUI.NewLang.Bind(SetGUI))
-	SetGUI.Add("Checkbox", "xp w185 h22 yp+32 Checked" Settings.StartUp, Lang.SETTINGS.STARTUP)
+	SetGUI.Add("Checkbox", "xp w185 h33 yp+32 Checked" Settings.StartUp, Lang.SETTINGS.STARTUP)
 	SetGUI.Add("Text",, Lang.SETTINGS.DESK_VIB)
-	SetGUI.Add("Edit", "x125 yp-2 w49 Number -Wrap Limit")
+	SetGUI.Add("Edit", "x+m yp-2 w49 Number -Wrap Limit")
 	SetGUI.Add("UpDown", "Range0-100", Settings.VibrancyDefault)
 	SetGUI.Font("s10")
 	
