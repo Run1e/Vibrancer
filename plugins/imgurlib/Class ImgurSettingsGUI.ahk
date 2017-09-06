@@ -52,7 +52,8 @@ Settings() {
 	SetGUI.Add("Radio", "Checked" (Settings.CopyOnUpload = 0 ? true : false), "Never")
 	
 	; bottom buttons
-	SetGUI.Add("Button", "x60 w60", "Save", SetGUI.Save.Bind(SetGUI))
+	SetGUI.Add("Button", "xm w130", "Purge images", Func("PurgeImages"))
+	SetGUI.Add("Button", "xm w130", "Save", SetGUI.Save.Bind(SetGUI))
 	
 	SetGUI.Show()
 	

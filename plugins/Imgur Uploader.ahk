@@ -31,6 +31,7 @@ OnExit("Exit")
 
 #Include imgurlib\Class CustomImageList.ahk
 #Include imgurlib\Class ImgurGUI.ahk
+#Include imgurlib\Class ImgurSettingsGUI.ahk
 #Include imgurlib\Class RectClass.ahk
 #Include imgurlib\Class ScreenClass.ahk
 #Include imgurlib\Class OnMouseMove.ahk
@@ -39,6 +40,7 @@ OnExit("Exit")
 #Include imgurlib\DefaultSettings.ahk
 #Include imgurlib\Functions.ahk
 #Include imgurlib\MakeFolders.ahk
+#Include imgurlib\PurgeImages.ahk
 #Include imgurlib\UploaderScript.ahk
 
 #Include imgurlib\third-party\SB_SetProgress.ahk
@@ -190,4 +192,3 @@ Screen() {
 		return
 	ScreenClass.Start()
 }
-#Include imgurlib\Class ImgurSettingsGUI.ahk

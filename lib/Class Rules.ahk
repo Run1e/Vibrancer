@@ -13,6 +13,8 @@
 	Enable(Process) {
 		Event("RulesEnable", Process, Info := GameRules[Process])
 		
+		p("Rules.Enable: " Process)
+		
 		this.Enabled := true
 		this.Process := Process
 		
@@ -37,8 +39,11 @@
 	}
 	
 	Vib(Vibrancy, Screen := 1) {
-		if !Settings.NvAPI_InitFail
-			NvAPI.SetDVCLevelEx(Vibrancy, Screen - 1)
+		if !Settings.NvAPI_InitFail {
+			p("Vibrancing screen " Screen - 1 " at " Vibrancy "%")
+			Result := NvAPI.SetDVCLevelEx(Vibrancy, Screen - 1)
+			p("NvAPI.SetDVCLevelEx: " Result)
+		}
 	}
 	
 	VibSelected(Vibrancy) {
@@ -56,6 +61,8 @@
 			return
 		
 		WinGet, ProcessPath, ProcessPath, ahk_id %hwnd%
+		
+		p("Rules.WinChange: " ProcessPath)
 		
 		for Process, Info in GameRules.Object() {
 			if (SubStr(ProcessPath, 1, StrLen(Process)) = Process) { ; apply rules to any exe in the dir if only a dir is specified

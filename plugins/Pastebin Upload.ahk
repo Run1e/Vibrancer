@@ -6,6 +6,7 @@
 #NoTrayIcon
 SetBatchLines -1
 SetKeyDelay -1
+SetWorkingDir % A_ScriptDir
 
 #Include %A_ScriptDir%
 #Include ..\lib\plugin\BindSection.ahk
@@ -51,6 +52,7 @@ SetKey() {
 	if !ErrorLevel {
 		FileDelete ..\data\PastebinKey.txt
 		FileAppend % Key, ..\data\PastebinKey.txt
+		MsgBox,64,Success!,You can now upload text to pastebin.
 	}
 }
 
@@ -63,7 +65,7 @@ UploadClip() {
 	Key := GetKey()
 	
 	if !StrLen(Key)
-		SetKey()
+		return SetKey()
 	
 	POST := {api_dev_key:Key, api_option:"paste", api_paste_private:true, api_paste_code:clipboard}
 	

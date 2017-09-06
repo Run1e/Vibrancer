@@ -13,6 +13,12 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
+/*
+	DebugGUI := new DebugGUI("DEBUG")
+	DebugGUI.Add("Edit", "xm y+7 w600 h800 0x800 -VScroll")
+	DebugGUI.Show()
+*/
+
 QPC(true)
 
 global Args := []
@@ -38,7 +44,7 @@ global Actions, Plug, Tray, Binds, Rules ; objects
 global Lang, pToken ; other
 
 AppName := "Vibrancer"
-AppVersion := [0, 9, 99]
+AppVersion := [1, 0, 1]
 AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
 
 od("Launching " AppName " v" AppVersionString)
@@ -93,12 +99,24 @@ ApplySettings()
 Plugin.Launch(1)
 return
 
+Class DebugGUI extends GUI {
+	Print(msg) {
+		this.SetText("Edit1", this.GetText("Edit1") msg "`r`n")
+		PostMessage, 0x115, 7, , Edit1, % this.ahkid
+	}
+}
+
+p(x) {
+	DebugGUI.Print(x)
+}
+
 ; runs after plugins have finished launching
 PluginsLaunched() {
 	Tray.Icon()
 	Keybinds(true)
 	
 	Rules.Listen()
+	Rules.Disable()
 	Rules.WinChange(32772, WinActive("A"))
 	
 	for Index, Arg in Args {
@@ -205,6 +223,7 @@ ImageButtonApply(hwnd) {
 #Include lib\GetApplications.ahk
 #Include lib\InitNvAPI.ahk
 #Include lib\Keybinds.ahk
+#Include lib\Language.ahk
 #Include lib\MakeFolders.ahk
 #Include lib\MonitorSetup.ahk
 #Include lib\Update.ahk
@@ -223,4 +242,3 @@ ImageButtonApply(hwnd) {
 #Include lib\third-party\SetCueBanner.ahk
 
 
-#Include lib\Language.ahk

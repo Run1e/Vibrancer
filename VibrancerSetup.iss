@@ -1,5 +1,4 @@
 #define MyAppName "Vibrancer"
-#define MyAppVersion "0.9.99"
 #define MyAppURL "https://github.com/Run1e/Vibrancer"
 #define MyAppWiki "https://github.com/Run1e/Vibrancer/wiki"
 #define MyAppExeName "Vibrancer.exe"
@@ -12,8 +11,9 @@ AppVersion={#MyAppVersion}
 AppPublisher=Runar Andreas Borge
 AppPublisherURL={#MyAppURL}             
 AppSupportURL={#MyAppWiki}                  
-DefaultDirName={pf}\Vibrancer
+DefaultDirName={localappdata}\Vibrancer
 DisableProgramGroupPage=yes
+DisableDirPage=yes
 LicenseFile=D:\Documents\Scripts\Vibrancer\LICENSE.txt
 OutputBaseFilename=Vibrancer-installer
 SetupIconFile={#MyAppIcon}
@@ -21,6 +21,7 @@ Compression=lzma
 SolidCompression=yes
 UninstallDisplayName=Vibrancer
 UninstallDisplayIcon={app}\{#MyAppExeName}
+SetupLogging=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -39,7 +40,7 @@ Type: files; Name: "{app}\icons\powerplay.ico"
 [Files]
 Source: "D:\Documents\Scripts\Vibrancer\Vibrancer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-[Dirs]
+[Dirs]               
 Name: "{app}"; Permissions: users-full
                          
 [Icons]
