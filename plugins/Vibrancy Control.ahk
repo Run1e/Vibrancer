@@ -24,26 +24,26 @@ global GameRules := Vib.Get("GameRules").Object()
 
 Binds := new BindSection(Vib, "Vibrancy Control", "VibrancyControl")
 Binds.AddFunc("VibChange", Func("VibChange"))
-Binds.AddBind("Increase Vibrancy", "VibChange", 3)
-Binds.AddBind("Decrease Vibrancy", "VibChange", -3)
+Binds.AddBind("Increase Vibrancy", "VibChange", 2)
+Binds.AddBind("Decrease Vibrancy", "VibChange", -2)
 Binds.Register()
 
 Vib.Finished()
 return
 
-VibChange(num) {
+VibChange(Diff) {
 	if (Rules.Process = "")
 		return
-	
-	Vibrance := (Prev := GameRules[Rules.Process].Vibrancy) + num
+	Prev := GameRules[Rules.Process].Vibrancy
+	Vibrance := Prev + Diff
 	Vibrance := Vibrance > 100 ? 100 : (Vibrance < 50 ? 50 : Vibrance)
+	if (Prev = Vibrance)
+		return
 	GameRules[Rules.Process].Vibrancy := Vibrance
 	Rules.VibSelected(Vibrance)
-	
 	if Big.IsVisible && (Big.GameLV.GetText(Big.GameLV.GetNext(), 2) = Rules.Process)
 		Big.SetText(Big.VibrancySliderHWND, Vibrance)
-	
-	if ((Vibrance = 100) && (Prev < 100)) || ((Vibrance = 50) && (Prev > 50))
+	if (Vibrance = 50) || (Vibrance = 100)
 		SoundBeep
 }
 

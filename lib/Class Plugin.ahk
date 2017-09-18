@@ -84,7 +84,7 @@
 	; === PRIVATE METHODS ===
 	
 	Event(Event, Param*) {
-		od("EVENT: " Event, Param)
+		p("EVENT: " Event, Param)
 		for Listener, Events in this.Listeners {
 			if Events.HasKey(Event) {
 				try
@@ -108,7 +108,7 @@
 	}
 	
 	Run(Plg) {
-		od("Running plugin: " Plg)
+		p("Running plugin: " Plg)
 		if FileExist(A_WorkingDir "\Vibrancer.exe")
 			Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
 		else
@@ -120,8 +120,10 @@
 		if (Plg := Settings.Object().Plugins[Index]) {
 			try
 				this.Run(Plg)
-			catch e
+			catch e {
+				p("Plugin " p " not found, removing from list")
 				Settings.Plugins.Delete(Index)
+			}
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
 			SetTimer, % NextFunc, % "-" MaxWait
 		} else

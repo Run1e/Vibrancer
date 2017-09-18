@@ -69,9 +69,9 @@
 	*/
 	
 	Log(Text) {
-		static out := Func("od")
-		if out
-			%out%(text)
+		static OutFunc := Func("p")
+		if OutFunc
+			%OutFunc%(Text)
 	}
 	
 	GetData() {

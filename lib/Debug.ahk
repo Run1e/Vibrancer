@@ -17,12 +17,6 @@ pa(array, depth=5, indentLevel:="   ") {
 	} return
 }
 
-od(x*) {
-	for a, b in x
-		text .= "`n" (IsObject(b)?pa(b):b)
-	OutputDebug % "VIB: " StrReplace(trim(text, "`n"), "`n", "`nVIB: ")
-}
-
 QPC(R := 0) { ; By SKAN, http://goo.gl/nf7O4G, CD:01/Sep/2014 | MD:01/Sep/2014
 	static P := 0, F := 0, Q := DllCall("QueryPerformanceFrequency", "Int64P", F)
 	return !DllCall("QueryPerformanceCounter", "Int64P" , Q) + (R ? (P := Q) / F : (Q - P) / F)

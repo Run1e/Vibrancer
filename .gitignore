@@ -6,6 +6,7 @@ logs/*
 lib/backup/*
 lib/plugin/backup/*
 Vibrancer/*
+plugins/disabled/*
 plugins/backup/*
 plugins/imgurlib/backup/*
 msvcr100.dll

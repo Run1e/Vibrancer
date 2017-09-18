@@ -212,7 +212,7 @@
 		
 		this.Destroy()
 		
-		od("Bind callback: ", Bind)
+		p("Bind callback: ", Bind)
 		
 		this.Callback.Call(Bind, ID)
 	}

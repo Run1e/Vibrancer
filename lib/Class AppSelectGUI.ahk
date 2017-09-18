@@ -13,7 +13,7 @@
 		this.ListViewCLV := ""
 		this.Destroy()
 		
-		od("App selected: ", Info)
+		p("App selected: ", Info)
 		
 		this.Callback.Call(Info)
 		Prog := ""
