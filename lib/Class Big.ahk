@@ -1,4 +1,4 @@
-﻿Class BigGUI extends GUI {
+﻿Class Big extends GUI {
 	static BindHistory := []
 	static GamesHistory := []
 	static MonitorHWND := []

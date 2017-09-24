@@ -1,5 +1,4 @@
 ﻿SetLanguage() {
-	
 	Lang := GetLanguageInfo()
 	
 	Big.SetText(Big.GamesTabHWND, Lang.BIG.TAB_GAMES)
@@ -27,7 +26,6 @@
 	
 	for Index, TabberBOYE in [Big.GamesTabHWND, Big.KeybindsTabHWND]
 		ImageButton.Create(TabberBOYE, NORMAL*)
-	
 }
 
 GetLanguageInfo() {

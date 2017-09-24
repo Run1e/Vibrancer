@@ -25,7 +25,7 @@
 Class JSONFile {
 	static Instances := []
 	
-	__New(File, DebugFunc := "") {
+	__New(File) {
 		FileExist := FileExist(File)
 		JSONFile.Instances[&this] := {File: File, Object: {}}
 		FileObj := FileOpen(File, "rw")

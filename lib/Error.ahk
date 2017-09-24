@@ -18,7 +18,7 @@
 	FileAppend, % DateForm . "`n`n" . ErrorForm, % A_WorkingDir "\" LogsFolder "\" A_Now A_MSec ".txt"
 	
 	if Fatal {
-		MsgBox,262192,ERROR,% "A fatal error has occured and " AppName " must close.`n`nAn error log has been written to the logs folder.`n`nSpecifically:`n" ErrorForm,5
+		MsgBox,262192,ERROR,% "A fatal error has occured and " App.Name " must close.`n`nAn error log has been written to the logs folder.`n`nSpecifically:`n" ErrorForm,5
 		ExitApp
 	} if Announce
 		m("AN ERROR OCCURED:`n`n" ErrorForm)

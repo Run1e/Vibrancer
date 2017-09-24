@@ -89,6 +89,7 @@
 		for Index, Control in this.Controls
 			GuiControl, -g, % Control
 		Gui % this.hwnd ":Destroy"
+		this.IsVisible := false
 		Gui.Instances[this.hwnd] := ""
 	}
 	

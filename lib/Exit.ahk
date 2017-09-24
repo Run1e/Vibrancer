@@ -1,9 +1,9 @@
 ﻿Exit(Exit := true) {
 	CtlColors.Free() ; free ctlcolors
-	Plugin.Exit()
+	PluginConnector.Exit()
 	
 	Gdip_Shutdown(pToken) ; shut down gdip
-	ObjRegisterActive(Plugin, "") ; revoke COM objects
+	ObjRegisterActive(PluginConnector, "") ; revoke COM objects
 	
 	Settings.Save(true)
 	Keybinds.Save(true)

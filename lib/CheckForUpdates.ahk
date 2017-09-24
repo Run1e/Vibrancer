@@ -18,7 +18,7 @@
 	
 	Installer := "https://github.com/Run1e/Vibrancer/releases/download/" GitJSON.tag_name "/Vibrancer-installer.zip"
 	
-	if (GitJSON.tag_name > AppVersionString) {
+	if (GitJSON.tag_name > App.VersionString) {
 		
 		p("Update avaliable: " GitJSON.tag_name)
 		
@@ -27,11 +27,11 @@
 				Notes .= "`n" Line
 		
 		if FileExist("Vibrancer.exe") {
-			MsgBox, 68, % AppName " v" AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to update?"
+			MsgBox, 68, % App.Name " v" App.VersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to update?"
 			ifMsgBox yes
 			Update(Installer)
 		} else {
-			MsgBox, 68, % AppName " v" AppVersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to visit download page?"
+			MsgBox, 68, % App.Name " v" App.VersionString, % "Newest version: v" GitJSON.tag_name "`n`nUpdate notes:`n" SubStr(Notes, 2) "`n`nDo you want to visit download page?"
 			ifMsgBox yes
 			Run("https://github.com/Run1e/Vibrancer/releases/latest")
 		}

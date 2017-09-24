@@ -1,4 +1,4 @@
-﻿Class BinderGUI extends GUI {
+﻿Class Binder extends GUI {
 	static IgnoreAssignmentList := "^(Built-in)$"
 	
 	AddButton() {
@@ -229,7 +229,7 @@ CreateNugget(Callback, Owner := "") {
 		Assignments .= Class "|"
 	Assignments .= "Launch File/Program|Launch Website"
 	
-	Binder := new BinderGUI("Binder", "+Owner" Owner " +AlwaysOnTop -Caption +Border")
+	Binder := new Binder("Binder", "+Owner" Owner " +AlwaysOnTop -Caption +Border")
 	
 	Binder.Font("s10", Settings.Font)
 	Binder.Margin(6, 4)

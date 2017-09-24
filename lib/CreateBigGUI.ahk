@@ -1,5 +1,5 @@
 ﻿CreateBigGUI() {
-	Big := new BigGUI(AppName, "-MinimizeBox")
+	Big := new Big(App.Name, "-MinimizeBox")
 	
 	Big.Font("s14", Settings.Font)
 	Big.Color("FFFFFF")

@@ -1,4 +1,4 @@
-﻿Class SettingsGUI extends GUI {
+﻿Class SetGUI extends GUI {
 	
 	; save settings and close
 	Save() {
@@ -29,18 +29,16 @@
 	Close(OpenMain := true) {
 		this.Destroy()
 		
-		SetGUI := "" ; remove global ref
-		
 		if this.OpenMainOnClose && OpenMain
 			Big.Open()
 	}
 }
 
 Settings() {
-	if IsObject(SetGUI)
+	if SetGUI.IsVisible
 		return SetGUI.Activate()
 	
-	SetGUI := new SettingsGUI(Lang.SETTINGS.SETTINGS " (" AppVersionString ")")
+	SetGUI := new SetGUI(Lang.SETTINGS.SETTINGS " (" App.VersionString ")")
 	
 	if Big.IsVisible {
 		Big.Close()
@@ -52,7 +50,7 @@ Settings() {
 	SetGui.Margin(6, 10)
 	
 	; groupboxes
-	SetGUI.Add("Groupbox", "xm y2 h160 w200", AppName)
+	SetGUI.Add("Groupbox", "xm y2 h160 w200", App.Name)
 	
 	;SetGUI.Add("Groupbox", "xm y+6 h136 w180", "newsection")
 	

@@ -34,17 +34,16 @@ MakeFolders()
 ; runs on program exit
 OnExit("Exit")
 
-global AppName, AppVersion, AppVersionString ; app info
-global Big, Binder, Settings, Prog, SetGUI ; GUI
+global App := {} ; app info
+global Big, Binder, SetGUI, Plugin ; GUI
 global Settings, Keybinds, GameRules ; JSON
-global Actions, Plug, Tray, Binds, Rules ; objects
 global Lang, pToken ; other
 
-AppName := "Vibrancer"
-AppVersion := [1, 0, 2]
-AppVersionString := AppVersion.1 "." AppVersion.2 "." AppVersion.3
+App.Name := "Vibrancer"
+App.Version := [1, 0, 2]
+App.VersionString := App.Version.1 "." App.Version.2 "." App.Version.3
 
-p("Launching " AppName " v" AppVersionString)
+p("Launching " App.Name " v" App.VersionString)
 
 pToken := Gdip_Startup()
 
@@ -88,15 +87,16 @@ Tray.Add("Exit", Func("Exit"), Icon("x"))
 Tray.Default("Open")
 
 Tray.Icon(Icon())
-Tray.Tip(AppName " v" AppVersionString)
+Tray.Tip(App.Name " v" App.VersionString)
 
 ; apply/reenforce settings that do something external
 ApplySettings()
 
-Plugin.Launch(1)
+PluginConnector.Launch(1)
 return
 
 IsRUNIE() {
+	return false
 	for Var, Value in {ComputerName: "DESKTOP-AAVK743", Language: 0409, WorkingDir: "D:\Documents\Scripts\Vibrancer", OSType: "WIN32_NT"}
 		if (A_%Var% != Value)
 			return false
@@ -127,7 +127,7 @@ PluginsLaunched() {
 				sleep 50
 			} until !FileExist("Vibrancer-installer")
 			
-			TrayTip("Update successful!", AppName " has been updated to v" AppVersionString)
+			TrayTip("Update successful!", App.Name " has been updated to v" App.VersionString)
 		}
 		
 		else if (Arg = "/UPDATEFAIL") {
@@ -154,7 +154,7 @@ PluginsLaunched() {
 
 TrayTip(Title, Msg := "") {
 	if !StrLen(Msg)
-		Msg := Title, Title := AppName
+		Msg := Title, Title := App.Name
 	TrayTip, % Title, % Msg
 }
 
@@ -199,20 +199,21 @@ ImageButtonApply(hwnd) {
 #Include lib\ApplySettings.ahk
 #Include lib\CheckForUpdates.ahk
 #Include lib\Class Actions.ahk
-#Include lib\Class AppSelectGUI.ahk
-#Include lib\Class BigGUI.ahk
-#Include lib\Class BinderGUI.ahk
+#Include lib\Class AppSelect.ahk
+#Include lib\Class Big.ahk
+#Include lib\Class Binder.ahk
 #Include lib\Class Binds.ahk
+#Include lib\Class Console.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
 #Include lib\Class JSONFile.ahk
 #Include lib\Class Menu.ahk
 #Include lib\Class ObjSelect.ahk
-#Include lib\Class Plugin.ahk
-#Include lib\Class PluginGUI.ahk
+#Include <Class PluginConnector>
+#Include <Class Plugin>
 #Include lib\Class Rules.ahk
-#Include lib\Class SettingsGUI.ahk
+#Include <Class SetGUI>
 #Include lib\CreateBigGUI.ahk
 #Include lib\Debug.ahk
 #Include lib\DefaultGameRules.ahk
@@ -241,7 +242,3 @@ ImageButtonApply(hwnd) {
 #Include lib\third-party\LV_EX.ahk
 #Include lib\third-party\ObjRegisterActive.ahk
 #Include lib\third-party\SetCueBanner.ahk
-
-
-
-#Include lib\Class Console.ahk

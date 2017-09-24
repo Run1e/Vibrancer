@@ -5,7 +5,7 @@
 	
 	Big.Destroy(), Big := ""
 	SetGUI.Destroy(), SetGUI := ""
-	Plug.Destroy(), Plug := ""
+	Plugin.Destroy(), Plug := ""
 	
 	Tray.Tip("Please wait..")
 	Tray.DeleteAll()
