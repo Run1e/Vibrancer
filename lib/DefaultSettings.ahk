@@ -6,5 +6,6 @@
 			, Language: "English"
 			, Plugins: ["Vibrancy Control"]
 			, VibrancyScreens: [SysGet("MonitorPrimary")]
-			, VibrancyDefault: 50}
+			, VibrancyDefault: 50
+			, Console: false}
 }

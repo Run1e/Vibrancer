@@ -8,9 +8,11 @@
 		}
 		
 		StartUp := this.ControlGet("Checked",, "Button5")
+		Console := this.ControlGet("Checked",, "Button6")
 		VibrancyDefault := this.GetText("Edit1")
 		
 		Settings.StartUp := StartUp
+		Settings.Console := Console
 		Settings.VibrancyDefault := VibrancyDefault
 		
 		Rules.VibAll(VibrancyDefault)
@@ -50,7 +52,7 @@ Settings() {
 	SetGui.Margin(6, 10)
 	
 	; groupboxes
-	SetGUI.Add("Groupbox", "xm y2 h160 w200", App.Name)
+	SetGUI.Add("Groupbox", "xm y2 h185 w200", App.Name)
 	
 	;SetGUI.Add("Groupbox", "xm y+6 h136 w180", "newsection")
 	
@@ -70,6 +72,7 @@ Settings() {
 	}
 	SetGUI.Add("DropDownList", "w180 Choose" Sel, SubStr(langs, 2), SetGUI.NewLang.Bind(SetGUI))
 	SetGUI.Add("Checkbox", "xp w185 h33 yp+32 Checked" Settings.StartUp, Lang.SETTINGS.STARTUP)
+	SetGUI.Add("Checkbox", "xp w185 h33 yp+25 Checked" Settings.Console, Lang.SETTINGS.SHOW_CONSOLE)
 	SetGUI.Add("Text",, Lang.SETTINGS.DESK_VIB)
 	SetGUI.Add("Edit", "x+m yp-2 w49 Number -Wrap Limit")
 	SetGUI.Add("UpDown", "Range0-100", Settings.VibrancyDefault)

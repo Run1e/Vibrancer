@@ -13,9 +13,6 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
-if 1
-	Debug.Console.Alloc()
-
 Debug.LogFolder("logs")
 Debug.Timer.Start(1)
 
@@ -39,10 +36,8 @@ global Big, Binder, SetGUI, Plugin ; GUI
 global Settings, Keybinds, GameRules ; JSON
 global Lang, pToken ; other
 
-global App := {Name: "Vibrancer", Version: [1, 0, 2]}
+global App := {Name: "Vibrancer", Version: [1, 0, 3]}
 App.VersionString := App.Version.1 "." App.Version.2 "." App.Version.3
-
-p("Launching " App.Name " v" App.VersionString)
 
 pToken := Gdip_Startup()
 
@@ -65,6 +60,11 @@ if GameRules.IsNew() {
 	GameRules.Fill(DefaultGameRules())
 	GameRules.Save(true)
 }
+
+if Settings.Console
+	Debug.Console.Alloc()
+
+p(App.Name " " App.VersionString "`n")
 
 ; init nvidia api wrapper
 InitNvAPI()
@@ -95,15 +95,10 @@ PluginConnector.Launch(1)
 return
 
 IsRUNIE() {
-	return false
 	for Var, Value in {ComputerName: "DESKTOP-AAVK743", Language: 0409, WorkingDir: "D:\Documents\Scripts\Vibrancer", OSType: "WIN32_NT"}
 		if (A_%Var% != Value)
 			return false
 	return true
-}
-
-p(x*) {
-	Debug.Console.Print(Debug.Print(x*))
 }
 
 ; runs after plugins have finished launching

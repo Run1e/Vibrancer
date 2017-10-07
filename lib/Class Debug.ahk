@@ -30,7 +30,11 @@
 	
 	Class Console {
 		Alloc() {
-			DllCall("AllocConsole", int)
+			DllCall("AllocConsole")
+		}
+		
+		Free() {
+			DllCall("FreeConsole")
 		}
 		
 		Print(Str) {
@@ -87,6 +91,14 @@
 			return (new this).Call(Param*)
 		}
 	}
+}
+
+t(x*) {
+	tooltip % Debug.Print(x*)
+}
+
+p(x*) {
+	Debug.Console.Print(Debug.Print(x*))
 }
 
 m(x*) {

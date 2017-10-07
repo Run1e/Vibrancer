@@ -39,10 +39,9 @@
 	}
 	
 	Vib(Vibrancy, Screen := 1) {
+		Event("Vibrancing", {Vibrancy: Vibrancy, Screen: Screen})
 		if !Settings.NvAPI_InitFail {
-			p("Vibrancing screen " Screen - 1 " at " Vibrancy "%")
 			Result := NvAPI.SetDVCLevelEx(Vibrancy, Screen - 1)
-			p("NvAPI.SetDVCLevelEx: " Result)
 		}
 	}
 	
