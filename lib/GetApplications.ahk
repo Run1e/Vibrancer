@@ -55,7 +55,7 @@ GetSteamDir() {
 }
 
 GetWindows() {
-	static no_pls := "AutoHotkey.exe|NVIDIA Share.exe|Calculator.exe|SystemSettings.exe"
+	static no_pls := "AutoHotkey.exe|NVIDIA Share.exe|Calculator.exe|SystemSettings.exe|Vibrancer.exe"
 	HiddenWin := A_DetectHiddenWindows
 	DetectHiddenWindows, Off
 	WinGet windows, List
