@@ -107,21 +107,14 @@
 		return Back
 	}
 	
-	Run(Plg) {
-		p("Running plugin: " Plg)
-		if FileExist(A_WorkingDir "\Vibrancer.exe")
-			Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" Plg ".ahk""")
-		else
-			Run(A_WorkingDir "\plugins\" Plg ".ahk")
-	}
-	
 	Launch(Index) {
 		static MaxWait := 2500 ; max amount of time a plugin has to declare it has finished its autoexec
-		if (Plg := Settings.Object().Plugins[Index]) {
+		
+		if StrLen(RunPlug := Settings.Object().Plugins[Index]) {
 			try
-				this.Run(Plg)
+				Run(A_WorkingDir "\Vibrancer.exe """ A_WorkingDir "\plugins\" RunPlug ".ahk""")
 			catch e {
-				p("Plugin " p " not found, removing from list")
+				p("Plugin " RunPlug " not found, removing from list")
 				Settings.Plugins.Delete(Index)
 			}
 			this.NextFunc := NextFunc := this.Launch.Bind(this, Index + 1)
