@@ -15,12 +15,11 @@ OnExit("Exit")
 #Include %A_ScriptDir%
 #Include ..\lib\plugin\BindSection.ahk
 
-#Include ..\lib\Debug.ahk
+#Include ..\lib\Class Debug.ahk
 #Include ..\lib\Class GUI.ahk
 #Include ..\lib\Class Hotkey.ahk
 #Include ..\lib\Class JSONFile.ahk
 #Include ..\lib\Class Menu.ahk
-#Include ..\lib\Error.ahk
 #Include ..\lib\Functions.ahk
 #Include ..\lib\MonitorSetup.ahk
 #Include ..\lib\third-party\Class JSON.ahk
@@ -46,9 +45,9 @@ OnExit("Exit")
 #Include imgurlib\third-party\SB_SetProgress.ahk
 #Include imgurlib\third-party\WinGetPosEx.ahk
 
-MakeFolders()
+Debug.LogFolder("..\logs")
 
-Error("", "",,,, "..\logs") ; set error log folder
+MakeFolders()
 
 ; port data from pre-v0.9.9
 if FileExist("..\data\Images.json") {

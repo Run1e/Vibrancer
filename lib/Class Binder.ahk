@@ -54,7 +54,7 @@
 		
 		; throw an error if we don't have a bind object
 		if !IsObject(Bind) || !StrLen(Bind.Desc) {
-			Error("Unable to create bind", A_ThisFunc, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText)
+			Debug.Log(Exception("Unable to create bind", -1, "Key: " key "`nAssignment: " this.Assignment "`nFunction: " this.Function "`nEdit: " EditText))
 			TrayTip("Unable to create create bind.`nAn error log has been saved.")
 			this.Close()
 		} else

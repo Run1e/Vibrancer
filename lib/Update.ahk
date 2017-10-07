@@ -16,7 +16,7 @@
 	try
 		URLDownloadToFile, % URL, Vibrancer-installer.zip
 	catch e {
-		ErrorEx(e)
+		Debug.Log(e)
 		UpdateFail("Failed downloading update.")
 		return
 	}

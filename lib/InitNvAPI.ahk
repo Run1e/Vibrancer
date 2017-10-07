@@ -2,7 +2,7 @@
 	if (Code := NvAPI.init := NvAPI.ClassInit()) { ; NvAPI initialization failed, no nvidia card is installed
 		if !Settings.NvAPI_InitFail {
 			Error := (Code = 2 ? "NvAPI initialization failed!" : "No NVIDIA graphics card found!")
-			Error("NvAPI init failed, NvAPI features disabled.", A_ThisFunc, Error)
+			Debug.Log(Exception("NvAPI init failed, NvAPI features disabled.", -1, Error))
 			a := Func("TrayTip").Bind(Error, "Some features have been disabled.")
 			SetTimer, % a, -4000
 		} Settings.NvAPI_InitFail := Code

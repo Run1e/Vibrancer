@@ -77,7 +77,7 @@
 			return
 		
 		if !IsObject(GameRules[Key]) {
-			Error("Attempted deletion doesn't exist in GameRules", A_ThisFunc, "Pos: " pos "`nKey: " Key)
+			Debug.Log(Exception("Attempted deletion doesn't exist in GameRules", -1, "Pos: " pos "`nKey: " Key))
 			return
 		}
 		
@@ -168,7 +168,7 @@
 		
 		; check if key exists in gamerules
 		if !IsObject(GameRules[Key])
-			return Error("Key not found in GameRules Array", A_ThisFunc, "Key: " Key)
+			return Debug.Log(Exception("Key not found in GameRules Array", -1, "Key: " Key))
 		else
 			return Key
 	}

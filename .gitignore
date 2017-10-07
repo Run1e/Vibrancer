@@ -12,3 +12,4 @@ plugins/imgurlib/backup/*
 msvcr100.dll
 plugins/Steam Account Switcher.ahk
 plugins/ROO.ahk
+debug.log

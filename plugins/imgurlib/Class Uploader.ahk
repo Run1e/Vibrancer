@@ -132,7 +132,7 @@
 	; upload failed
 	UploadFailure(Error) {
 		this.AddFail(this.Queue.Current(), Error)
-		Error("Failed uploading image", A_ThisFunc, Error)
+		Debug.Log(Exception("Failed uploading image", -1, Error))
 		this.Queue.OnStep(false)
 		this.StepQueue()
 	}
@@ -166,7 +166,7 @@
 	; deletion failed
 	DeleteFailure(Error) {
 		this.AddFail(this.Queue.Current(), Error)
-		Error("Failed deleting image", A_ThisFunc, Error)
+		Debug.Log(Exception("Failed deleting image", -1, Error))
 		this.Queue.OnStep(false)
 		this.StepQueue()
 	}
@@ -176,7 +176,7 @@
 		status := res.status
 		error := (IsObject(res.data.error)?res.data.error.message:res.data.error)
 		
-		Error("Imgur threw an error", A_ThisFunc, "Error: " error "`nFile: " file "`n`nRes:`n" pa(res) "`n`nHeaders:`n" pa(this.LastHeaders))
+		Debug.Log(Exception("Imgur threw an error", -1, "Error: " error "`nFile: " file "`n`nRes:`n" Debug.Print.Object(res) "`n`nHeaders:`n" Debug.Print.Object(this.LastHeaders)))
 		
 		if (status = "400") {
 			

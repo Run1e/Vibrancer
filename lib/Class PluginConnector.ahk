@@ -70,7 +70,7 @@
 		try
 			Tray.Insert(Added + DefItemCount "&", Name, Call, Icon)
 		catch Exception
-			ErrorEx(Exception, true)
+			Debug.Log(Exception, true)
 		
 		Added++
 		if (Added = 2) {

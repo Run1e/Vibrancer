@@ -13,10 +13,11 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
-if IsRUNIE()
-	Console.Alloc()
+if 1
+	Debug.Console.Alloc()
 
-QPC(true)
+Debug.LogFolder("logs")
+Debug.Timer.Start(1)
 
 global Args := []
 Loop %0%
@@ -34,13 +35,11 @@ MakeFolders()
 ; runs on program exit
 OnExit("Exit")
 
-global App := {} ; app info
 global Big, Binder, SetGUI, Plugin ; GUI
 global Settings, Keybinds, GameRules ; JSON
 global Lang, pToken ; other
 
-App.Name := "Vibrancer"
-App.Version := [1, 0, 2]
+global App := {Name: "Vibrancer", Version: [1, 0, 2]}
 App.VersionString := App.Version.1 "." App.Version.2 "." App.Version.3
 
 p("Launching " App.Name " v" App.VersionString)
@@ -104,11 +103,7 @@ IsRUNIE() {
 }
 
 p(x*) {
-	if !Console.Visible
-		return
-	for a, b in x
-		text .= "`n" (IsObject(b)?pa(b):b)
-	Console.Print(trim(text, "`n"))
+	Debug.Console.Print(Debug.Print(x*))
 }
 
 ; runs after plugins have finished launching
@@ -149,7 +144,7 @@ PluginsLaunched() {
 		}
 	}
 	
-	p("Startup time: " QPC(false) "s")
+	p("Startup time: " Debug.Timer.Stop(1) "s")
 }
 
 TrayTip(Title, Msg := "") {
@@ -203,23 +198,21 @@ ImageButtonApply(hwnd) {
 #Include lib\Class Big.ahk
 #Include lib\Class Binder.ahk
 #Include lib\Class Binds.ahk
-#Include lib\Class Console.ahk
+#Include lib\Class Debug.ahk
 #Include lib\Class GUI.ahk
 #Include lib\Class Hotkey.ahk
 #Include lib\Class HTTP.ahk
 #Include lib\Class JSONFile.ahk
 #Include lib\Class Menu.ahk
 #Include lib\Class ObjSelect.ahk
-#Include <Class PluginConnector>
-#Include <Class Plugin>
+#Include lib\Class PluginConnector.ahk
+#Include lib\Class Plugin.ahk
 #Include lib\Class Rules.ahk
-#Include <Class SetGUI>
+#Include lib\Class SetGUI.ahk
 #Include lib\CreateBigGUI.ahk
-#Include lib\Debug.ahk
 #Include lib\DefaultGameRules.ahk
 #Include lib\DefaultKeybinds.ahk
 #Include lib\DefaultSettings.ahk
-#Include lib\Error.ahk
 #Include lib\Exit.ahk
 #Include lib\Functions.ahk
 #Include lib\GetApplications.ahk
