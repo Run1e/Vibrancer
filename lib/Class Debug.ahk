@@ -38,7 +38,8 @@
 		}
 		
 		Print(Str) {
-			FileAppend, % Str, CONOUT$
+			try
+				FileAppend, % Str, CONOUT$
 		}
 	}
 	

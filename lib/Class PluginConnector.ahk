@@ -13,9 +13,12 @@
 		ObjRegisterActive(this, "{40677552-fdbd-444d-a9dd-6dce43b0cd56}")
 	}
 	
-	test() {
-		m(Binds.List)
-		m(Actions)
+	Print(Str) {
+		p(Str)
+	}
+	
+	p(str) {
+		p(str)
 	}
 	
 	; create an object in here if you need to pass to pp and still have it be for-loopable
