@@ -204,6 +204,7 @@ ImageButtonApply(hwnd) {
 #Include lib\Class Plugin.ahk
 #Include lib\Class Rules.ahk
 #Include lib\Class SetGUI.ahk
+#Include lib\Class WinSelect.ahk
 #Include lib\CreateBigGUI.ahk
 #Include lib\DefaultGameRules.ahk
 #Include lib\DefaultKeybinds.ahk

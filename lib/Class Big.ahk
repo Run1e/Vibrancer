@@ -40,7 +40,6 @@
 	}
 	
 	AddGameCallback(Info) {
-		
 		this.Enable()
 		this.Options("-AlwaysOnTop")
 		this.Activate()
@@ -68,6 +67,8 @@
 				break
 			}
 		}
+		
+		this.Activate()
 	}
 	
 	GameDelete() {

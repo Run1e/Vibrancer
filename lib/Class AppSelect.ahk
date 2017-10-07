@@ -8,6 +8,19 @@
 		this.Close({InstallLocation:Game, Run:Game})
 	}
 	
+	WinSelect() {
+		this.Disable()
+		WinSelect(this.WinSelectCallback.Bind(this), this.hwnd)
+	}
+	
+	WinSelectCallback(Info) {
+		this.Enable()
+		this.Activate()
+		
+		if IsObject(Info)
+			this.Close({InstallLocation: Info.Path, DisplayName: Info.Title})
+	}
+	
 	Close(Info := "") {
 		this.IL.Destroy()
 		this.CLV := ""
@@ -52,8 +65,8 @@ AppSelect(Callback, Owner := "", IgnoreGameRules := false) {
 	AppSelect.CLV := new LV_Colors(AppSelect.LV.hwnd)
 	AppSelect.CLV.SelectionColors(Settings.Color.Selection, 0xFFFFFF)
 	
-	AppSelect.Add("Text", "y+10", Lang.PROGRAM.MANUAL_PROMPT)
-	AppSelect.Add("Button", "x+m yp-5", Lang.PROGRAM.SELECT_EXE, AppSelect.SelectFile.Bind(AppSelect))
+	AppSelect.Add("Button", "", LANG.PROGRAM.SELECT_WIN, AppSelect.WinSelect.Bind(AppSelect))
+	AppSelect.Add("Button", "x+m yp", Lang.PROGRAM.SELECT_EXE, AppSelect.SelectFile.Bind(AppSelect))
 	
 	IL := new Gui.ImageList
 	AppSelect.IL := IL
