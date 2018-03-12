@@ -63,20 +63,8 @@
 			this.Msg(0xC0000)
 		}
 		
-		VolUp() {
-			this.MenuItem("Playback", "Volume Up")
-		}
-		
-		VolDown() {
-			this.MenuItem("Playback", "Volume Down")
-		}
-		
 		Msg(Msg) {
-			PostMessage, 0x319,, % Msg,, ahk_class SpotifyMainWindow ; 0x319 = WM_APPCOMMAND
-		}
-		
-		MenuItem(Top, Sub) {
-			WinMenuSelectItem, ahk_class SpotifyMainWindow, Chrome Legacy Window, % Top, % Sub
+			PostMessage, 0x319,, % Msg,, ahk_exe Spotify.exe ; 0x319 = WM_APPCOMMAND
 		}
 	}
 }

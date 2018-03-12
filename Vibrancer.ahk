@@ -13,8 +13,10 @@ CoordMode, ToolTip, Screen
 SetTitleMatchMode 2
 SetWorkingDir % A_ScriptDir
 
+Debug.Clear()
+
 Debug.LogFolder("logs")
-Debug.Timer.Start(1)
+Timer.Start(1)
 
 global Args := []
 Loop %0%
@@ -34,9 +36,9 @@ OnExit("Exit")
 
 global Big, Binder, SetGUI, Plugin ; GUI
 global Settings, Keybinds, GameRules ; JSON
-global Lang, pToken ; other
+global Lang, pToken, NV ; other
 
-global App := {Name: "Vibrancer", Version: [1, 0, 3]}
+global App := {Name: "Vibrancer", Version: [1, 0, 4]}
 App.VersionString := App.Version.1 "." App.Version.2 "." App.Version.3
 
 pToken := Gdip_Startup()
@@ -60,9 +62,6 @@ if GameRules.IsNew() {
 	GameRules.Fill(DefaultGameRules())
 	GameRules.Save(true)
 }
-
-if Settings.Console
-	Debug.Console.Alloc()
 
 p(App.Name " " App.VersionString "`n")
 
@@ -139,7 +138,7 @@ PluginsLaunched() {
 		}
 	}
 	
-	p("Startup time: " Debug.Timer.Stop(1) "s")
+	p("Startup time: " Timer.Stop(1) "s")
 }
 
 TrayTip(Title, Msg := "") {

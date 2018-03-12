@@ -13,8 +13,6 @@
 	Enable(Process) {
 		Event("RulesEnable", Process, Info := GameRules[Process])
 		
-		p("Rules.Enable: " Process)
-		
 		this.Enabled := true
 		this.Process := Process
 		
@@ -40,19 +38,30 @@
 	
 	Vib(Vibrancy, Screen := 1) {
 		Event("Vibrancing", {Vibrancy: Vibrancy, Screen: Screen})
-		if !Settings.NvAPI_InitFail {
-			Result := NvAPI.SetDVCLevelEx(Vibrancy, Screen - 1)
+		try {
+			if !Settings.NvAPI_InitFail
+				if ((Result := NV.SetDVCLevelEx(Vibrancy, Screen - 1)) != Vibrancy)
+					throw Exception("SetDVCLevelEx call failed", -1, "ErrorMessage:`n" Result "`n`nVibrancy: " Vibrancy "`nScreen: " Screen)			
+		} catch e {
+			Debug.Log(e)
+			return true
 		}
 	}
 	
 	VibSelected(Vibrancy) {
 		for Index, Screen in Settings.VibrancyScreens
-			this.Vib(Vibrancy, Screen)
+			if this.Vib(Vibrancy, Screen) {
+				TrayTip("Vibrancer couldn't apply vibrancy.", "Try running program as administrator.`nA lot has been saved to the logs folder.")
+				return
+			}
 	}
 	
 	VibAll(Vibrancy) {
 		Loop % SysGet("MonitorCount")
-			this.Vib(Vibrancy, A_Index)
+			if this.Vib(Vibrancy, A_Index) {
+				TrayTip("Vibrancer couldn't apply vibrancy.", "Try running program as administrator.`nA lot has been saved to the logs folder.")
+				return
+			}
 	}
 	
 	WinChange(wParam, hwnd) {

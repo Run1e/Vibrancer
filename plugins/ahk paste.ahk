@@ -40,7 +40,7 @@ Exit() {
 }
 
 UploadClip() {
-	static EndPoint := "http://p.ahkscript.org/"
+	static EndPoint := "https://p.ahkscript.org/"
 	
 	if !StrLen(clipboard)
 		return TrayTip("Clipboard is empty.")

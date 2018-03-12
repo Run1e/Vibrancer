@@ -1,13 +1,13 @@
 *.exe
 notes.txt
-backup/*
+AHK-Studio Backup/*
 data/*
 logs/*
-lib/backup/*
-lib/plugin/backup/*
+lib/AHK-Studio Backup/*
+lib/plugin/AHK-Studio Backup/*
 Vibrancer/*
 plugins/disabled/*
-plugins/backup/*
+plugins/AHK-Studio Backup/*
 plugins/imgurlib/backup/*
 msvcr100.dll
 plugins/Steam Account Switcher.ahk

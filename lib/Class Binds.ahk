@@ -2,12 +2,9 @@
 	static _init := Binds.Init()
 	
 	Init() {
-		
 		Spotify :=	[ {Desc: "Play/Pause", Class: "Spotify", Func: "PlayPause"}
 					, {Desc: "Next", Class: "Spotify", Func: "Next"}
-					, {Desc: "Previous", Class: "Spotify", Func: "Prev"}
-					, {Desc: "Volume Up", Class: "Spotify", Func: "VolUp"}
-					, {Desc: "Volume Down", Class: "Spotify", Func: "VolDown"}]
+					, {Desc: "Previous", Class: "Spotify", Func: "Prev"}]
 		
 		LaunchApp := 	[ {Desc: "Task Manager", Func: "Run", Param:["Taskmgr"]}
 					, {Desc: "Control Panel", Func: "Run", Param:["control"]}
